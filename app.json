@@ -1,0 +1,57 @@
+{
+  "expo": {
+    "name": "Health Age",
+    "slug": "healthAge",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/healthAge_Icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "splash": {
+      "image": "./assets/images/logo.png",
+      "resizeMode": "center",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "bundleIdentifier": "com.wtt.healthAge",
+      "usesAppleSignIn": true,
+      "supportsTablet": true
+    },
+    "android": {
+      "versionCode": 10,
+      "permissions": [
+        "com.android.vending.BILLING",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ],
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/healthAge_Adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.wtt.healthAge"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-localization",
+      "expo-sqlite",
+      "./expo-plugin.js",
+      [
+        "react-native-iap",
+        {
+          "playBillingVersion": "6.0.1"
+        }
+      ],
+      "expo-build-properties"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "56228a4c-a10a-4334-8404-ae2f77310425"
+      }
+    }
+  }
+}
