@@ -2,7 +2,6 @@ import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import AppNavigator from "./src/navigation/AppNavigator";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { initIAP } from "./src/components/utils/purchase";
 import { SubscriptionProvider } from "./src/context/subScriptionContext";
 import { initDatabase } from "./src/components/utils/database";
 // base plan id : health-age-yearly-premium-package
@@ -20,7 +19,7 @@ const App: React.FC = () => {
       // console.log('Database initialized successfully');
     } catch (error) {
       console.error(`Database initialization failed (attempt ${retryCount + 1}):`, error);
-      
+
       if (retryCount < MAX_RETRIES) {
         console.log(`Retrying database initialization in ${RETRY_DELAY}ms...`);
         setTimeout(() => {
@@ -38,7 +37,7 @@ const App: React.FC = () => {
         <NavigationContainer>
           <SubscriptionProvider>
 
-          <AppNavigator />
+            <AppNavigator />
           </SubscriptionProvider>
         </NavigationContainer>
       </SafeAreaView>

@@ -40,91 +40,118 @@ import { calculateBMIValues } from "../components/utils/BmiCalculation";
 
 type ReportScreenProps = DrawerScreenProps<DrawerParamList, "ReportScreen">;
 
+type HealthTip = {
+  id: number;
+  title: string;
+  description: string;
+  citations_link: string;
+}
 const healthTips = [
   {
     id: 1,
     title: "Rs_1_title",
     description: "Rs_1_desc",
+    citations_link: "https://www.webmd.com/food-recipes/breakfast-lose-weight"
   },
   {
     id: 2,
     title: "Rs_2_title",
     description: "Rs_2_desc",
+    citations_link: "https://pubmed.ncbi.nlm.nih.gov/34144310/"
   },
   {
     id: 3,
     title: "Rs_3_title",
     description: "Rs_3_desc",
+    citations_link: "https://nutritionsource.hsph.harvard.edu/what-should-you-eat/vegetables-and-fruits/"
+
   },
   {
     id: 4,
     title: "Rs_4_title",
     description: "Rs_4_desc",
+    citations_link: "https://www.mayoclinic.org/healthy-lifestyle/nutrition-and-healthy-eating/in-depth/whole-grains/art-20047826"
+
   },
   {
     id: 5,
     title: "Rs_5_title",
     description: "Rs_5_desc",
+    citations_link: "https://adventisthealthstudy.org/studies/AHS-1/findings-nuts"
+
   },
   {
     id: 6,
     title: "Rs_6_title",
     description: "Rs_6_desc",
+    citations_link: "https://www.health.harvard.edu/staying-healthy/whats-the-beef-with-red-meat"
+
   },
   {
     id: 7,
     title: "Rs_7_title",
     description: "Rs_7_desc",
+    citations_link: "https://www.mayoclinic.org/healthy-lifestyle/fitness/in-depth/exercise/art-20048389"
+
   },
   {
     id: 8,
     title: "Rs_8_title",
     description: "Rs_8_desc",
+    citations_link: "https://www.nhlbi.nih.gov/health/educational/lose_wt/index.htm"
+
   },
   {
     id: 9,
     title: "Rs_9_title",
     description: "Rs_9_desc",
+    citations_link: "https://www.nhlbi.nih.gov/health/sleep/why-sleep-important"
+
   },
   {
     id: 10,
     title: "Rs_10_title",
     description: "Rs_10_desc",
+    citations_link: "https://www.cdc.gov/tobacco/about/benefits-of-quitting.html"
+
   },
   {
     id: 11,
     title: "Rs_11_title",
     description: "Rs_11_desc",
+    citations_link: "https://www.who.int/europe/news/item/04-01-2023-no-level-of-alcohol-consumption-is-safe-for-our-health"
+
   },
   {
     id: 12,
     title: "Rs_12_title",
     description: "Rs_12_desc",
+    citations_link: "https://hsph.harvard.edu/news/more-spirituality-in-health-system-could-boost-health-well-being/"
   },
 ];
 const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
   const { t } = useTranslation();
-    React.useEffect(() => {
-      const backAction = () => {
-        navigation.navigate("Main");
-        return true; // Prevent default back action
-      };
-  
-      const backHandler = BackHandler.addEventListener(
-        "hardwareBackPress",
-        backAction
-      );
-  
-      return () => backHandler.remove();
-    }, []);
+  React.useEffect(() => {
+    const backAction = () => {
+      navigation.navigate("Main");
+      return true; // Prevent default back action
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, []);
   const { answers } = route?.params;
   const { healthAge, potentialAge } = route?.params?.reportData;
 
   const userName = route?.params?.reportData?.name
     ? route.params.reportData.name
-        .split(" ")
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(" ")
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ")
     : "NA";
   // const totalScore = route?.params?.totalScore || "NA";
   const userGender = route?.params?.reportData?.gender;
@@ -202,10 +229,10 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
     route.params.reportData.selectedGlucoseUnit == "mg/dL"
       ? parseInt(route.params.reportData.bloodGlucose_mg)
       : parseInt(
-          route.params.reportData.bloodGlucose_mmol +
-            "." +
-            route.params.reportData.blood_glucose_mmol_points
-        ),
+        route.params.reportData.bloodGlucose_mmol +
+        "." +
+        route.params.reportData.blood_glucose_mmol_points
+      ),
     route.params.reportData.selectedGlucoseUnit == "mg/dL" ? "mg/dL" : "mmol/L",
     route.params.reportData.fasting,
     parseInt(route.params.reportData.age)
@@ -222,6 +249,8 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
         bloodGlucoseStatus == "low"
           ? "maintainLowBloodGlucoseDesc"
           : "maintainHighBloodGlucoseDesc",
+      citations_link: "https://www.heart.org/en/healthy-living/healthy-lifestyle/lifes-essential-8/how-to-manage-blood-sugar-fact-sheet"
+
     },
     {
       id: 14,
@@ -230,6 +259,8 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
         bloodPressureStatus == "low"
           ? "maintainLowBloodPressureDesc"
           : "maintainHighBloodPressureDesc",
+      citations_link: "https://www.heart.org/en/health-topics/high-blood-pressure/changes-you-can-make-to-manage-high-blood-pressure"
+
     },
   ];
   const recommendations = answers
@@ -271,10 +302,10 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
     )
     .join("");
 
-    console.log(route.params.reportData.heightValue,"height value in report screen");
-    
+  console.log(route.params.reportData.heightValue, "height value in report screen");
+
   const SharePDF = async () => {
-    const htmlContent =  `
+    const htmlContent = `
     <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -398,22 +429,22 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
     
         <div class="container">
           <div class="header"><p class="text-p">${t(
-            "Rs_CustomizedReport"
-          )}</p><br><strong>${userName}</strong>
+      "Rs_CustomizedReport"
+    )}</p><br><strong>${userName}</strong>
               <div class="separator"></div>
               <div class="user-info">
                 <div ><p class="text-p">${t(
-                  "gender"
-                )}: </p><br><strong>${userGender}</strong></div>
+      "gender"
+    )}: </p><br><strong>${userGender}</strong></div>
                 <div><p class="text-p">${t(
-                  "age"
-                )}: </p><br><strong>${userAge}</strong></div>
+      "age"
+    )}: </p><br><strong>${userAge}</strong></div>
                 <div><p class="text-p">${t(
-                  "height"
-                )}: </p><br><strong>${userHeight}</strong></div>
+      "height"
+    )}: </p><br><strong>${userHeight}</strong></div>
                   <div><p class="text-p">${t(
-                    "weight"
-                  )}: </p><br><strong>${userWeight}</strong></div>
+      "weight"
+    )}: </p><br><strong>${userWeight}</strong></div>
             </div>
           </div>
   <div class="age-numbers">
@@ -424,11 +455,11 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
       "BloodGlucose"
     )}</p></div>
                     <div class="age-box">${calculateBMIValues(
-                      parseInt(route.params.reportData.weightValue),
-                      route.params.reportData.selectedWeightUnit,
-                      route.params.reportData.heightValue,
-                      route.params.reportData.selectedHeightUnit
-                    )} <br><p class="text-p">${t(
+      parseInt(route.params.reportData.weightValue),
+      route.params.reportData.selectedWeightUnit,
+      route.params.reportData.heightValue,
+      route.params.reportData.selectedHeightUnit
+    )} <br><p class="text-p">${t(
       "BMI"
     )}</p></div>
                 </div>
@@ -507,7 +538,7 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
 
   const print = async () => {
     // On iOS/android prints the given html. On web prints the HTML from the current page.
-  
+
   };
 
   // const SharePDFIOS = async () => {
@@ -611,7 +642,7 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
   //       border-color: white;
   //       border-style: solid; 
   //   }
-    
+
   //         .check-icon-container {
   //         width:40px;
   //         }
@@ -627,12 +658,12 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
   //               font-size: 14px;
   //               margin-right: 10px;
   //           }
-      
-    
+
+
   //       </style>
   //   </head>
   //   <body>
-    
+
   //       <div class="container">
   //         <div class="header"><p class="text-p">${t(
   //           "Rs_CustomizedReport"
@@ -685,7 +716,7 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
   //   )}</p></div>
   //               </div>
   //           </div>
-    
+
   //           <p style="margin-top: 15px; font-size: 13px;">
   //               ${t("Rs_HealthyHabitsParagraph")}</p>
   //           <div class="recommendations">
@@ -710,7 +741,7 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
   // };
 
   const selectPrinter = async () => {
-  
+
   };
   // const SharePDFIOS = async () => {
   //   const htmlContent = `
@@ -804,7 +835,7 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
   //               </div>
   //             </div>
   //           </div>
-  
+
   //           <div class="age-numbers">
   //             <div class="age-box">
   //               ${bloodPressure} <br><p>${t("BloodPressure")}</p>
@@ -816,7 +847,7 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
   //               ${calculateBMIValues(parseInt(route.params.reportData.weightValue), route.params.reportData.selectedWeightUnit, parseInt(route.params.reportData.heightValue), route.params.reportData.selectedHeightUnit)} <br><p>${t("BMI")}</p>
   //             </div>
   //           </div>
-  
+
   //           <div class="health-age">
   //             <p>${t("Rs_YourHealthAge")} <strong>${healthAge}</strong> vs ${t("Rs_YourActualAge")} <strong>${userAge}</strong></p>
   //             <div class="age-numbers">
@@ -831,14 +862,14 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
   //               </div>
   //             </div>
   //           </div>
-  
+
   //           <p>${t("Rs_HealthyHabitsParagraph")}</p>
-  
+
   //           <div class="recommendations">
   //             <h3>${t("Rs_Recommendations")}</h3>
   //             ${generateRecommendationsHTML}
   //           </div>
-  
+
   //           <div class="last-div">
   //             <p>This PDF is Generated by Health Age app</p>
   //           </div>
@@ -846,7 +877,7 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
   //       </body>
   //     </html>
   //   ` 
-  
+
   //   try {
   //     // Generate PDF
   //     const options = {
@@ -856,24 +887,24 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
   //     };
   //     const pdf = await RNHTMLtoPDF.convert(options);
   //     console.log("Generated PDF:", pdf.filePath);
-  
+
   //     if (!pdf.filePath) {
   //       throw new Error(t("Error"));
   //     }
-  
+
   //     // Define destination path in the Downloads folder (Public Storage)
   //     const newPdfPath = FileSystem.documentDirectory + `${userName}_health_Report.pdf`;
-  
+
   //     // Read the file as base64
   //     const base64Pdf = await RNFS.readFile(pdf.filePath, "base64");
-  
+
   //     // Write it to FileSystem.documentDirectory
   //     await FileSystem.writeAsStringAsync(newPdfPath, base64Pdf, {
   //       encoding: FileSystem.EncodingType.Base64,
   //     });
-  
+
   //     console.log("PDF saved at:", newPdfPath);
-  
+
   //     // Share the PDF
   //     if (await Sharing.isAvailableAsync()) {
   //       await Sharing.shareAsync(newPdfPath);
@@ -885,7 +916,7 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
   //     alert(t("Error"));
   //   }
   // };
-  
+
   const downloadPDF = async () => {
     const htmlContent = `
     <html lang="en">
@@ -1007,22 +1038,22 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
     
         <div class="container">
           <div class="header"><p class="text-p">${t(
-            "Rs_CustomizedReport"
-          )}</p><br><strong>${userName}</strong>
+      "Rs_CustomizedReport"
+    )}</p><br><strong>${userName}</strong>
               <div class="separator"></div>
               <div class="user-info">
                 <div ><p class="text-p">${t(
-                  "gender"
-                )}: </p><br><strong>${userGender}</strong></div>
+      "gender"
+    )}: </p><br><strong>${userGender}</strong></div>
                 <div><p class="text-p">${t(
-                  "age"
-                )}: </p><br><strong>${userAge}</strong></div>
+      "age"
+    )}: </p><br><strong>${userAge}</strong></div>
                 <div><p class="text-p">${t(
-                  "height"
-                )}: </p><br><strong>${userHeight}</strong></div>
+      "height"
+    )}: </p><br><strong>${userHeight}</strong></div>
                   <div><p class="text-p">${t(
-                    "weight"
-                  )}: </p><br><strong>${userWeight}</strong></div>
+      "weight"
+    )}: </p><br><strong>${userWeight}</strong></div>
             </div>
           </div>
 
@@ -1055,47 +1086,47 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
     </html>
         `;
 
-        try {
-          // ✅ 1. Generate PDF
-          const options = {
-            html: htmlContent,
-            fileName: `${userName}_health_Report`, // no .pdf extension
-            directory: "Documents", // or "cache"
-          };
-      
-          const pdf = await RNHTMLtoPDF.convert(options);
-          const tempPath = pdf.filePath;
-    
-          if (!tempPath) throw new Error("PDF generation failed.");
-    
-          // 2. Move to Expo-accessible location
-          const newPath = FileSystem.documentDirectory + "Health_Report.pdf";
-          await FileSystem.copyAsync({
-            from: tempPath,
-            to: newPath,
-          });
-    
-          if (Platform.OS === "android") {
-            const { status } = await MediaLibrary.requestPermissionsAsync();
-            if (status !== "granted") {
-              Alert.alert("Permission denied", "Storage access required.");
-              return;
-            }
-    
-            const asset = await MediaLibrary.createAssetAsync(newPath);
-            await MediaLibrary.createAlbumAsync("Download", asset, false);
-            Alert.alert("Success", "PDF saved to Downloads folder!");
-          } else {
-            // iOS - share sheet
-            await Sharing.shareAsync(newPath, {
-              mimeType: "application/pdf",
-              dialogTitle: "Share Health Report",
-            });
-          }
-        }   catch (error) {
-          console.error("Error downloading PDF:", error);
-          Alert.alert("Error", "Failed to download PDF");
+    try {
+      // ✅ 1. Generate PDF
+      const options = {
+        html: htmlContent,
+        fileName: `${userName}_health_Report`, // no .pdf extension
+        directory: "Documents", // or "cache"
+      };
+
+      const pdf = await RNHTMLtoPDF.convert(options);
+      const tempPath = pdf.filePath;
+
+      if (!tempPath) throw new Error("PDF generation failed.");
+
+      // 2. Move to Expo-accessible location
+      const newPath = FileSystem.documentDirectory + "Health_Report.pdf";
+      await FileSystem.copyAsync({
+        from: tempPath,
+        to: newPath,
+      });
+
+      if (Platform.OS === "android") {
+        const { status } = await MediaLibrary.requestPermissionsAsync();
+        if (status !== "granted") {
+          Alert.alert("Permission denied", "Storage access required.");
+          return;
+        }
+
+        const asset = await MediaLibrary.createAssetAsync(newPath);
+        await MediaLibrary.createAlbumAsync("Download", asset, false);
+        Alert.alert("Success", "PDF saved to Downloads folder!");
+      } else {
+        // iOS - share sheet
+        await Sharing.shareAsync(newPath, {
+          mimeType: "application/pdf",
+          dialogTitle: "Share Health Report",
+        });
       }
+    } catch (error) {
+      console.error("Error downloading PDF:", error);
+      Alert.alert("Error", "Failed to download PDF");
+    }
   };
 
   const saveToDownloads = async (pdfUri: string) => {
@@ -1104,17 +1135,17 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
       copyToCacheDirectory: false,
       multiple: false,
       mode: 'save', // 👈 This enables "save" mode (Expo 47+)
-  });
-    console.log(result,"doc picker log");
-    
+    });
+    console.log(result, "doc picker log");
+
     // if (result.type === 'success') {
-        await FileSystem.copyAsync({
-            from: pdfUri,
-            to: result.assets?.[0].uri,
-        });
-        Alert.alert("Saved!", "PDF downloaded successfully.");
+    await FileSystem.copyAsync({
+      from: pdfUri,
+      to: result.assets?.[0].uri,
+    });
+    Alert.alert("Saved!", "PDF downloaded successfully.");
     // }
-};
+  };
 
   React.useEffect(() => {
     const backAction = () => {
@@ -1192,46 +1223,46 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
           </View>
         </LinearGradient>
         <View style={[styles.ageNumbers, { ...{ marginTop: 10 } }]}>
-            <View
-              style={[styles.ageBox, { ...{ backgroundColor: "#C8E0E8" } }]}
-            >
-              <Font
-                text={bloodPressure}
-                style={{ fontSize: 20, color: "#194959" }}
-              ></Font>
-              <Font
-                text={"BloodPressure"}
-                style={{ fontSize: 12, color: "#194959" }}
-              ></Font>
-            </View>
-            <View style={[styles.ageBox, styles.healthAgeBox]}>
-              <Font
-                text={bloodGlucose}
-                style={{ fontSize: 20, color: "#194959" }}
-              ></Font>
-              <Font
-                text={"BloodGlucose"}
-                style={{ fontSize: 12, color: "#194959" }}
-              ></Font>
-            </View>
-            <View style={styles.ageBox}>
-              <Font
-                text={`${calculateBMIValues(
-                  parseInt(route.params.reportData.weightValue),
-                  route.params.reportData.selectedWeightUnit,
-                  route.params.reportData.heightValue,
-                  route.params.reportData.selectedHeightUnit
-                )}`}
-                style={{ fontSize: 20, color: "#194959" }}
-              ></Font>
-              <Font
-                text={"BMI"}
-                style={{ fontSize: 12, color: "#194959" }}
-              ></Font>
-            </View>
+          <View
+            style={[styles.ageBox, { ...{ backgroundColor: "#C8E0E8" } }]}
+          >
+            <Font
+              text={bloodPressure}
+              style={{ fontSize: 20, color: "#194959" }}
+            ></Font>
+            <Font
+              text={"BloodPressure"}
+              style={{ fontSize: 12, color: "#194959" }}
+            ></Font>
           </View>
+          <View style={[styles.ageBox, styles.healthAgeBox]}>
+            <Font
+              text={bloodGlucose}
+              style={{ fontSize: 20, color: "#194959" }}
+            ></Font>
+            <Font
+              text={"BloodGlucose"}
+              style={{ fontSize: 12, color: "#194959" }}
+            ></Font>
+          </View>
+          <View style={styles.ageBox}>
+            <Font
+              text={`${calculateBMIValues(
+                parseInt(route.params.reportData.weightValue),
+                route.params.reportData.selectedWeightUnit,
+                route.params.reportData.heightValue,
+                route.params.reportData.selectedHeightUnit
+              )}`}
+              style={{ fontSize: 20, color: "#194959" }}
+            ></Font>
+            <Font
+              text={"BMI"}
+              style={{ fontSize: 12, color: "#194959" }}
+            ></Font>
+          </View>
+        </View>
         <View style={styles.healthAge}>
-          
+
           <View
             style={{
               flexDirection: "row",
@@ -1289,32 +1320,38 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
           <Font text="Rs_Recommendations" style={styles.sectionTitle}></Font>
           {recommendations.length > 0 ? (
             recommendations.map((rec, index) => (
-              <View key={index} style={styles.recommendation}>
-                <View style={styles.checkIcon}>
-                  <Text style={styles.checkText}>✔</Text>
+              <View key={index} style={styles.recommendationCard}>
+                <View style={styles.iconsContainer}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      const url = rec?.citations_link || ''
+                      try {
+                        const Linking = require('react-native').Linking;
+                        Linking.openURL(url);
+                      } catch (e) { }
+                    }}
+                    style={styles.citationButton}
+                    accessibilityLabel="Citation information"
+                  >
+                    <Text style={styles.citationIcon}>i</Text>
+                  </TouchableOpacity>
                 </View>
-                <View style={{ paddingHorizontal: 10 }}>
-                  <Font
-                    text={rec?.title}
-                    style={{ fontSize: 14, fontWeight: "bold" }}
-                  ></Font>
-                  <Font text={rec?.description}></Font>
+                <View style={styles.recommendationTextContainer}>
+                  <View style={styles.recommendationHeader}>
+                    <View style={styles.checkIcon}>
+                      <Text style={styles.checkText}>✔</Text>
+                    </View>
+                    <Font
+                      text={rec?.title}
+                      style={styles.recommendationTitle}
+                    />
+                  </View>
+                  <Font text={rec?.description} style={styles.recommendationDesc} />
                 </View>
               </View>
             ))
           ) : (
             <></>
-            // <View style={styles.recommendation}>
-            //   <View style={styles.checkIcon}>
-            //     <Text style={styles.checkText}>✔</Text>
-            //   </View>
-            //   <View style={{ paddingHorizontal: 10 }}>
-            //     <Font
-            //       text="There are no Recommendations for you follow the same healthy lifestyle"
-            //       style={{ fontSize: 14, fontWeight: "bold" }}
-            //     ></Font>
-            //   </View>
-            // </View>
           )}
         </View>
       </ScrollView>
@@ -1334,11 +1371,11 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
             onPress={downloadPDF}
             style={{ padding: 10 }}
           ></Button> */}
-      
+
         <Button
           title="Rs_ShareReport"
           // onPress={()=> Platform.OS=="ios" ? SharePDFIOS() : SharePDF()}
-          onPress={()=>  SharePDF()}
+          onPress={() => SharePDF()}
           style={{ padding: 10 }}
         ></Button>
       </View>
@@ -1439,22 +1476,84 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 10,
   },
-  recommendation: {
+  recommendationCard: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#EEF3F7",
-    padding: 10,
-    borderRadius: 20,
-    marginBottom: 10,
+    paddingVertical: 16,
+    paddingHorizontal: 14,
+    borderRadius: 18,
+    marginBottom: 16,
+    flexWrap: 'wrap',
+    width: '100%',
+    minHeight: 60,
+    maxWidth: '100%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  recommendationTextContainer: {
+    flex: 1,
+    flexDirection: 'column',
+    flexWrap: 'wrap',
+    paddingLeft: 12,
+    minWidth: 0,
+    maxWidth: '100%',
+    justifyContent: 'center',
+  },
+  recommendationHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 2,
+    width: '100%',
+    gap: 6,
+  },
+  recommendationTitle: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    flex: 1,
+    flexWrap: 'wrap',
+    color: '#222',
+    marginRight: 6,
+  },
+  citationButton: {
+    padding: 4,
+    marginLeft: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 12,
+    backgroundColor: '#e3f1fa',
+    width: 22,
+    height: 22,
+  },
+  citationIcon: {
+    fontSize: 14,
+    color: '#0B9FD5',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    lineHeight: 16,
+  },
+  recommendationDesc: {
+    flexWrap: 'wrap',
+    flexShrink: 1,
+    width: '100%',
+    fontSize: 14,
+    color: '#333',
+    marginTop: 6,
+    lineHeight: 20,
   },
   checkIcon: {
-    width: 20,
-    height: 20,
+    width: 24,
+    height: 24,
     backgroundColor: "#4caf50",
-    borderRadius: 50,
+    borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 10,
+    alignSelf: 'center',
+    flexShrink: 0,
   },
   checkText: {
     color: "white",
@@ -1466,4 +1565,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "300",
   },
+  iconsContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    width: '100%',
+    paddingHorizontal: 10,
+    justifyContent: 'flex-end',
+  }
 });
