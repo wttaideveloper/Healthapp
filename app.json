@@ -38,18 +38,11 @@
     "plugins": [
       "expo-localization",
       "expo-sqlite",
-      "./expo-plugin.js",
-      [
-        "react-native-iap",
-        {
-          "playBillingVersion": "6.0.1"
-        }
-      ],
       "expo-build-properties"
     ],
     "extra": {
       "eas": {
-        "projectId": "fb2caa7f-7051-4756-827b-10066145da1c"
+        "projectId": "3684707d-6c10-4127-9a5d-39b86daccc93"
       }
     }
   }

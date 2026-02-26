@@ -11,28 +11,15 @@ import { DrawerContentComponentProps } from "@react-navigation/drawer";
 import { icons } from "./images";
 import Font from "./CustomisedFont";
 import UpgradeModal from "./upgradeModal";
-import { verifySubscriptionStatus } from "./utils/purchase";
 import { useSubscription } from "../context/subScriptionContext";
+import { useAuth } from "../context/authContext";
 
 export const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (
   props
 ) => {
-  const [isValid, setIsValid] = React.useState<boolean | null>(null);
-  const { isSubscribed, autoRenewing, refreshSubscription } = useSubscription();
-
-  React.useEffect(() => {
-    SubscriptionCheck();
-  });
-  const SubscriptionCheck = () => {
-    if (isSubscribed && autoRenewing) {
-      setIsValid(true);
-    } else if (isSubscribed && !autoRenewing) {
-      setIsValid(true);
-    } else {
-      setIsValid(false);
-    }
-    // setIsValid(true);
-  };
+  const { isSubscribed } = useSubscription();
+  const { signOut, user } = useAuth();
+  const hasPremium = isSubscribed;
 
   const [showModal, setShowModal] = React.useState(false);
 
@@ -53,20 +40,20 @@ export const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (
           iconKey: "print",
           navigateLocation: "PrintScreen",
           screen: "Questionnaire",
-          pro: !isValid,
+          pro: !hasPremium,
         },
         {
           name: "PrintReport",
           iconKey: "print",
           navigateLocation: "PrintScreen",
           screen: "Report",
-          pro: !isValid,
+          pro: !hasPremium,
         },
         {
           name: "reportSetting",
           iconKey: "report",
           navigateLocation: "ReportSettings",
-          pro: !isValid,
+          pro: !hasPremium,
         },
       ],
     },
@@ -117,13 +104,13 @@ export const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (
                       ]}
                       onPress={() =>
                         ee.navigateLocation == "PrintScreen"
-                          ? isValid
+                          ? hasPremium
                             ? props.navigation.navigate(ee.navigateLocation, {
                                 screen: ee.screen,
                               })
                             : setShowModal(true)
                           : ee.navigateLocation == "ReportSettings"
-                          ? isValid
+                          ? hasPremium
                             ? props.navigation.navigate(ee.navigateLocation)
                             : setShowModal(true)
                           : props.navigation.navigate(ee.navigateLocation)
@@ -168,15 +155,20 @@ export const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (
 
       {/* Footer Section */}
       <View style={styles.drawerFooter}>
+        <TouchableOpacity
+          style={styles.logoutButton}
+          onPress={async () => {
+            await signOut();
+          }}
+        >
+          <Text style={styles.logoutButtonText}>Logout</Text>
+        </TouchableOpacity>
+
         <View style={{ borderRadius: 10, padding: 4 }}>
-          {/* Logout Button */}
-          <TouchableOpacity
-            // style={styles.footerItem}
-            onPress={() => {
-              // Implement logout functionality here
-              // console.log("Logging out...");
-            }}
-          >
+          <View>
+            <Text style={{ color: "white", marginBottom: 6 }}>
+              {user ? `Signed in as ${user.email}` : "Not signed in"}
+            </Text>
             <Text style={{ color: "white" }}>Contact Information</Text>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               {/* <Image source={icons.phone} style={{ width: 15, height: 14 }} /> */}
@@ -189,7 +181,7 @@ export const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (
                 : communitychange@andrews.edu
               </Text>
             </View>
-          </TouchableOpacity>
+          </View>
         </View>
         <View
           style={{
@@ -278,5 +270,20 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     fontSize: 18,
     color: "#ff6347", // Red color for the footer text
+  },
+  logoutButton: {
+    borderWidth: 1,
+    borderColor: "#ffffff",
+    borderRadius: 8,
+    paddingVertical: 10,
+    alignItems: "center",
+    marginHorizontal: 4,
+    marginBottom: 12,
+    backgroundColor: "rgba(255,255,255,0.12)",
+  },
+  logoutButtonText: {
+    color: "#ffffff",
+    fontSize: 15,
+    fontWeight: "600",
   },
 });

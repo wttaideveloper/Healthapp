@@ -1,296 +1,384 @@
-import React from "react";
+// import React, { useEffect, useState } from "react";
+// import {
+//   View,
+//   StyleSheet,
+//   Platform,
+//   Image,
+//   ActivityIndicator,
+//   Alert,
+//   Linking,
+//   Text,
+//   TouchableOpacity,
+//   ScrollView,
+// } from "react-native";
+// import { useFocusEffect } from "@react-navigation/native";
+// import { LinearGradient } from "expo-linear-gradient";
+// import { useTranslation } from "react-i18next";
+// import type { PurchasesPackage } from "react-native-purchases";
+
+// import Button from "../components/Button";
+// import Font from "../components/CustomisedFont";
+// import { icons } from "../components/images";
+// import { useSubscription } from "../context/subScriptionContext";
+// import {
+//   getSubscriptions,
+//   initIAP,
+//   purchaseSubscription,
+// } from "../components/utils/purchase";
+
+// // Using Apple's Standard EULA and Privacy Policy as placeholders
+// const TERMS_OF_USE_URL = "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/";
+// const PRIVACY_POLICY_URL = "https://www.apple.com/legal/privacy/";
+
+// const PurchaseScreen: React.FC = () => {
+//   const {
+//     isSubscribed,
+//     refreshSubscription,
+//     setDebugSubscriptionOverride,
+//     debugSubscriptionOverride,
+//   } = useSubscription();
+//   const { t } = useTranslation();
+
+//   const [subscriptions, setSubscriptions] = useState<PurchasesPackage[]>([]);
+//   const [isLoading, setIsLoading] = useState(true);
+//   const [actionLoading, setActionLoading] = useState(false);
+
+//   const loadOfferings = async (): Promise<void> => {
+//     const subs = await getSubscriptions();
+//     setSubscriptions(subs);
+//   };
+
+//   useEffect(() => {
+//     const setup = async () => {
+//       await initIAP();
+//       await loadOfferings();
+//     };
+//     setup();
+//   }, []);
+
+//   const openLegalLink = async (url: string) => {
+//     try {
+//       const supported = await Linking.canOpenURL(url);
+//       if (supported) {
+//         await Linking.openURL(url);
+//       } else {
+//         Alert.alert(t("Error"), "Unable to open link");
+//       }
+//     } catch (error) {
+//       console.error("Failed to open legal link:", error);
+//     }
+//   };
+
+//   // Fixed FocusEffect to prevent infinite loops
+//   useFocusEffect(
+//     React.useCallback(() => {
+//       let isActive = true;
+
+//       const checkSubscription = async () => {
+//         if (actionLoading) return;
+//         setIsLoading(true);
+//         try {
+//           if (isActive) {
+//             await refreshSubscription(true);
+//             await loadOfferings();
+//           }
+//         } catch (error) {
+//           console.error("Subscription refresh failed:", error);
+//         } finally {
+//           if (isActive) setIsLoading(false);
+//         }
+//       };
+
+//       checkSubscription();
+//       return () => { isActive = false; };
+//     }, [])
+//   );
+
+//   const handlePurchase = async () => {
+//     setActionLoading(true);
+//     try {
+//       await purchaseSubscription(subscriptions);
+//       Alert.alert("✅ " + t("UpgradeComplete"), t("NowAProMember"));
+//       await refreshSubscription(true);
+//     } catch (error: unknown) {
+//       const message = error instanceof Error ? error.message : "Purchase failed.";
+//       Alert.alert("❌ " + t("Error"), message);
+//     } finally {
+//       setActionLoading(false);
+//     }
+//   };
+
+//   const handleDevSubscriptionToggle = async () => {
+//     if (actionLoading) return;
+//     setActionLoading(true);
+//     try {
+//       await setDebugSubscriptionOverride(!isSubscribed);
+//     } catch (error) {
+//       console.error("Debug toggle failed:", error);
+//     } finally {
+//       setActionLoading(false);
+//     }
+//   };
+
+//   const benefits = [
+//     { text: "UnlimitedReports" },
+//     { text: "FullReportHistory" },
+//     { text: "PrintYourQuestionnaire" },
+//     { text: "printYourReport" },
+//   ];
+
+//   if (isLoading) {
+//     return (
+//       <View style={styles.loadingContainer}>
+//         <ActivityIndicator size="large" color="#0B9FD4" />
+//       </View>
+//     );
+//   }
+
+//   return (
+//     <View style={{ flex: 1, backgroundColor: "white" }}>
+//       <ScrollView
+//         style={styles.container}
+//         contentContainerStyle={{ paddingBottom: 120 }}
+//       >
+//         {isSubscribed ? (
+//           <View style={styles.proBadgeCard}>
+//             <Font text="NowAProMember" style={styles.proBadgeTitle} />
+//             <Font text="Lifetime Access Enabled" style={styles.proBadgeSub} />
+//           </View>
+//         ) : (
+//           <>
+//             <LinearGradient
+//               start={{ x: 0, y: 1 }}
+//               end={{ x: 1, y: 0 }}
+//               colors={["#ffe0a4", "#ffeebb", "#fee1a1"]}
+//               style={styles.priceCard}
+//             >
+//               <View style={styles.priceTextContainer}>
+//                 <Font
+//                   text={Platform.OS === "ios" ? "$49" : "$39"}
+//                   style={styles.priceValue}
+//                 />
+//                 <Font text="Lifetime Access" style={styles.priceLabel} />
+//               </View>
+//               <Image source={icons.proVersion} style={styles.proIcon} />
+//             </LinearGradient>
+
+//             <View style={styles.headerTextContainer}>
+//               <Font text="goBeyond" style={styles.headerTitle} />
+//               <Font text="JoinPro" style={styles.headerSub} />
+//             </View>
+
+//             <View style={styles.benefitsCard}>
+//               <Font text="WhyJoinPro" style={styles.sectionTitle} />
+//               <View style={styles.divider} />
+//               {benefits.map((val, index) => (
+//                 <View key={index} style={styles.benefitRow}>
+//                   <Image source={icons.tick} style={styles.tickIcon} />
+//                   <Font text={val.text} style={styles.benefitText} />
+//                 </View>
+//               ))}
+
+//               {/* Integrated Legal Section for Guidelines */}
+//               <View style={styles.legalSection}>
+//                 <Text style={styles.disclosureText}>
+//                   One-time purchase for lifetime access. No recurring charges or auto-renewals.
+//                 </Text>
+//                 <View style={styles.linkRow}>
+//                   <TouchableOpacity onPress={() => openLegalLink(TERMS_OF_USE_URL)}>
+//                     <Text style={styles.legalLink}>Terms of Use</Text>
+//                   </TouchableOpacity>
+//                   <Text style={styles.linkSeparator}> • </Text>
+//                   <TouchableOpacity onPress={() => openLegalLink(PRIVACY_POLICY_URL)}>
+//                     <Text style={styles.legalLink}>Privacy Policy</Text>
+//                   </TouchableOpacity>
+//                 </View>
+//               </View>
+//             </View>
+//           </>
+//         )}
+
+//         {__DEV__ && (
+//           <Button
+//             style={{
+//               padding: 10,
+//               marginTop: 12,
+//             }}
+//             title={isSubscribed ? "DEV: Disable Subscription" : "DEV: Enable Subscription"}
+//             onPress={handleDevSubscriptionToggle}
+//             disabled={actionLoading}
+//           />
+//         )}
+//       </ScrollView>
+
+//       {/* Action Button */}
+//       {!isSubscribed && (
+//         <View style={styles.bottomButtonContainer}>
+//           {actionLoading ? (
+//             <ActivityIndicator />
+//           ) : (
+//             <Button
+//               style={{
+//                 padding: 10,
+//                 marginTop: 12,
+//               }}
+//               title="upgrade" onPress={handlePurchase} />
+//           )}
+//         </View>
+//       )}
+//     </View>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   container: { flex: 1, paddingHorizontal: 20, paddingTop: 10 },
+//   loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
+//   priceCard: {
+//     borderRadius: 14,
+//     flexDirection: "row",
+//     borderWidth: 1,
+//     borderColor: "#EAECF1",
+//     justifyContent: "space-evenly",
+//     alignItems: "center",
+//     padding: 15,
+//     marginVertical: 10,
+//   },
+//   priceTextContainer: { alignItems: "center", gap: 5 },
+//   priceValue: { fontSize: 40, fontWeight: "700", color: "#B8751D" },
+//   priceLabel: { fontSize: 14, fontWeight: "600", color: "#B8751D" },
+//   proIcon: { width: 90, height: 90 },
+//   headerTextContainer: { marginVertical: 20, gap: 8, alignItems: "center" },
+//   headerTitle: { color: "#274273", fontWeight: "700", fontSize: 22 },
+//   headerSub: { color: "#274273", fontWeight: "400", fontSize: 14 },
+//   benefitsCard: {
+//     backgroundColor: "#F8FAFB",
+//     borderRadius: 24,
+//     padding: 24,
+//     borderWidth: 1,
+//     borderColor: "#EAECF1",
+//   },
+//   sectionTitle: { color: "#274273", fontWeight: "700", fontSize: 18 },
+//   divider: { height: 1, backgroundColor: "#E6ECF2", marginVertical: 12 },
+//   benefitRow: { flexDirection: "row", alignItems: "center", gap: 12, marginVertical: 6 },
+//   tickIcon: { width: 22, height: 22 },
+//   benefitText: { color: "#274273", fontSize: 15 },
+//   legalSection: { marginTop: 20, paddingTop: 15, borderTopWidth: 1, borderTopColor: "#E6ECF2", alignItems: "center" },
+//   disclosureText: { color: "#7D8699", fontSize: 11, textAlign: "center", marginBottom: 10, lineHeight: 16 },
+//   linkRow: { flexDirection: "row", alignItems: "center" },
+//   legalLink: { color: "#0B9FD4", fontSize: 12, textDecorationLine: "underline", fontWeight: "500" },
+//   linkSeparator: { color: "#7D8699", marginHorizontal: 8 },
+//   bottomButtonContainer: { position: "absolute", bottom: 30, left: 20, right: 20 },
+//   proBadgeCard: { borderRadius: 20, backgroundColor: "#F8FAFB", padding: 25, marginTop: 20, alignItems: "center", borderWidth: 1, borderColor: "#EAECF1" },
+//   proBadgeTitle: { color: "#274273", fontWeight: "700", fontSize: 20 },
+//   proBadgeSub: { color: "#0B9FD4", fontWeight: "600", fontSize: 14, marginTop: 5 },
+// });
+
+// export default PurchaseScreen;
+
+
+import React, { useState } from "react";
 import {
   View,
-  Text,
   StyleSheet,
-  Platform,
-  Image,
   ActivityIndicator,
+  Alert,
+  Text,
+  TouchableOpacity,
+  TextInput,
+  ScrollView,
 } from "react-native";
-import * as RNIap from "react-native-iap";
-import { useEffect, useState } from "react";
-import { Alert } from "react-native";
-import Button from "../components/Button";
-import {
-  cancelSubscription,
-  getSubscriptions,
-  initIAP,
-  itemSkus,
-  purchaseSubscription,
-  restorePurchases,
-  restoreSubscription,
-  verifySubscriptionStatus,
-} from "../components/utils/purchase";
-import { LinearGradient } from "expo-linear-gradient";
-import Font from "../components/CustomisedFont";
-import { icons } from "../components/images";
-import { useTranslation } from "react-i18next";
-import { useSubscription } from "../context/subScriptionContext";
 import { useFocusEffect } from "@react-navigation/native";
 
-// Define product IDs (same as those set in Google Play/App Store)
-// const productIds = ['healthAge_OneTime_Purchase', 'healthAge_Yearly_Subscription'];
+import Button from "../components/Button";
+import Font from "../components/CustomisedFont";
+import { useSubscription } from "../context/subScriptionContext";
+import { useAuth } from "../context/authContext";
+import { activateLicenseKey } from "../components/utils/purchase";
+
+const TERMS_OF_USE_URL = "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/";
+const PRIVACY_POLICY_URL = "https://www.apple.com/legal/privacy/";
 
 const PurchaseScreen: React.FC = () => {
-  const { isSubscribed, autoRenewing, expiryDate, refreshSubscription } =
-    useSubscription();
-  const remainingDays = Math.ceil(
-    (expiryDate - new Date()) / (1000 * 60 * 60 * 24)
-  );
-
-  const SubscriptionButton = () => {
-    if (isSubscribed && autoRenewing) {
-      return (
-        <View
-          style={{
-            gap: 10,
-            padding: 20,
-            marginTop: 40,
-            position: "absolute",
-            bottom: 20,
-            left: 0,
-            right: 0,
-          }}
-        >
-          <Font
-            text="NowAProMember"
-            style={{ color: "#262F40", textAlign: "center" }}
-          ></Font>
-          {actionLoading ? (
-            <View style={{ padding: 10 }}>
-              <ActivityIndicator />
-            </View>
-          ) : (
-            <Button
-              style={{
-                padding: 10,
-              }}
-              // title="cancelSub"
-              title="cancelSub"
-              onPress={handleCancel}
-              disabled={actionLoading}
-            />
-          )}
-        </View>
-      );
-    } else if (isSubscribed && !autoRenewing) {
-      return (
-        <>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Font
-              text={"SubDaysRemaining"}
-              style={{ color: "#262F40", textAlign: "center" }}
-            ></Font>
-            <Font
-              text={" " + `${remainingDays}`}
-              style={{
-                color: remainingDays < 3 ? "red" : "#262F40",
-                textAlign: "center",
-              }}
-            ></Font>
-          </View>
-          {actionLoading ? (
-            <View style={{ padding: 10 }}>
-              <ActivityIndicator />
-            </View>
-          ) : (
-            <Button
-              title="RenewSub"
-              style={{
-                padding: 10,
-                marginTop: 40,
-                position: "absolute",
-                bottom: 20,
-                left: 0,
-                right: 0,
-              }}
-              onPress={handleRenew}
-              disabled={actionLoading}
-            />
-          )}
-        </>
-      );
-    } else {
-      return (
-        <>
-          {actionLoading ? (
-            <View style={{ padding: 10 }}>
-              <ActivityIndicator />
-            </View>
-          ) : (
-            <Button
-              style={{
-                padding: 10,
-                marginTop: 40,
-                position: "absolute",
-                bottom: 20,
-                left: 0,
-                right: 0,
-              }}
-              title="upgrade"
-              onPress={handlePurchase}
-              disabled={actionLoading}
-            />
-          )}
-        </>
-      );
-    }
-  };
-  console.log(
+  const {
     isSubscribed,
-    autoRenewing,
     refreshSubscription,
-    "isSubscribed, autoRenewing, refreshSubscription "
-  );
+    setDebugSubscriptionOverride,
+  } = useSubscription();
+  const { accessToken } = useAuth();
 
-  const [subscriptions, setSubscriptions] = useState([]);
-  const { t } = useTranslation();
-  useEffect(() => {
-    const setupIAP = async () => {
-      await initIAP();
-      const subs = await getSubscriptions();
-      console.log("subs", subs);
-      setSubscriptions(subs);
-    };
-    setupIAP();
-    // getSubscriptions();
-  }, []);
-
-  // const handlePurchase = async () => {
-  //   try {
-  //     console.log(subscriptions,"subscriptions");
-
-  //     const purchase = await purchaseSubscription(subscriptions);
-  //     let text1 = t("UpgradeComplete");
-  //     let text2 = t("NowAProMember");
-  //     Alert.alert("✅ " + text1, text2);
-  //     refreshSubscription();
-  //   } catch (error: any) {
-  //     Alert.alert("❌ " + t("Error"));
-  //   }
-  // };
-  // const handleRestore = async () => {
-  //   const purchases = await restorePurchases();
-  //   if (purchases.length > 0) {
-  //     refreshSubscription();
-  //     Alert.alert("Restored", "Your subscription is active!");
-  //   } else {
-  //     Alert.alert("No Purchases", "No active subscriptions found.");
-  //   }
-  // };
-
-  const benefits = [
-    { text: "UnlimitedReports" },
-    { text: "FullReportHistory" },
-    { text: "PrintYourQuestionnaire" },
-    { text: "printYourReport" },
-  ];
-
-  const [Subscribed, setSubscribed] = useState(false);
+  const [licenseKey, setLicenseKey] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+  const isInitialMount = React.useRef(true);
 
   useFocusEffect(
-  React.useCallback(() => {
-    const checkSubscription = async () => {
-      setIsLoading(true);
-      try {
-        await initIAP();
+    React.useCallback(() => {
+      let isActive = true;
 
-        // Option 1: Simple check
-        // const { Subscribed } = await checkActiveSubscriptions();
-
-        // Option 2: Verified check (recommended)
-        const { isValid } = await verifySubscriptionStatus();
-
-        setSubscribed(isValid);
-      } catch (error) {
-        console.error("Subscription check failed:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkSubscription();
-
-    // Add purchase listener
-    const purchaseUpdateSubscription = RNIap.purchaseUpdatedListener(
-      async (purchase) => {
-        // Handle new purchases
-        if (purchase.productId === itemSkus[0]) {
-          setSubscribed(true);
-          await RNIap.finishTransaction({ purchase: purchase });
+      const refresh = async () => {
+        // Only show the full-screen loader on the very first mount
+        if (isInitialMount.current) {
+          setIsLoading(true);
         }
-      }
-    );
 
-    return () => {
-      purchaseUpdateSubscription.remove();
-    };
-  }, [])
-);
+        try {
+          if (isActive) {
+            // Pass 'false' if you don't want a hard-fetch every single focus
+            await refreshSubscription(true);
+          }
+        } finally {
+          if (isActive) {
+            setIsLoading(false);
+            isInitialMount.current = false; // Mark initial load as done
+          }
+        }
+      };
 
-  const handleCancel = async () => {
+      refresh();
+      return () => {
+        isActive = false;
+      };
+    }, [refreshSubscription]) // Ensure this is memoized in context!
+  );
+
+  const handleActivateLicense = async () => {
+    if (!accessToken) {
+      Alert.alert("Sign in required", "Please sign in before activating a license key.");
+      return;
+    }
+
+    if (!licenseKey.trim()) {
+      Alert.alert("Missing key", "Please enter your license key.");
+      return;
+    }
+
     setActionLoading(true);
     try {
-      await cancelSubscription();
-      await refreshSubscription();
-    } catch (error: any) {
-      Alert.alert(
-        t("Error"),
-        error?.message ?? "Failed to cancel subscription."
-      );
+      await activateLicenseKey(accessToken, licenseKey);
+      await refreshSubscription(true);
+      Alert.alert("License activated", "Pro features are now enabled.");
+      setLicenseKey("");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to activate license";
+      Alert.alert("Activation failed", message);
     } finally {
       setActionLoading(false);
     }
   };
 
-  // const handleRenew = async () => {
-  //   setActionLoading(true);
-  //   try {
-  //     await restoreSubscription();
-  //     await refreshSubscription();
-  //   } catch (error: any) {
-  //     Alert.alert(
-  //       t("Error"),
-  //       error?.message ?? "Failed to renew subscription."
-  //     );
-  //   } finally {
-  //     setActionLoading(false);
-  //   }
-  // };
+  const handleDevSubscriptionToggle = async () => {
+    if (!__DEV__ || actionLoading) return;
 
-  const handleRenew = async () => {
-  setActionLoading(true);
-  try {
-    // In testing: Just try to purchase again
-    const purchase = await purchaseSubscription(subscriptions);
-    Alert.alert("✅ " + t("SubscriptionRenewed"), t("NowAProMember"));
-    await refreshSubscription();
-  } catch (error: any) {
-    Alert.alert(
-      t("Error"),
-      error?.message ?? "Failed to renew subscription."
-    );
-  } finally {
-    setActionLoading(false);
-  }
-};
-
-  const handlePurchase = async () => {
     setActionLoading(true);
     try {
-      const purchase = await purchaseSubscription(subscriptions);
-      Alert.alert("✅ " + t("UpgradeComplete"), t("NowAProMember"));
-      await refreshSubscription();
-    } catch (error: any) {
-      Alert.alert("❌ " + t("Error"), error?.message ?? "Purchase failed.");
+      // Logic: Toggle current state
+      await setDebugSubscriptionOverride(!isSubscribed);
+
+      // IMPORTANT: Don't call refreshSubscription(true) here manually 
+      // if your context already updates the local 'isSubscribed' state, 
+      // as it triggers a double render.
+    } catch (e) {
+      Alert.alert("Dev Error", "Failed to toggle");
     } finally {
       setActionLoading(false);
     }
@@ -298,156 +386,131 @@ const PurchaseScreen: React.FC = () => {
 
   if (isLoading) {
     return (
-      <View style={{ padding: 10 }}>
-        <ActivityIndicator />
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0B9FD4" />
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <LinearGradient
-        start={{ x: 0, y: 1 }}
-        end={{ x: 1, y: 0 }}
-        colors={["#ffe0a4", "#ffeebb", "#fee1a1"]}
-        style={[
-          {
-            // Border thickness
-            borderRadius: 14,
-            flexDirection: "row",
-            // flex: 1,
-            borderWidth: 1,
-            borderColor: "#EAECF1",
-            // justifyContent: "center",
-            justifyContent: "space-evenly",
-            alignItems: "center",
-            padding: 10,
-            marginVertical: 10,
-          },
-        ]}
-      >
-        <View
-          style={{
-            flexDirection: "column",
-            gap: 20,
-            alignItems: "center",
-            // backgroundColor: "red",
-          }}
-        >
-          <Font
-            text={Platform.OS === "ios" ? "$49" : "$39"}
-            style={{ fontSize: 40, fontWeight: 600, color: "#B8751D" }}
-          ></Font>
-          <Font
-            text="yearlyPurchase"
-            style={{ fontSize: 12, fontWeight: 500, color: "#B8751D" }}
-          ></Font>
-        </View>
-        <Image
-          source={icons.proVersion}
-          style={{ width: 105, height: 100 }}
-        ></Image>
-      </LinearGradient>
-      <View
-        style={{
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          marginVertical: 20,
-          gap: 10,
-        }}
-      >
-        <Font
-          text="goBeyond"
-          style={{
-            color: "#274273",
-            fontWeight: 700,
-            fontSize: 20,
-            textAlign: "center",
-          }}
-        ></Font>
-        <Font
-          text="JoinPro"
-          style={{
-            color: "#274273",
-            fontWeight: 400,
-            fontSize: 14,
-            textAlign: "center",
-          }}
-        ></Font>
-      </View>
-      <View
-        style={{
-          flexDirection: "column",
-          // alignItems: "center",
-          // justifyContent: "center",
-          marginVertical: 10,
-          gap: 10,
-          backgroundColor: "#F8FAFB",
-          borderRadius: 24,
-          paddingHorizontal: 24,
-          paddingVertical: 20,
-        }}
-      >
-        <View>
-          <Font
-            text="WhyJoinPro"
-            style={{
-              color: "#274273",
-              fontWeight: 700,
-              fontSize: 20,
-              // textAlign: "center",
-            }}
-          ></Font>
-        </View>
-        <View style={{ borderWidth: 1, borderColor: "#f2f5f9" }}></View>
-        {benefits.map((val, index) => (
-          <View
-            key={index}
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "flex-start",
-              gap: 10,
-              marginVertical: 5,
-            }}
-          >
-            <Image
-              source={icons.tick}
-              style={{ width: 24, height: 24 }}
-            ></Image>
-            <Font
-              text={val.text}
-              style={{
-                color: "#274273",
-                fontWeight: 400,
-                fontSize: 14,
-                textAlign: "center",
-              }}
-            ></Font>
+    <View style={{ flex: 1, backgroundColor: "white" }}>
+      <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 120 }}>
+        {isSubscribed ? (
+          <View style={styles.proBadgeCard}>
+            <Font text="NowAProMember" style={styles.proBadgeTitle} />
+            <Text style={styles.proBadgeSub}>Your license is active and all pro features are unlocked.</Text>
           </View>
-        ))}
-      </View>
-      {SubscriptionButton()}
+        ) : (
+          <View style={styles.licenseCard}>
+            <Text style={styles.licenseTitle}>Activate Pro License</Text>
+            <Text style={styles.licenseSubtitle}>
+              Enter your license key from the backend/admin panel to unlock all premium features.
+            </Text>
+
+            <TextInput
+              style={styles.licenseInput}
+              value={licenseKey}
+              onChangeText={setLicenseKey}
+              placeholder="Enter license key"
+              placeholderTextColor="#8b909b"
+              autoCapitalize="characters"
+            />
+
+            <Button
+              style={{ padding: 10, marginTop: 12 }}
+              title={actionLoading ? "Activating..." : "Activate License"}
+              onPress={handleActivateLicense}
+              disabled={actionLoading}
+            />
+
+            <TouchableOpacity
+              style={{ marginTop: 10, alignItems: "center" }}
+              onPress={() => refreshSubscription(true)}
+              disabled={actionLoading}
+            >
+              <Text style={styles.refreshText}>I already have a license, refresh status</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        <View style={styles.legalSection}>
+          <Text style={styles.disclosureText}>
+            Premium access is controlled by your account license status from our backend.
+          </Text>
+          <Text style={styles.disclosureText}>Terms: {TERMS_OF_USE_URL}</Text>
+          <Text style={styles.disclosureText}>Privacy: {PRIVACY_POLICY_URL}</Text>
+        </View>
+
+        {__DEV__ ? (
+          <Button
+            style={{ padding: 10, marginTop: 12 }}
+            title={isSubscribed ? "DEV: Disable Subscription" : "DEV: Enable Subscription"}
+            onPress={handleDevSubscriptionToggle}
+            disabled={actionLoading}
+          />
+        ) : null}
+      </ScrollView>
+
+      {!isSubscribed && actionLoading ? (
+        <View style={styles.bottomLoaderContainer}>
+          <ActivityIndicator />
+        </View>
+      ) : null}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    // justifyContent: "center",
-    // alignItems: "center",
-    backgroundColor: "white",
-    paddingHorizontal: 20,
+  container: { flex: 1, paddingHorizontal: 20, paddingTop: 10 },
+  loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
+  licenseCard: {
+    backgroundColor: "#F8FAFB",
+    borderRadius: 24,
+    padding: 24,
+    borderWidth: 1,
+    borderColor: "#EAECF1",
+    marginTop: 8,
+  },
+  licenseTitle: { color: "#274273", fontWeight: "700", fontSize: 20 },
+  licenseSubtitle: { color: "#274273", fontSize: 14, marginTop: 8, marginBottom: 12 },
+  licenseInput: {
+    borderWidth: 1,
+    borderColor: "#d8deea",
+    borderRadius: 10,
+    paddingHorizontal: 12,
     paddingVertical: 10,
-    flexDirection: "column",
-    // justifyContent: 'center',
-    // alignItems: 'center',
+    color: "#111827",
+    backgroundColor: "#fbfcfe",
   },
-  text: {
-    fontSize: 24,
+  refreshText: {
+    color: "#1663d6",
+    textDecorationLine: "underline",
+    fontSize: 13,
+    fontWeight: "500",
   },
+  legalSection: {
+    marginTop: 20,
+    paddingTop: 15,
+    borderTopWidth: 1,
+    borderTopColor: "#E6ECF2",
+  },
+  disclosureText: {
+    color: "#7D8699",
+    fontSize: 11,
+    lineHeight: 16,
+  },
+  proBadgeCard: {
+    borderRadius: 20,
+    backgroundColor: "#F8FAFB",
+    padding: 25,
+    marginTop: 20,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#EAECF1",
+  },
+  proBadgeTitle: { color: "#274273", fontWeight: "700", fontSize: 20 },
+  proBadgeSub: { color: "#0B9FD4", fontWeight: "600", fontSize: 14, marginTop: 5, textAlign: "center" },
+  bottomLoaderContainer: { position: "absolute", bottom: 30, left: 20, right: 20 },
 });
 
 export default PurchaseScreen;

@@ -1,41 +1,32 @@
+import { DrawerScreenProps } from "@react-navigation/drawer";
+import * as FileSystem from "expo-file-system";
+import React from "react";
 import {
   Alert,
   BackHandler,
-  FlatList,
   Image,
-  PermissionsAndroid,
+  Linking,
   Platform,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
-import React from "react";
-import Font from "../components/CustomisedFont";
-import ProgressBar from "../components/ProgressBar";
-import { icons } from "../components/images";
-import { DrawerScreenProps } from "@react-navigation/drawer";
-import { DrawerParamList } from "../navigation/DrawerNavigator";
 import Button from "../components/Button";
-import * as FileSystem from "expo-file-system";
+import Font from "../components/CustomisedFont";
+import { icons } from "../components/images";
+import { DrawerParamList } from "../navigation/DrawerNavigator";
 // import * as Print from 'expo-print';
 // import RNBlobUtil from 'react-native-blob-util';
 // import htmlToDocx from 'html-to-docx';
 // import RNFS from "react-native-fs";
 // import Share from "react-native-share";
-import RNHTMLtoPDF from "react-native-html-to-pdf";
-import RNFS from "react-native-fs";
-import * as DocumentPicker from 'expo-document-picker';
 import { LinearGradient } from "expo-linear-gradient";
-import { addReport } from "../components/utils/reportService";
+import * as MediaLibrary from 'expo-media-library';
 import * as Sharing from "expo-sharing";
 import { useTranslation } from "react-i18next";
-import * as MediaLibrary from 'expo-media-library';
-import {
-  checkBloodPressureStatus,
-  checkGlucoseLevel,
-} from "../components/utils/bloodPressure";
+import RNHTMLtoPDF from "react-native-html-to-pdf";
 import { calculateBMIValues } from "../components/utils/BmiCalculation";
 
 type ReportScreenProps = DrawerScreenProps<DrawerParamList, "ReportScreen">;
@@ -46,6 +37,15 @@ type HealthTip = {
   description: string;
   citations_link: string;
 }
+
+const MEDICAL_DISCLAIMER_TEXT =
+  "This report is for educational wellness purposes only and is not medical advice, diagnosis, or treatment. Consult a qualified healthcare professional before making medical decisions.";
+
+const TERMS_OF_USE_URL =
+  "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/";
+const PRIVACY_POLICY_URL =
+  "https://example.com/privacy-policy";
+
 const healthTips = [
   {
     id: 1,
@@ -131,6 +131,20 @@ const healthTips = [
 ];
 const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
   const { t } = useTranslation();
+  const openExternalUrl = async (url: string) => {
+    try {
+      const supported = await Linking.canOpenURL(url);
+      if (!supported) {
+        Alert.alert(t("Error"), "Unable to open link");
+        return;
+      }
+      await Linking.openURL(url);
+    } catch (error) {
+      console.error("Failed to open URL:", error);
+      Alert.alert(t("Error"), "Unable to open link");
+    }
+  };
+
   React.useEffect(() => {
     const backAction = () => {
       navigation.navigate("Main");
@@ -266,7 +280,7 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
   const recommendations = answers
     .filter((answer) => answer.points < 1)
     .map((answer) => healthTips.find((tip) => tip.id === answer.questionId))
-    .filter(Boolean);
+    .filter(Boolean) as HealthTip[];
 
   // Add blood-related recommendations based on status
   // if (bloodPressureStatus !== "normal" && bloodGlucoseStatus!=="normal") {
@@ -289,23 +303,23 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
   console.log(recommendations, "final recommendations");
 
   // Function to download as PDF
-  const generateRecommendationsHTML = (recommendations ?? [])
+  const generateRecommendationsHTML = recommendations
     .map(
       (rec) => `
     <div class="recommendation">
       <div class="check-icon-container">
         <div class="check-icon">✔</div>
       </div>
-      <div><strong>${t(rec!.title)}</strong><br>${t(rec!.description)}</div>
+      <div>
+        <strong>${t(rec.title)}</strong><br>${t(rec.description)}
+        <br><a href="${rec.citations_link}" style="font-size:12px;color:#0B9FD5;">Source</a>
+      </div>
     </div>
   `
     )
     .join("");
 
-  console.log(route.params.reportData.heightValue, "height value in report screen");
-
-  const SharePDF = async () => {
-    const htmlContent = `
+  const reportHtml = `
     <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -318,16 +332,12 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
                 box-sizing: border-box;
                 font-family: Arial, sans-serif;
             }
-            @media print {
             body {
                 background-color: #f5f7fa;
                 display: flex;
                 justify-content: center;
                 padding: 20px;
-                 -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
             }
-  }
             .container {
                 width: 350px;
                 background-color: #fff;
@@ -375,10 +385,10 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
                 font-size: 16px;
                 font-weight: bold;
             }
-          .text-p{
-          font-size: 12px;
-                font-weight: 300;
-          }
+            .text-p{
+              font-size: 12px;
+              font-weight: 300;
+            }
             .age-box:nth-child(2) {
                 background-color: #dff5e7;
             }
@@ -398,17 +408,16 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
                 align-items: center;
                 font-size: 14px;
             }
-          .separator {
-        width: 100%;
-          margin-top:10px;
-        border-width: 1px;  
-        border-color: white;
-        border-style: solid; 
-    }
-    
-          .check-icon-container {
-          width:40px;
-          }
+            .separator {
+              width: 100%;
+              margin-top:10px;
+              border-width: 1px;
+              border-color: white;
+              border-style: solid;
+            }
+            .check-icon-container {
+              width:40px;
+            }
             .check-icon {
                 width: 20px;
                 height: 20px;
@@ -421,76 +430,50 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
                 font-size: 14px;
                 margin-right: 10px;
             }
-      
-    
+            .disclaimer {
+              margin-top: 16px;
+              font-size: 12px;
+              color: #9c1b1b;
+              background: #fff0f0;
+              border-radius: 8px;
+              padding: 10px;
+            }
         </style>
     </head>
     <body>
-    
-        <div class="container">
-          <div class="header"><p class="text-p">${t(
-      "Rs_CustomizedReport"
-    )}</p><br><strong>${userName}</strong>
-              <div class="separator"></div>
-              <div class="user-info">
-                <div ><p class="text-p">${t(
-      "gender"
-    )}: </p><br><strong>${userGender}</strong></div>
-                <div><p class="text-p">${t(
-      "age"
-    )}: </p><br><strong>${userAge}</strong></div>
-                <div><p class="text-p">${t(
-      "height"
-    )}: </p><br><strong>${userHeight}</strong></div>
-                  <div><p class="text-p">${t(
-      "weight"
-    )}: </p><br><strong>${userWeight}</strong></div>
-            </div>
+      <div class="container">
+        <div class="header"><p class="text-p">${t("Rs_CustomizedReport")}</p><br><strong>${userName}</strong>
+          <div class="separator"></div>
+          <div class="user-info">
+            <div><p class="text-p">${t("gender")}: </p><br><strong>${userGender}</strong></div>
+            <div><p class="text-p">${t("age")}: </p><br><strong>${userAge}</strong></div>
+            <div><p class="text-p">${t("height")}: </p><br><strong>${userHeight}</strong></div>
+            <div><p class="text-p">${t("weight")}: </p><br><strong>${userWeight}</strong></div>
           </div>
-  <div class="age-numbers">
-                  <div class="age-box">${bloodPressure} <br><p class="text-p">${t(
-      "BloodPressure"
-    )}</p></div>
-                    <div class="age-box">${bloodGlucose} <br><p class="text-p">${t(
-      "BloodGlucose"
-    )}</p></div>
-                    <div class="age-box">${calculateBMIValues(
-      parseInt(route.params.reportData.weightValue),
-      route.params.reportData.selectedWeightUnit,
-      route.params.reportData.heightValue,
-      route.params.reportData.selectedHeightUnit
-    )} <br><p class="text-p">${t(
-      "BMI"
-    )}</p></div>
-                </div>
-            <div class="health-age">
-              <p>${t("Rs_YourHealthAge")} <strong>${healthAge}</strong> vs ${t(
-      "Rs_YourActualAge"
-    )} <strong>${userAge}</strong></p>
-                <div class="age-numbers">
-                  <div class="age-box">${userAge} <br><p class="text-p">${t(
-      "Rs_CurrentAge"
-    )}</p></div>
-                    <div class="age-box">${healthAge} <br><p class="text-p">${t(
-      "Rs_HealthAge"
-    )}</p></div>
-                    <div class="age-box">${potentialAge} <br><p class="text-p">${t(
-      "Rs_PotentialAge"
-    )}</p></div>
-                </div>
-            </div>
-    
-            <p style="margin-top: 15px; font-size: 13px;">
-                ${t("Rs_HealthyHabitsParagraph")}</p>
-            <div class="recommendations">
-                <h3>${t("Rs_Recommendations")}</h3>
-               ${generateRecommendationsHTML}
-            </div>
-                  <div class="last-div"><p class="text-p">This Pdf is Generated by Health Age App</p></div>
         </div>
+        <div class="health-age">
+          <p>${t("Rs_YourHealthAge")} <strong>${healthAge}</strong> vs ${t("Rs_YourActualAge")} <strong>${userAge}</strong></p>
+          <div class="age-numbers">
+            <div class="age-box">${userAge} <br><p class="text-p">${t("Rs_CurrentAge")}</p></div>
+            <div class="age-box">${healthAge} <br><p class="text-p">${t("Rs_HealthAge")}</p></div>
+            <div class="age-box">${potentialAge} <br><p class="text-p">${t("Rs_PotentialAge")}</p></div>
+          </div>
+        </div>
+        <p style="margin-top: 15px; font-size: 13px;">${t("Rs_HealthyHabitsParagraph")}</p>
+        <div class="recommendations">
+          <h3>${t("Rs_Recommendations")}</h3>
+          ${generateRecommendationsHTML}
+        </div>
+        <div class="disclaimer">${MEDICAL_DISCLAIMER_TEXT}</div>
+      </div>
     </body>
     </html>
-        `;
+  `;
+
+  console.log(route.params.reportData.heightValue, "height value in report screen");
+
+  const SharePDF = async () => {
+    const htmlContent = reportHtml;
 
     try {
       // Generate PDF
@@ -512,7 +495,9 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
         FileSystem.documentDirectory + `${userName}_health_Report.pdf`;
 
       // Read the file as base64
-      const base64Pdf = await RNFS.readFile(pdf.filePath, "base64");
+      const base64Pdf = await FileSystem.readAsStringAsync(pdf.filePath, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
 
       // Write it to FileSystem.documentDirectory
       await FileSystem.writeAsStringAsync(newPdfPath, base64Pdf, {
@@ -533,558 +518,8 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
     }
   };
 
-
-  const [selectedPrinter, setSelectedPrinter] = React.useState();
-
-  const print = async () => {
-    // On iOS/android prints the given html. On web prints the HTML from the current page.
-
-  };
-
-  // const SharePDFIOS = async () => {
-  //   const htmlContent =  `
-  //   <html lang="en">
-  //   <head>
-  //       <meta charset="UTF-8">
-  //       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  //       <title>Health Report</title>
-  //       <style>
-  //           * {
-  //               margin: 0;
-  //               padding: 0;
-  //               box-sizing: border-box;
-  //               font-family: Arial, sans-serif;
-  //           }
-  //               @media print {
-  //           body {
-  //               background-color: #f5f7fa;
-  //               display: flex;
-  //               justify-content: center;
-  //               padding: 20px;
-  //                -webkit-print-color-adjust: exact !important;
-  //               print-color-adjust: exact !important;
-  //           }
-  // }
-  //           .container {
-  //               width: 350px;
-  //               background-color: #fff;
-  //               border-radius: 15px;
-  //               box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  //               padding: 20px;
-  //           }
-  //           .header {
-  //               background: linear-gradient(to right, #0B9FD5, #284374);
-  //               color: #fff;
-  //               padding: 15px;
-  //               border-radius: 10px;
-  //               text-align: flex-start;
-  //               font-weight: bold;
-  //           }
-  //           .user-info {
-  //               margin-top: 10px;
-  //               padding: 10px;
-  //               border-radius: 10px;
-  //               display: flex;
-  //               justify-content: space-between;
-  //           }
-  //           .user-info div {
-  //               text-align: center;
-  //               font-size: 14px;
-  //           }
-  //           .health-age {
-  //               margin-top: 15px;
-  //               background: #fff8e5;
-  //               padding: 15px;
-  //               border-radius: 10px;
-  //               text-align: center;
-  //           }
-  //           .age-numbers {
-  //               display: flex;
-  //               justify-content: space-between;
-  //               margin-top: 10px;
-  //           }
-  //           .age-box {
-  //               width: 30%;
-  //               padding: 10px;
-  //               background-color: #eef2f6;
-  //               border-radius: 10px;
-  //               text-align: center;
-  //               font-size: 16px;
-  //               font-weight: bold;
-  //           }
-  //         .text-p{
-  //         font-size: 12px;
-  //               font-weight: 300;
-  //         }
-  //           .age-box:nth-child(2) {
-  //               background-color: #dff5e7;
-  //           }
-  //           .recommendations {
-  //               margin-top: 20px;
-  //           }
-  //           .recommendations h3 {
-  //               font-size: 16px;
-  //               margin-bottom: 10px;
-  //           }
-  //           .recommendation {
-  //               background-color: #f8f9fa;
-  //               padding: 10px;
-  //               border-radius: 10px;
-  //               margin-bottom: 10px;
-  //               display: flex;
-  //               align-items: center;
-  //               font-size: 14px;
-  //           }
-  //         .separator {
-  //       width: 100%;
-  //         margin-top:10px;
-  //       border-width: 1px;  
-  //       border-color: white;
-  //       border-style: solid; 
-  //   }
-
-  //         .check-icon-container {
-  //         width:40px;
-  //         }
-  //           .check-icon {
-  //               width: 20px;
-  //               height: 20px;
-  //               background-color: #4caf50;
-  //               color: white;
-  //               border-radius: 50%;
-  //               display: flex;
-  //               align-items: center;
-  //               justify-content: center;
-  //               font-size: 14px;
-  //               margin-right: 10px;
-  //           }
-
-
-  //       </style>
-  //   </head>
-  //   <body>
-
-  //       <div class="container">
-  //         <div class="header"><p class="text-p">${t(
-  //           "Rs_CustomizedReport"
-  //         )}</p><br><strong>${userName}</strong>
-  //             <div class="separator"></div>
-  //             <div class="user-info">
-  //               <div ><p class="text-p">${t(
-  //                 "gender"
-  //               )}: </p><br><strong>${userGender}</strong></div>
-  //               <div><p class="text-p">${t(
-  //                 "age"
-  //               )}: </p><br><strong>${userAge}</strong></div>
-  //               <div><p class="text-p">${t(
-  //                 "height"
-  //               )}: </p><br><strong>${userHeight}</strong></div>
-  //                 <div><p class="text-p">${t(
-  //                   "weight"
-  //                 )}: </p><br><strong>${userWeight}</strong></div>
-  //           </div>
-  //         </div>
-  // <div class="age-numbers">
-  //                 <div class="age-box">${bloodPressure} <br><p class="text-p">${t(
-  //     "BloodPressure"
-  //   )}</p></div>
-  //                   <div class="age-box">${bloodGlucose} <br><p class="text-p">${t(
-  //     "BloodGlucose"
-  //   )}</p></div>
-  //                   <div class="age-box">${calculateBMIValues(
-  //                     parseInt(route.params.reportData.weightValue),
-  //                     route.params.reportData.selectedWeightUnit,
-  //                     parseInt(route.params.reportData.heightValue),
-  //                     route.params.reportData.selectedHeightUnit
-  //                   )} <br><p class="text-p">${t(
-  //     "BMI"
-  //   )}</p></div>
-  //               </div>
-  //           <div class="health-age">
-  //             <p>${t("Rs_YourHealthAge")} <strong>${healthAge}</strong> vs ${t(
-  //     "Rs_YourActualAge"
-  //   )} <strong>${userAge}</strong></p>
-  //               <div class="age-numbers">
-  //                 <div class="age-box">${userAge} <br><p class="text-p">${t(
-  //     "Rs_CurrentAge"
-  //   )}</p></div>
-  //                   <div class="age-box">${healthAge} <br><p class="text-p">${t(
-  //     "Rs_HealthAge"
-  //   )}</p></div>
-  //                   <div class="age-box">${potentialAge} <br><p class="text-p">${t(
-  //     "Rs_PotentialAge"
-  //   )}</p></div>
-  //               </div>
-  //           </div>
-
-  //           <p style="margin-top: 15px; font-size: 13px;">
-  //               ${t("Rs_HealthyHabitsParagraph")}</p>
-  //           <div class="recommendations">
-  //               <h3>${t("Rs_Recommendations")}</h3>
-  //              ${generateRecommendationsHTML}
-  //           </div>
-  //                 <div class="last-div"><p class="text-p">This Pdf is Generated by Health Age App</p></div>
-  //       </div>
-  //   </body>
-  //   </html>
-  //       `;
-
-  //   // On iOS/android prints the given html. On web prints the HTML from the current page.
-  //   const { uri } = await Print.printToFileAsync({ html:htmlContent });
-  //   console.log('File has been saved to:', uri);
-  //   if (await Sharing.isAvailableAsync()) {
-  //     // await Sharing.shareAsync(newPdfPath);
-  //     await Sharing.shareAsync(uri, { UTI: '.pdf', mimeType: 'application/pdf' });
-  //   } else {
-  //     alert(t("Error"));
-  //   }
-  // };
-
-  const selectPrinter = async () => {
-
-  };
-  // const SharePDFIOS = async () => {
-  //   const htmlContent = `
-  //     <html lang="en">
-  //       <head>
-  //         <meta charset="UTF-8">
-  //         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  //         <title>Health Report</title>
-  //          <style>
-  //       body {
-  //         display: flex;
-  //         justify-content: center;
-  //         padding: 20px;
-  //         font-family: Arial, sans-serif;
-  //         background-color: #eef2f6 !important;
-  //         margin: 0;
-  //       }
-  //       .container {
-  //         width: 350px;
-  //         background-color: white;
-  //         border-radius: 15px;
-  //         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  //         padding: 20px;
-  //       }
-  //       .header {
-  //         background-color: #0B9FD5;
-  //         color: white;
-  //         padding: 15px;
-  //         border-radius: 10px;
-  //         text-align: center;
-  //         font-weight: bold;
-  //       }
-  //       .user-info {
-  //         margin-top: 15px;
-  //         padding: 10px;
-  //         border-radius: 10px;
-  //         background-color: #f0f4f8;
-  //         display: flex;
-  //         justify-content: space-between;
-  //       }
-  //       .age-numbers {
-  //         display: flex;
-  //         justify-content: space-between;
-  //         margin-top: 15px;
-  //       }
-  //       .age-box {
-  //         width: 30%;
-  //         padding: 12px;
-  //         background-color: #d9f9e5;
-  //         border: 1px solid #ccc;
-  //         border-radius: 10px;
-  //         font-size: 15px;
-  //         font-weight: bold;
-  //         color: #333;
-  //       }
-  //       .health-age {
-  //         margin-top: 20px;
-  //         background-color: #fff0d9;
-  //         padding: 15px;
-  //         border-radius: 10px;
-  //         text-align: center;
-  //       }
-  //       .recommendations {
-  //         margin-top: 20px;
-  //       }
-  //       .last-div {
-  //         margin-top: 20px;
-  //         text-align: center;
-  //         font-size: 12px;
-  //         color: #777;
-  //       }
-  //     </style>
-  //       </head>
-  //       <body>
-  //         <div class="container">
-  //           <div class="header">
-  //             <p>${t("Rs_CustomizedReport")}</p><br><strong>${userName}</strong>
-  //             <div class="separator"></div>
-  //             <div class="user-info">
-  //               <div style="text-align: center; font-size: 13px; color: #333;">
-  //                 <p>${t("gender")}: </p><strong>${userGender}</strong>
-  //               </div>
-  //               <div style="text-align: center; font-size: 13px; color: #333;">
-  //                 <p>${t("age")}: </p><strong>${userAge}</strong>
-  //               </div>
-  //               <div style="text-align: center; font-size: 13px; color: #333;">
-  //                 <p>${t("height")}: </p><strong>${userHeight}</strong>
-  //               </div>
-  //               <div style="text-align: center; font-size: 13px; color: #333;">
-  //                 <p>${t("weight")}: </p><strong>${userWeight}</strong>
-  //               </div>
-  //             </div>
-  //           </div>
-
-  //           <div class="age-numbers">
-  //             <div class="age-box">
-  //               ${bloodPressure} <br><p>${t("BloodPressure")}</p>
-  //             </div>
-  //             <div class="age-box">
-  //               ${bloodGlucose} <br><p>${t("BloodGlucose")}</p>
-  //             </div>
-  //             <div class="age-box">
-  //               ${calculateBMIValues(parseInt(route.params.reportData.weightValue), route.params.reportData.selectedWeightUnit, parseInt(route.params.reportData.heightValue), route.params.reportData.selectedHeightUnit)} <br><p>${t("BMI")}</p>
-  //             </div>
-  //           </div>
-
-  //           <div class="health-age">
-  //             <p>${t("Rs_YourHealthAge")} <strong>${healthAge}</strong> vs ${t("Rs_YourActualAge")} <strong>${userAge}</strong></p>
-  //             <div class="age-numbers">
-  //               <div class="age-box">
-  //                 ${userAge} <br><p>${t("Rs_CurrentAge")}</p>
-  //               </div>
-  //               <div class="age-box">
-  //                 ${healthAge} <br><p>${t("Rs_HealthAge")}</p>
-  //               </div>
-  //               <div class="age-box">
-  //                 ${potentialAge} <br><p>${t("Rs_PotentialAge")}</p>
-  //               </div>
-  //             </div>
-  //           </div>
-
-  //           <p>${t("Rs_HealthyHabitsParagraph")}</p>
-
-  //           <div class="recommendations">
-  //             <h3>${t("Rs_Recommendations")}</h3>
-  //             ${generateRecommendationsHTML}
-  //           </div>
-
-  //           <div class="last-div">
-  //             <p>This PDF is Generated by Health Age app</p>
-  //           </div>
-  //         </div>
-  //       </body>
-  //     </html>
-  //   ` 
-
-  //   try {
-  //     // Generate PDF
-  //     const options = {
-  //       html: htmlContent,
-  //       fileName: `${userName}_health_Report`,
-  //       directory: "Documents",
-  //     };
-  //     const pdf = await RNHTMLtoPDF.convert(options);
-  //     console.log("Generated PDF:", pdf.filePath);
-
-  //     if (!pdf.filePath) {
-  //       throw new Error(t("Error"));
-  //     }
-
-  //     // Define destination path in the Downloads folder (Public Storage)
-  //     const newPdfPath = FileSystem.documentDirectory + `${userName}_health_Report.pdf`;
-
-  //     // Read the file as base64
-  //     const base64Pdf = await RNFS.readFile(pdf.filePath, "base64");
-
-  //     // Write it to FileSystem.documentDirectory
-  //     await FileSystem.writeAsStringAsync(newPdfPath, base64Pdf, {
-  //       encoding: FileSystem.EncodingType.Base64,
-  //     });
-
-  //     console.log("PDF saved at:", newPdfPath);
-
-  //     // Share the PDF
-  //     if (await Sharing.isAvailableAsync()) {
-  //       await Sharing.shareAsync(newPdfPath);
-  //     } else {
-  //       alert(t("Error"));
-  //     }
-  //   } catch (error) {
-  //     console.error("Error generating or sharing PDF:", error);
-  //     alert(t("Error"));
-  //   }
-  // };
-
   const downloadPDF = async () => {
-    const htmlContent = `
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Health Report</title>
-        <style>
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-                font-family: Arial, sans-serif;
-            }
-            body {
-                background-color: #f5f7fa;
-                display: flex;
-                justify-content: center;
-                padding: 20px;
-            }
-            .container {
-                width: 350px;
-                background-color: #fff;
-                border-radius: 15px;
-                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-                padding: 20px;
-            }
-            .header {
-                background: linear-gradient(to right, #0B9FD5, #284374);
-                color: #fff;
-                padding: 15px;
-                border-radius: 10px;
-                text-align: flex-start;
-                font-weight: bold;
-            }
-            .user-info {
-                margin-top: 10px;
-                padding: 10px;
-                border-radius: 10px;
-                display: flex;
-                justify-content: space-between;
-            }
-            .user-info div {
-                text-align: center;
-                font-size: 14px;
-            }
-            .health-age {
-                margin-top: 15px;
-                background: #fff8e5;
-                padding: 15px;
-                border-radius: 10px;
-                text-align: center;
-            }
-            .age-numbers {
-                display: flex;
-                justify-content: space-between;
-                margin-top: 10px;
-            }
-            .age-box {
-                width: 30%;
-                padding: 10px;
-                background-color: #eef2f6;
-                border-radius: 10px;
-                text-align: center;
-                font-size: 16px;
-                font-weight: bold;
-            }
-          .text-p{
-          font-size: 12px;
-                font-weight: 300;
-          }
-            .age-box:nth-child(2) {
-                background-color: #dff5e7;
-            }
-            .recommendations {
-                margin-top: 20px;
-            }
-            .recommendations h3 {
-                font-size: 16px;
-                margin-bottom: 10px;
-            }
-            .recommendation {
-                background-color: #f8f9fa;
-                padding: 10px;
-                border-radius: 10px;
-                margin-bottom: 10px;
-                display: flex;
-                align-items: center;
-                font-size: 14px;
-            }
-          .separator {
-        width: 100%;
-          margin-top:10px;
-        border-width: 1px;  
-        border-color: white;
-        border-style: solid; 
-    }
-    
-          .check-icon-container {
-          width:40px;
-          }
-            .check-icon {
-                width: 20px;
-                height: 20px;
-                background-color: #4caf50;
-                color: white;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 14px;
-                margin-right: 10px;
-            }
-      
-    
-        </style>
-    </head>
-    <body>
-    
-        <div class="container">
-          <div class="header"><p class="text-p">${t(
-      "Rs_CustomizedReport"
-    )}</p><br><strong>${userName}</strong>
-              <div class="separator"></div>
-              <div class="user-info">
-                <div ><p class="text-p">${t(
-      "gender"
-    )}: </p><br><strong>${userGender}</strong></div>
-                <div><p class="text-p">${t(
-      "age"
-    )}: </p><br><strong>${userAge}</strong></div>
-                <div><p class="text-p">${t(
-      "height"
-    )}: </p><br><strong>${userHeight}</strong></div>
-                  <div><p class="text-p">${t(
-      "weight"
-    )}: </p><br><strong>${userWeight}</strong></div>
-            </div>
-          </div>
-
-            <div class="health-age">
-              <p>${t("Rs_YourHealthAge")} <strong>${healthAge}</strong> vs ${t(
-      "Rs_YourActualAge"
-    )} <strong>${userAge}</strong></p>
-                <div class="age-numbers">
-                  <div class="age-box">${userAge} <br><p class="text-p">${t(
-      "Rs_CurrentAge"
-    )}</p></div>
-                    <div class="age-box">${healthAge} <br><p class="text-p">${t(
-      "Rs_HealthAge"
-    )}</p></div>
-                    <div class="age-box">${potentialAge} <br><p class="text-p">${t(
-      "Rs_PotentialAge"
-    )}</p></div>
-                </div>
-            </div>
-    
-            <p style="margin-top: 15px; font-size: 13px;">
-                ${t("Rs_HealthyHabitsParagraph")}</p>
-            <div class="recommendations">
-                <h3>${t("Rs_Recommendations")}</h3>
-               ${generateRecommendationsHTML}
-            </div>
-                  <div class="last-div"><p class="text-p">This Pdf is Generated by Health Age App</p></div>
-        </div>
-    </body>
-    </html>
-        `;
+    const htmlContent = reportHtml;
 
     try {
       // ✅ 1. Generate PDF
@@ -1127,24 +562,6 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
       console.error("Error downloading PDF:", error);
       Alert.alert("Error", "Failed to download PDF");
     }
-  };
-
-  const saveToDownloads = async (pdfUri: string) => {
-    const result = await DocumentPicker.getDocumentAsync({
-      type: 'application/pdf',
-      copyToCacheDirectory: false,
-      multiple: false,
-      mode: 'save', // 👈 This enables "save" mode (Expo 47+)
-    });
-    console.log(result, "doc picker log");
-
-    // if (result.type === 'success') {
-    await FileSystem.copyAsync({
-      from: pdfUri,
-      to: result.assets?.[0].uri,
-    });
-    Alert.alert("Saved!", "PDF downloaded successfully.");
-    // }
   };
 
   React.useEffect(() => {
@@ -1206,7 +623,7 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
           <View style={styles.userInfo}>
             <View style={styles.userInfoItem}>
               <Font text="gender" style={styles.textP}></Font>
-              <Font text={userGender} style={styles.boldText}></Font>
+              <Font text={userGender as string} style={styles.boldText}></Font>
             </View>
             <View style={styles.userInfoItem}>
               <Font text="age" style={styles.textP}></Font>
@@ -1316,43 +733,58 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
           text="Rs_HealthyHabitsParagraph"
           style={styles.description}
         ></Font>
+        <View style={styles.disclaimerCard}>
+          <Text style={styles.disclaimerTitle}>Medical Disclaimer</Text>
+          <Text style={styles.disclaimerText}>{MEDICAL_DISCLAIMER_TEXT}</Text>
+        </View>
         <View style={styles.recommendations}>
           <Font text="Rs_Recommendations" style={styles.sectionTitle}></Font>
           {recommendations.length > 0 ? (
             recommendations.map((rec, index) => (
               <View key={index} style={styles.recommendationCard}>
-                <View style={styles.iconsContainer}>
-                  <TouchableOpacity
-                    onPress={() => {
-                      const url = rec?.citations_link || ''
-                      try {
-                        const Linking = require('react-native').Linking;
-                        Linking.openURL(url);
-                      } catch (e) { }
-                    }}
-                    style={styles.citationButton}
-                    accessibilityLabel="Citation information"
-                  >
-                    <Text style={styles.citationIcon}>i</Text>
-                  </TouchableOpacity>
-                </View>
                 <View style={styles.recommendationTextContainer}>
                   <View style={styles.recommendationHeader}>
-                    <View style={styles.checkIcon}>
-                      <Text style={styles.checkText}>✔</Text>
+                    {/* Group Checkbox and Title to stay on the left */}
+                    <View style={styles.titleGroup}>
+                      <View style={styles.checkIcon}>
+                        <Text style={styles.checkText}>✔</Text>
+                      </View>
+                      <Font
+                        text={rec?.title}
+                        style={styles.recommendationTitle}
+                      />
                     </View>
-                    <Font
-                      text={rec?.title}
-                      style={styles.recommendationTitle}
-                    />
+
+                    {/* Info icon pushed to the far right */}
+                    <TouchableOpacity
+                      onPress={() => openExternalUrl(rec?.citations_link)}
+                      style={styles.citationButton}
+                      accessibilityLabel="Citation information"
+                    >
+                      <Text style={styles.citationIcon}>i</Text>
+                    </TouchableOpacity>
                   </View>
+
+                  {/* Description wraps below the header */}
                   <Font text={rec?.description} style={styles.recommendationDesc} />
                 </View>
               </View>
             ))
-          ) : (
-            <></>
-          )}
+          ) : null}
+        </View>
+        <View style={styles.legalSection}>
+          <Text style={styles.disclosureText}>
+            One-time purchase for lifetime access. No recurring charges or auto-renewals.
+          </Text>
+          <View style={styles.linkRow}>
+            <TouchableOpacity onPress={() => openExternalUrl(TERMS_OF_USE_URL)}>
+              <Text style={styles.legalLink}>Terms of Use</Text>
+            </TouchableOpacity>
+            <Text style={styles.linkSeparator}> • </Text>
+            <TouchableOpacity onPress={() => openExternalUrl(PRIVACY_POLICY_URL)}>
+              <Text style={styles.legalLink}>Privacy Policy</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
       <View
@@ -1362,15 +794,16 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
           //   bottom: 30,
           //   left:20,
           gap: 10,
+          paddingVertical: 10,
           flexDirection: "row",
           // justifyContent: "space-between",
         }}
       >
-        {/* <Button
-            title="Rs_SavePdf"
-            onPress={downloadPDF}
-            style={{ padding: 10 }}
-          ></Button> */}
+        <Button
+          title="Rs_SavePdf"
+          onPress={downloadPDF}
+          style={{ padding: 10 }}
+        ></Button>
 
         <Button
           title="Rs_ShareReport"
@@ -1472,52 +905,58 @@ const styles = StyleSheet.create({
   recommendations: {
     marginTop: 20,
   },
+  disclaimerCard: {
+    marginTop: 14,
+    backgroundColor: "#FFF3F3",
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: "#FFD6D6",
+  },
+  disclaimerTitle: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#9C1B1B",
+    marginBottom: 6,
+  },
+  disclaimerText: {
+    fontSize: 13,
+    lineHeight: 19,
+    color: "#7A1A1A",
+  },
   sectionTitle: {
     fontSize: 16,
     marginBottom: 10,
   },
   recommendationCard: {
-    flexDirection: "row",
-    alignItems: "center",
     backgroundColor: "#EEF3F7",
-    paddingVertical: 16,
-    paddingHorizontal: 14,
+    padding: 16,
     borderRadius: 18,
     marginBottom: 16,
-    flexWrap: 'wrap',
     width: '100%',
-    minHeight: 60,
-    maxWidth: '100%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 2,
-    elevation: 1,
   },
   recommendationTextContainer: {
-    flex: 1,
-    flexDirection: 'column',
-    flexWrap: 'wrap',
-    paddingLeft: 12,
-    minWidth: 0,
-    maxWidth: '100%',
-    justifyContent: 'center',
+    width: '100%',
   },
   recommendationHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 2,
+    justifyContent: 'space-between', // This creates the "eye-thing" space-between effect
     width: '100%',
-    gap: 6,
+    marginBottom: 8,
+  },
+  titleGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1, // This ensures the title takes up available space but doesn't push the icon off-screen
+    marginRight: 10,
   },
   recommendationTitle: {
     fontSize: 15,
     fontWeight: 'bold',
-    flex: 1,
-    flexWrap: 'wrap',
     color: '#222',
-    marginRight: 6,
+    marginLeft: 10, // Space between checkmark and text
+    flexShrink: 1, // Allows title to wrap if it's too long
   },
   citationButton: {
     padding: 4,
@@ -1545,6 +984,14 @@ const styles = StyleSheet.create({
     marginTop: 6,
     lineHeight: 20,
   },
+  sourceLink: {
+    marginTop: 8,
+  },
+  sourceLinkText: {
+    color: "#0B9FD5",
+    fontSize: 12,
+    textDecorationLine: "underline",
+  },
   checkIcon: {
     width: 24,
     height: 24,
@@ -1571,5 +1018,11 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingHorizontal: 10,
     justifyContent: 'flex-end',
-  }
+  },
+  legalSection: { marginTop: 20, paddingVertical: 20, borderTopWidth: 1, borderTopColor: "#E6ECF2", alignItems: "center" },
+  disclosureText: { color: "#7D8699", fontSize: 11, textAlign: "center", marginBottom: 10, lineHeight: 16 },
+  linkRow: { flexDirection: "row", alignItems: "center" },
+  legalLink: { color: "#0B9FD4", fontSize: 12, textDecorationLine: "underline", fontWeight: "500" },
+  linkSeparator: { color: "#7D8699", marginHorizontal: 8 },
+
 });

@@ -1,261 +1,287 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Alert, Linking, Platform } from "react-native";
-import * as RNIap from "react-native-iap";
+import Purchases, {
+  type CustomerInfo,
+  type PurchasesEntitlementInfo,
+  type PurchasesPackage,
+} from "react-native-purchases";
 
-export const itemSkus = Platform.select({
-  ios: ["healthAge_yearly_premium_package_ios"],
-  android: ["health_age_yearly_premium_package"],
-});
+const SUB_STATUS_STORAGE_KEY = "sub_status";
+const DEFAULT_ENTITLEMENT_ID = "premium";
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ?? "";
+const LICENSE_STATUS_PATH = process.env.EXPO_PUBLIC_LICENSE_STATUS_PATH ?? "/license/status";
+const LICENSE_ACTIVATE_PATH = process.env.EXPO_PUBLIC_LICENSE_ACTIVATE_PATH ?? "/license/activate";
 
-export const initIAP = async () => {
+export type SubscriptionStatus = {
+  isValid: boolean;
+  autoRenewing: boolean;
+  expiryDate: Date | null;
+};
+
+const normalizeBackendStatus = (payload: unknown): SubscriptionStatus | null => {
+  if (!payload || typeof payload !== "object") {
+    return null;
+  }
+
+  const source = payload as Record<string, unknown>;
+  const nested = source.data && typeof source.data === "object" ? (source.data as Record<string, unknown>) : null;
+  const target = nested ?? source;
+
+  const isValidRaw =
+    target.isSubscribed ?? target.isValid ?? target.subscribed ?? target.premium;
+
+  const autoRenewingRaw =
+    target.autoRenewing ?? target.willRenew ?? target.isAutoRenewing;
+
+  const expiryRaw = target.expiryDate ?? target.expiresAt ?? target.expirationDate;
+
+  return {
+    isValid: Boolean(isValidRaw),
+    autoRenewing: Boolean(autoRenewingRaw),
+    expiryDate: typeof expiryRaw === "string" ? new Date(expiryRaw) : null,
+  };
+};
+
+const getActiveEntitlement = (
+  customerInfo: CustomerInfo
+): PurchasesEntitlementInfo | null => {
+  const activeEntitlements = Object.values(customerInfo.entitlements.active);
+  if (activeEntitlements.length === 0) {
+    return null;
+  }
+
+  return (
+    customerInfo.entitlements.active[DEFAULT_ENTITLEMENT_ID] ??
+    activeEntitlements[0] ??
+    null
+  );
+};
+
+const statusFromCustomerInfo = (customerInfo: CustomerInfo): SubscriptionStatus => {
+  const entitlement = getActiveEntitlement(customerInfo);
+
+  if (!entitlement) {
+    return {
+      isValid: false,
+      autoRenewing: false,
+      expiryDate: null,
+    };
+  }
+
+  return {
+    isValid: entitlement.isActive,
+    autoRenewing: entitlement.willRenew,
+    expiryDate: entitlement.expirationDate ? new Date(entitlement.expirationDate) : null,
+  };
+};
+
+export const initIAP = async (): Promise<void> => {
+  // RevenueCat is configured in App.tsx; no runtime init needed here.
+  return;
+};
+
+export const verifySubscriptionStatusSafe = async (): Promise<SubscriptionStatus> => {
   try {
-    console.log("Running");
-    await RNIap.initConnection();
+    const cached = await AsyncStorage.getItem(SUB_STATUS_STORAGE_KEY);
+    if (!cached) {
+      return { isValid: false, autoRenewing: false, expiryDate: null };
+    }
 
-    console.log("IAP Connection Initialized ");
-  } catch (error) {
-    console.error("IAP Connection Error:", error);
+    const parsed = JSON.parse(cached) as {
+      isValid?: boolean;
+      autoRenewing?: boolean;
+      expiryDate?: string | null;
+    };
+
+    return {
+      isValid: Boolean(parsed.isValid),
+      autoRenewing: Boolean(parsed.autoRenewing),
+      expiryDate: parsed.expiryDate ? new Date(parsed.expiryDate) : null,
+    };
+  } catch {
+    return { isValid: false, autoRenewing: false, expiryDate: null };
   }
 };
 
-export const getSubscriptions = async () => {
+export const verifySubscriptionStatusLive = async (): Promise<SubscriptionStatus> => {
   try {
-    const subscriptions = await RNIap.getSubscriptions({ skus: itemSkus });
-    console.log(
-      "📦 Subscriptions:",
-      JSON.stringify(subscriptions),
-      itemSkus,
-      "itemSkus"
-    );
-    return JSON.stringify(subscriptions);
+    const customerInfo = await Purchases.getCustomerInfo();
+    const status = statusFromCustomerInfo(customerInfo);
+    await AsyncStorage.setItem(SUB_STATUS_STORAGE_KEY, JSON.stringify(status));
+    return status;
   } catch (error) {
-    console.log("❌ Error Fetching Subscriptions:", error);
+    console.error("Subscription verification error:", error);
+    return { isValid: false, autoRenewing: false, expiryDate: null };
+  }
+};
+
+export const verifySubscriptionStatusBackend = async (
+  accessToken: string
+): Promise<SubscriptionStatus | null> => {
+  try {
+    if (!API_BASE_URL || !accessToken) {
+      return null;
+    }
+
+    const response = await fetch(`${API_BASE_URL}${LICENSE_STATUS_PATH}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    let payload: unknown = null;
+    try {
+      payload = await response.json();
+    } catch {
+      payload = null;
+    }
+
+    const status = normalizeBackendStatus(payload);
+    if (!status) {
+      return null;
+    }
+
+    await AsyncStorage.setItem(SUB_STATUS_STORAGE_KEY, JSON.stringify(status));
+    return status;
+  } catch (error) {
+    console.error("Backend license status fetch failed:", error);
+    return null;
+  }
+};
+
+export const activateLicenseKey = async (
+  accessToken: string,
+  licenseKey: string
+): Promise<SubscriptionStatus> => {
+  if (!API_BASE_URL || !accessToken) {
+    throw new Error("Missing API base URL or access token");
+  }
+
+  const normalizedKey = licenseKey.trim();
+  if (!normalizedKey) {
+    throw new Error("License key is required");
+  }
+
+  const response = await fetch(`${API_BASE_URL}${LICENSE_ACTIVATE_PATH}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({ licenseKey: normalizedKey }),
+  });
+
+  let payload: unknown = null;
+  try {
+    payload = await response.json();
+  } catch {
+    payload = null;
+  }
+
+  if (!response.ok) {
+    const source = payload as Record<string, unknown> | null;
+    const message =
+      source && typeof source.message === "string"
+        ? source.message
+        : "Unable to activate license key";
+    throw new Error(message);
+  }
+
+  const status = normalizeBackendStatus(payload);
+  if (!status) {
+    throw new Error("Invalid license response from server");
+  }
+
+  await AsyncStorage.setItem(SUB_STATUS_STORAGE_KEY, JSON.stringify(status));
+  return status;
+};
+
+export const clearCachedSubscriptionStatus = async (): Promise<void> => {
+  await AsyncStorage.removeItem(SUB_STATUS_STORAGE_KEY);
+};
+
+export const syncRevenueCatUser = async (appUserId: string | null): Promise<void> => {
+  try {
+    if (appUserId) {
+      await Purchases.logIn(appUserId);
+      return;
+    }
+
+    await Purchases.logOut();
+  } catch (error) {
+    console.error("Failed to sync RevenueCat user identity:", error);
+  }
+};
+
+export const verifySubscriptionStatus = async (): Promise<SubscriptionStatus> => {
+  return verifySubscriptionStatusLive();
+};
+
+export const getSubscriptions = async (): Promise<PurchasesPackage[]> => {
+  try {
+    const offerings = await Purchases.getOfferings();
+    return offerings.current?.availablePackages ?? [];
+  } catch (error) {
+    console.error("Error fetching offerings:", error);
     return [];
   }
 };
 
-
-export const purchaseSubscription = async (subscriptions) => {
+export const purchaseSubscription = async (
+  subscriptions: PurchasesPackage[]
+): Promise<CustomerInfo> => {
   try {
-    if (!subscriptions || subscriptions.length === 0) {
-      console.error("Subscriptions are empty or undefined:", subscriptions);
+    if (!subscriptions?.length) {
       throw new Error("No subscriptions available for purchase.");
     }
 
-    const sku = Platform.select({
-      ios: "healthAge_yearly_premium_package_ios",
-      android: "health_age_yearly_premium_package",
-    });
+    const preferredPackage =
+      subscriptions.find((pkg) => pkg.packageType === Purchases.PACKAGE_TYPE.ANNUAL) ??
+      subscriptions[0];
 
-    const OfferDetails = JSON.parse(subscriptions);
+    const { customerInfo } = await Purchases.purchasePackage(preferredPackage);
+    const status = statusFromCustomerInfo(customerInfo);
+    await AsyncStorage.setItem(SUB_STATUS_STORAGE_KEY, JSON.stringify(status));
+    return customerInfo;
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Unable to complete purchase right now.";
 
-    const offerToken = OfferDetails?.[0]?.subscriptionOfferDetails?.[0].offerToken
-    if (!offerToken) {
-      console.error(
-        "Offer token is missing in subscription offer details:",
-        OfferDetails
-      );
-      throw new Error("No valid subscription offer token found.");
-    }
-
-    console.log("Offer Token:", offerToken);
-
-    let purchase;
-    if (Platform.OS === "android") {
-      purchase = await RNIap.requestSubscription({
-        sku,
-        subscriptionOffers: [{ sku, offerToken }],
-      });
-    } else {
-      purchase = await RNIap.requestSubscription({ sku });
-    }
-
-    console.log("✅ Purchase Success:", purchase);
-    return purchase;
-  } catch (error) {
-    console.error("❌ Purchase Failed:", error?.message ?? error);
-    Alert.alert("Purchase Error", error?.message ?? "Unknown error occurred.");
+    console.error("Purchase failed:", error);
+    Alert.alert("Purchase Error", message);
     throw error;
   }
 };
 
-export const restorePurchases = async () => {
-  try {
-    const purchases = await RNIap.getAvailablePurchases();
-    console.log("Restored Purchases:", purchases);
-    return purchases;
-  } catch (error) {
-    console.log("Restore Purchase Error:", error);
-  }
+export const restorePurchases = async (): Promise<CustomerInfo> => {
+  const customerInfo = await Purchases.restorePurchases();
+  const status = statusFromCustomerInfo(customerInfo);
+  await AsyncStorage.setItem(SUB_STATUS_STORAGE_KEY, JSON.stringify(status));
+  return customerInfo;
 };
 
+export const cancelSubscription = async (): Promise<void> => {
+  const customerInfo = await Purchases.getCustomerInfo();
 
-export const verifySubscriptionStatus = async () => {
-  try {
-    let autoRenewing = false;
-    let isSubscribed = false;
-    let expiryDate = null;
-
-    const purchases = await RNIap.getAvailablePurchases();
-    let subscriptionPurchase = purchases.find((p) =>
-      itemSkus.includes(p.productId)
-    );
-
-    if (subscriptionPurchase) {
-      autoRenewing = subscriptionPurchase.autoRenewingAndroid ?? false;
-      try {
-        const receiptData = JSON.parse(subscriptionPurchase.transactionReceipt);
-        expiryDate = new Date(
-          receiptData?.expires_date_ms ??
-            receiptData.purchaseTime + 365 * 24 * 60 * 60 * 1000
-        );
-        isSubscribed = expiryDate > new Date();
-      } catch (e) {
-        console.log("Receipt parse error:", e);
-      }
-    } else {
-      const history = await RNIap.getPurchaseHistory();
-      subscriptionPurchase = history.find((p) =>
-        itemSkus.includes(p.productId)
-      );
-      if (subscriptionPurchase) {
-        try {
-          const receiptData = JSON.parse(subscriptionPurchase.transactionReceipt);
-          expiryDate = new Date(
-            receiptData?.expires_date_ms ??
-              receiptData.purchaseTime + 365 * 24 * 60 * 60 * 1000
-          );
-          isSubscribed = expiryDate > new Date();
-        } catch (e) {
-          console.log("Receipt parse error:", e);
-        }
-      }
-    }
-
-    return { isValid: isSubscribed, autoRenewing, expiryDate };
-  } catch (error) {
-    console.error("Verification error:", error.message || error);
-    return { isValid: false, error };
+  if (customerInfo.managementURL) {
+    await Linking.openURL(customerInfo.managementURL);
+    return;
   }
+
+  if (Platform.OS === "ios") {
+    await Linking.openURL("itms-apps://apps.apple.com/account/subscriptions");
+    return;
+  }
+
+  await Linking.openURL("https://play.google.com/store/account/subscriptions");
 };
 
-export const cancelSubscription = async () => {
-  try {
-    // 1. Get active purchases first
-    const purchases = await RNIap.getAvailablePurchases();
-    console.log("get available purchase", purchases);
-
-    const activeSubscription = purchases.find((p) =>
-      itemSkus.includes(p.productId)
-    );
-    // Alert.alert("Active Subs" , JSON.stringify(activeSubscription) )
-    if (!activeSubscription) {
-      throw new Error("No active subscription found");
-    }
-
-    // 2. Platform-specific cancellation
-    if (Platform.OS === "ios") {
-      // iOS: Open App Store's subscription management page
-      // await RNIap.requestSubscription({
-      //   sku: activeSubscription.productId,
-      //   andDangerouslyFinishTransactionAutomaticallyIOS: false,
-      // });
-      Alert.alert(
-        "Manage Subscription",
-        "Please cancel your subscription in the App Store settings.",
-        [
-          {
-            text: "Open Settings",
-            onPress: () =>
-              Linking.openURL(
-                "itms-apps://apps.apple.com/account/subscriptions"
-              ),
-          },
-          { text: "Cancel" },
-        ]
-      );
-    } else {
-      Alert.alert(
-        "Manage Subscription",
-        "Please cancel your subscription in Google Play Store.",
-        [
-          {
-            text: "Open Play Store",
-            onPress: () =>
-              Linking.openURL(
-                "https://play.google.com/store/account/subscriptions"
-              ),
-          },
-          { text: "Cancel" },
-        ]
-      );
-    }
-  } catch (error: any) {
-    console.error("❌ Cancellation Error:", error);
-    Alert.alert(
-      "Error",
-      error.message || "Failed to cancel subscription. Please try again."
-    );
-    throw error;
-  }
-};
-
-export const restoreSubscription = async () => {
-  try {
-    // 1. Get active purchases first
-    const purchases = await RNIap.getAvailablePurchases();
-    console.log("get available purchase", purchases);
-
-    const activeSubscription = purchases.find((p) =>
-      itemSkus.includes(p.productId)
-    );
-    // Alert.alert("Active Subs" , JSON.stringify(activeSubscription) )
-    // if (!activeSubscription) {
-    //   throw new Error("No active subscription found");
-    // }
-
-    // 2. Platform-specific cancellation
-    if (Platform.OS === "ios") {
-      // iOS: Open App Store's subscription management page
-      await RNIap.requestSubscription({
-        sku: activeSubscription.productId,
-        andDangerouslyFinishTransactionAutomaticallyIOS: false,
-      });
-      Alert.alert(
-        "Manage Subscription",
-        "Please cancel your subscription in the App Store settings.",
-        [
-          {
-            text: "Open Settings",
-            onPress: () =>
-              Linking.openURL(
-                "itms-apps://apps.apple.com/account/subscriptions"
-              ),
-          },
-          { text: "Cancel" },
-        ]
-      );
-    } else {
-      Alert.alert(
-        "Manage Subscription",
-        "Please cancel your subscription in Google Play Store.",
-        [
-          {
-            text: "Open Play Store",
-            onPress: () =>
-              Linking.openURL(
-                "https://play.google.com/store/account/subscriptions"
-              ),
-          },
-          { text: "Cancel" },
-        ]
-      );
-    }
-  } catch (error: any) {
-    console.error("❌ Cancellation Error:", error);
-    Alert.alert(
-      "Error",
-      error.message || "Failed to cancel subscription. Please try again."
-    );
-    throw error;
-  }
+export const restoreSubscription = async (): Promise<CustomerInfo> => {
+  return restorePurchases();
 };

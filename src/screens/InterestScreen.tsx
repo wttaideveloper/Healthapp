@@ -33,6 +33,11 @@ import CheckBox from "../components/checkbox";
 import CustomInput from "../components/CustomInput";
 import { addReport } from "../components/utils/reportService";
 import { useTranslation } from "react-i18next";
+import { useSubscription } from "../context/subScriptionContext";
+import {
+  FREE_DAILY_TASK_LIMIT,
+  getDailyLimitStatus,
+} from "../components/utils/usageLimit";
 
 
 type InterestScreenProps = DrawerScreenProps<DrawerParamList, "InterestScreen">;
@@ -104,6 +109,7 @@ const InterestScreen: React.FC<InterestScreenProps> = ({
   route,
 }) => {
     const { t } = useTranslation();
+  const { isSubscribed } = useSubscription();
   const [otherText, setOtherText] = React.useState("");
 
   const [interestList, setInterestList] = React.useState<
@@ -193,6 +199,22 @@ const InterestScreen: React.FC<InterestScreenProps> = ({
   };
 
   const handleCalculate = async () => {
+    const limitStatus = await getDailyLimitStatus(Boolean(isSubscribed));
+    if (!limitStatus.allowed) {
+      Alert.alert(
+        `${t("dailyLimit")} : ${limitStatus.used}/${FREE_DAILY_TASK_LIMIT}`,
+        t("JoinPro"),
+        [
+          { text: t("Hs_Cancel"), style: "cancel" },
+          {
+            text: t("purchase"),
+            onPress: () => navigation.navigate("Purchase"),
+          },
+        ]
+      );
+      return;
+    }
+
     const data = await readExcelFile();
     if (data) {
       const calculatedHealthAge = calculateHealthAge(

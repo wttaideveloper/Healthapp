@@ -5,7 +5,7 @@ import { RootStackParamList } from "../navigation/AppNavigator";
 import Font from "../components/CustomisedFont";
 
 type AboutAppScreenProps = {
-  navigation: StackNavigationProp<RootStackParamList, "AboutApp">;
+  navigation: StackNavigationProp<RootStackParamList>;
 };
 
 const AboutAppScreen: React.FC<AboutAppScreenProps> = ({ navigation }) => {

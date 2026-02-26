@@ -1,11 +1,12 @@
 import React, { useCallback } from "react";
 import {
   View,
-  Text,
   StyleSheet,
   Image,
   Alert,
   BackHandler,
+  TouchableOpacity,
+  Text,
 } from "react-native";
 import Font from "../components/CustomisedFont";
 import { icons } from "../components/images";
@@ -13,57 +14,37 @@ import { LinearGradient } from "expo-linear-gradient";
 import Button from "../components/Button";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
 import { DrawerParamList } from "../navigation/DrawerNavigator";
-import { initDatabase } from "../components/utils/database";
-import {
-  calculateHealthAge,
-  calculatePotentialHealthAge,
-  readExcelFile,
-} from "../components/utils/readExcel";
-import { getTodayReportCount } from "../components/utils/reportService";
-import { verifySubscriptionStatus } from "../components/utils/purchase";
-import { useFocusEffect } from "@react-navigation/native";
+import { CommonActions, useFocusEffect } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 import { useSubscription } from "../context/subScriptionContext";
+import {
+  FREE_DAILY_TASK_LIMIT,
+  getDailyLimitStatus,
+} from "../components/utils/usageLimit";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAuth } from "../context/authContext";
+import i18n from "../components/i18n";
 
 type HomeScreenProps = {
   navigation: DrawerNavigationProp<DrawerParamList, "Main">;
 };
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
-
-
-  const [count, setCount] = React.useState();
+  const [count, setCount] = React.useState<number>(0);
   const { t } = useTranslation();
-
-
-
-  const [isValid, setIsValid] = React.useState<boolean | null>(null);
-  const { isSubscribed, autoRenewing, refreshSubscription } = useSubscription();
-  const checkSubscription = async () => {
-    // const { isValid } = await verifySubscriptionStatus();
-    if (isSubscribed && autoRenewing) {
-      setIsValid(true);
-    } else if (isSubscribed && !autoRenewing) {
-      setIsValid(true);
-    } else {
-      setIsValid(false);
-    }
-    // setIsValid(isValid);
-    // setIsValid(true); // change later to dynamic
-    // getReportCount();
-  };
+  const { isSubscribed } = useSubscription();
+  const { signOut } = useAuth();
+  const hasPremium = isSubscribed;
 
   useFocusEffect(
     React.useCallback(() => {
-      checkSubscription();
       getReportCount();
-    }, [])
-  )
-  const getReportCount = async () => {
-    const ReportCount = await getTodayReportCount();
-    console.log(ReportCount, "count");
+    }, [isSubscribed])
+  );
 
-    setCount(ReportCount);
+  const getReportCount = async () => {
+    const status = await getDailyLimitStatus(Boolean(isSubscribed));
+    setCount(status.used);
   };
 
   useFocusEffect(
@@ -92,11 +73,45 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     }, [])
   );
 
+  const navigateToRootLanguage = () => {
+    let parentNavigator: any = navigation;
+    while (parentNavigator?.getParent?.()) {
+      parentNavigator = parentNavigator.getParent();
+    }
+
+    parentNavigator?.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: "Language" }],
+      })
+    );
+  };
+
+  const handleDevResetAppData = () => {
+    Alert.alert("Reset app data", "This will clear local app data and restart onboarding.", [
+      { text: t("Hs_Cancel"), style: "cancel" },
+      {
+        text: "Reset",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            await signOut();
+            await AsyncStorage.clear();
+            await i18n.changeLanguage("en");
+            navigateToRootLanguage();
+          } catch (error) {
+            console.error("Failed to reset app data:", error);
+            Alert.alert("Error", "Unable to reset app data.");
+          }
+        },
+      },
+    ]);
+  };
 
   return (
     <View style={styles.container}>
       <View style={{ width: "100%" }}>
-        {!isValid && (
+        {!hasPremium && (
           <View
             style={{
               width: "100%",
@@ -146,7 +161,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                     }}
                   ></Font>
                   <Font
-                    text={` ${count || 0}/3`}
+                    text={` ${count}/${FREE_DAILY_TASK_LIMIT}`}
                     style={{
                       fontWeight: "600",
                       fontSize: 12,
@@ -183,6 +198,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             ></Image> */}
           </View>
         </View>
+        {__DEV__ && (
+          <TouchableOpacity style={styles.devResetButton} onPress={handleDevResetAppData}>
+            <Text style={styles.devResetText}>Reset App Data (DEV)</Text>
+          </TouchableOpacity>
+        )}
       </View>
       <Button
         type="intro"
@@ -197,18 +217,16 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         }}
         title="startAssessment"
         onPress={() => {
-          console.log(isValid, "isValid");
-
-          if (isValid) {
+          if (hasPremium) {
             navigation.navigate("healthAgeTest");
           } else {
-            if (parseInt(count) < 3) {
+            if (count < FREE_DAILY_TASK_LIMIT) {
               navigation.navigate("healthAgeTest");
             } else {
               console.log(count, "count");
               
               Alert.alert(
-                `${t("dailyLimit")} : ${count || 0}/3`,
+                `${t("dailyLimit")} : ${count}/${FREE_DAILY_TASK_LIMIT}`,
                 t("JoinPro"),
                 [
                   { text: t("Hs_Cancel"), style: "cancel" },
@@ -245,6 +263,21 @@ const styles = StyleSheet.create({
   subText: {
     fontSize: 18,
     color: "gray",
+  },
+  devResetButton: {
+    marginTop: 6,
+    borderWidth: 1,
+    borderColor: "#ef4444",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    alignSelf: "flex-start",
+    backgroundColor: "#fff5f5",
+  },
+  devResetText: {
+    color: "#b91c1c",
+    fontSize: 12,
+    fontWeight: "600",
   },
 });
 

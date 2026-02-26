@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React from "react";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import BottomTabNavigator from "./BottomTabNavigator";
 import ProfileScreen from "../screens/PurchaseScreen";
@@ -19,9 +19,6 @@ import ReportSettings from "../screens/ReportSettings";
 import PrintScreen from "../screens/PrintScreen";
 import GroupDetailsScreen from "../screens/GroupDetailsScreen";
 import FilterScreen from "../screens/FilterScreen";
-import { verifySubscriptionStatus } from "../components/utils/purchase";
-import { getTodayReportCount } from "../components/utils/reportService";
-import { useFocusEffect } from "@react-navigation/native";
 import { useSubscription } from "../context/subScriptionContext";
 import AboutAppScreen from "../screens/AboutAppScreen";
 
@@ -189,31 +186,10 @@ export type StackParamList = {
   };
 };
 const HeaderRight = ({ navigation }) => {
-  const [isValid, setIsValid] = React.useState<boolean | null>(null);
-  const { isSubscribed, autoRenewing, refreshSubscription } = useSubscription();
+  const { isSubscribed } = useSubscription();
 
-  React.useEffect(()=>{
-    SubscriptionCheck();
-  })
-  const SubscriptionCheck = () => {
-  
-    if (isSubscribed && autoRenewing) {
-    setIsValid(true);
-    } else if (isSubscribed && !autoRenewing) {
-      setIsValid(true);
-    } else {
-      setIsValid(false);
-    }
-  // setIsValid(true); // change back to dynamic
-  };
-
-
-  return (
-    <>
-      {isValid ? (
-        <></>
-      ) : (
-        <TouchableOpacity onPress={() => navigation.navigate("Purchase")}>
+  return isSubscribed ? null : (
+    <TouchableOpacity onPress={() => navigation.navigate("Purchase")}>
           <LinearGradient
             colors={["#FDE182", "#F6F3EC", "#CCA02D"]}
             start={{ x: 0, y: 0 }}
@@ -253,9 +229,7 @@ const HeaderRight = ({ navigation }) => {
               ></Image>
             </View>
           </LinearGradient>
-        </TouchableOpacity>
-      )}
-    </>
+    </TouchableOpacity>
   );
 };
 const Stack = createStackNavigator<StackParamList>();

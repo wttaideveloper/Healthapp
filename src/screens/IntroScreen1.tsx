@@ -1,18 +1,19 @@
 import React from "react";
 import {
   View,
-  Text,
   StyleSheet,
   Image,
   TouchableOpacity,
-  Animated,
+  Text,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import Font from "../components/CustomisedFont";
 import { icons } from "../components/images";
 import Button from "../components/Button";
-import { initDatabase } from "../components/utils/database";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const ONBOARDING_COMPLETED_KEY = "onboarding_completed";
 
 type IntroScreen1Props = {
   navigation: StackNavigationProp<RootStackParamList, "Intro1">;
@@ -180,10 +181,24 @@ const IntroScreen1: React.FC<IntroScreen1Props> = ({ navigation }) => {
             setStep(step + 1);
             // handleNext();
           } else {
-            navigation.navigate("InitialScreen");
+            AsyncStorage.setItem(ONBOARDING_COMPLETED_KEY, "true")
+              .catch((error) => console.error("Failed to persist onboarding:", error))
+              .finally(() => {
+                navigation.replace("SignIn");
+              });
           }
         }}
       ></Button>
+      {step === 3 ? (
+        <TouchableOpacity
+          style={{ alignItems: "center", marginTop: -24, marginBottom: 20 }}
+          onPress={() => navigation.replace("SignIn")}
+        >
+          <Text style={{ color: "#0C9FD5", fontWeight: "500", fontSize: 13 }}>
+            Already have an account? Sign in
+          </Text>
+        </TouchableOpacity>
+      ) : null}
     </View>
   );
 };

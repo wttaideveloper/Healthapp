@@ -58,26 +58,8 @@ const LanguageScreen: React.FC<LanguageScreenProps> = ({ navigation }) => {
     setLanguage(lng);
   };
 
-  const checkLanguageFromStore = async () => {
-    try {
-      const storedLang = await AsyncStorage.getItem("language");
-      if (storedLang) {
-        i18n.changeLanguage(storedLang);
-        setLanguage(storedLang);
-        navigation.navigate("Intro1");
-      }
-      else{
-        setLanguageToStore(i18n.language);
-      }
-    } catch (e) {
-      console.error("Failed to fetch language", e);
-    }
-  };
-
   React.useEffect(() => {
-    console.log(i18n.language,"i18n.language");
-    
-    checkLanguageFromStore();
+    setLanguageToStore(i18n.language);
   }, []);
 
   return (
