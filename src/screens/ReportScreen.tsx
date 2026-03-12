@@ -26,8 +26,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import * as MediaLibrary from 'expo-media-library';
 import * as Sharing from "expo-sharing";
 import { useTranslation } from "react-i18next";
-import RNHTMLtoPDF from "react-native-html-to-pdf";
 import { calculateBMIValues } from "../components/utils/BmiCalculation";
+import { useFocusEffect } from "@react-navigation/native";
 
 type ReportScreenProps = DrawerScreenProps<DrawerParamList, "ReportScreen">;
 
@@ -131,6 +131,29 @@ const healthTips = [
 ];
 const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
   const { t } = useTranslation();
+  const goBackOrMain = React.useCallback(() => {
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+      return;
+    }
+    navigation.navigate("Main");
+  }, [navigation]);
+
+  const getHtmlToPdf = React.useCallback(() => {
+    if (Platform.OS === "web") {
+      return null;
+    }
+
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const mod = require("react-native-html-to-pdf");
+      return (mod?.default ?? mod) as {
+        convert: (options: any) => Promise<{ filePath?: string | null }>;
+      };
+    } catch {
+      return null;
+    }
+  }, []);
   const openExternalUrl = async (url: string) => {
     try {
       const supported = await Linking.canOpenURL(url);
@@ -145,19 +168,17 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
     }
   };
 
-  React.useEffect(() => {
-    const backAction = () => {
-      navigation.navigate("Main");
-      return true; // Prevent default back action
-    };
+  useFocusEffect(
+    React.useCallback(() => {
+      const backAction = () => {
+        goBackOrMain();
+        return true;
+      };
 
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      backAction
-    );
-
-    return () => backHandler.remove();
-  }, []);
+      const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
+      return () => backHandler.remove();
+    }, [goBackOrMain])
+  );
   const { answers } = route?.params;
   const { healthAge, potentialAge } = route?.params?.reportData;
 
@@ -476,13 +497,19 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
     const htmlContent = reportHtml;
 
     try {
+      const htmlToPdf = getHtmlToPdf();
+      if (!htmlToPdf) {
+        Alert.alert("Not supported", "PDF export is not supported on web.");
+        return;
+      }
+
       // Generate PDF
       const options = {
         html: htmlContent,
         fileName: `${userName}_health_Report`,
         directory: "Documents",
       };
-      const pdf = await RNHTMLtoPDF.convert(options);
+      const pdf = await htmlToPdf.convert(options);
       console.log("Generated PDF:", pdf.filePath);
 
       if (!pdf.filePath) {
@@ -522,6 +549,12 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
     const htmlContent = reportHtml;
 
     try {
+      const htmlToPdf = getHtmlToPdf();
+      if (!htmlToPdf) {
+        Alert.alert("Not supported", "PDF download is not supported on web.");
+        return;
+      }
+
       // ✅ 1. Generate PDF
       const options = {
         html: htmlContent,
@@ -529,7 +562,7 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
         directory: "Documents", // or "cache"
       };
 
-      const pdf = await RNHTMLtoPDF.convert(options);
+      const pdf = await htmlToPdf.convert(options);
       const tempPath = pdf.filePath;
 
       if (!tempPath) throw new Error("PDF generation failed.");
@@ -564,18 +597,7 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
     }
   };
 
-  React.useEffect(() => {
-    const backAction = () => {
-      navigation.navigate("Main"); // Ensure back goes to healthAgeTest
-      return true; // Prevent default behavior
-    };
-
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      backAction
-    );
-    return () => backHandler.remove(); // Cleanup
-  }, [navigation]);
+  // Back handler is registered via useFocusEffect above.
 
   return (
     <View style={styles.container}>
@@ -591,7 +613,7 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
           style={{ fontWeight: 700, fontSize: 20, color: "#262F40" }}
         ></Font>
         <TouchableOpacity
-          onPress={() => navigation.navigate("Main")}
+          onPress={goBackOrMain}
           style={{
             flexDirection: "row",
             gap: 4,

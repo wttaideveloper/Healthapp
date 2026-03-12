@@ -2,10 +2,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SUB_STATUS_STORAGE_KEY = "sub_status";
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ?? "";
-const LICENSE_STATUS_PATH =
-  process.env.EXPO_PUBLIC_LICENSE_STATUS_PATH ?? "/license/status";
-const LICENSE_ACTIVATE_PATH =
-  process.env.EXPO_PUBLIC_LICENSE_ACTIVATE_PATH ?? "/license/activate";
+const LICENSE_STATUS_PATH = process.env.EXPO_PUBLIC_LICENSE_STATUS_PATH ?? "/license/status";
+const LICENSE_ACTIVATE_PATH = process.env.EXPO_PUBLIC_LICENSE_ACTIVATE_PATH ?? "/license/activate";
 
 export type SubscriptionStatus = {
   isValid: boolean;
@@ -46,7 +44,6 @@ const normalizeBackendStatus = (payload: unknown): SubscriptionStatus | null => 
 };
 
 export const initIAP = async (): Promise<void> => {
-  // License-only builds: no store IAP initialization.
   return;
 };
 
@@ -107,8 +104,7 @@ export const verifySubscriptionStatusBackend = async (
 
     await AsyncStorage.setItem(SUB_STATUS_STORAGE_KEY, JSON.stringify(status));
     return status;
-  } catch (error) {
-    console.error("Backend license status fetch failed:", error);
+  } catch {
     return null;
   }
 };
@@ -162,5 +158,24 @@ export const activateLicenseKey = async (
 
 export const clearCachedSubscriptionStatus = async (): Promise<void> => {
   await AsyncStorage.removeItem(SUB_STATUS_STORAGE_KEY);
+};
+
+export const verifySubscriptionStatusLive = async (): Promise<SubscriptionStatus> => {
+  return verifySubscriptionStatusSafe();
+};
+
+// Native-only exports kept for compatibility with existing imports.
+export const getSubscriptions = async (): Promise<never[]> => [];
+export const purchaseSubscription = async (): Promise<never> => {
+  throw new Error("Purchases are not supported on web.");
+};
+export const restorePurchases = async (): Promise<never> => {
+  throw new Error("Restore is not supported on web.");
+};
+export const cancelSubscription = async (): Promise<void> => {
+  throw new Error("Manage subscription is not supported on web.");
+};
+export const restoreSubscription = async (): Promise<never> => {
+  throw new Error("Restore is not supported on web.");
 };
 

@@ -1,8 +1,32 @@
 import { getDatabase, initDatabase } from './database';
 import { HealthReport, Group, HealthMetrics } from './types';
+import { Platform } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { generateCSV } from './csvGenerator';
+
+const isWeb = Platform.OS === "web";
+const WEB_REPORTS_KEY = "web_reports";
+const WEB_SETTINGS_KEY = "web_settings";
+
+type WebStoredReport = { id: string; date: string; payload: unknown };
+const webTodayKey = (): string => new Date().toISOString().split("T")[0];
+
+const webReadReports = async (): Promise<WebStoredReport[]> => {
+  const raw = await AsyncStorage.getItem(WEB_REPORTS_KEY);
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw) as WebStoredReport[];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
+const webWriteReports = async (reports: WebStoredReport[]): Promise<void> => {
+  await AsyncStorage.setItem(WEB_REPORTS_KEY, JSON.stringify(reports));
+};
 
 // Function to add a health report
 export const addReport = async (
@@ -14,6 +38,17 @@ export const addReport = async (
   reportData: HealthMetrics,
   groupIds?: string[]
 ): Promise<string> => {
+  if (isWeb) {
+    const reportId = `report_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const reports = await webReadReports();
+    reports.push({
+      id: reportId,
+      date: webTodayKey(),
+      payload: { userId, userName, userEmail, title, answers, reportData, groupIds },
+    });
+    await webWriteReports(reports);
+    return reportId;
+  }
   const db = getDatabase();
   try {
     const reportId = 'report_' + Math.random().toString(36).substr(2, 9);// Generate a unique report ID
@@ -55,6 +90,11 @@ export const addReport = async (
 // function to get report count
 
 export const getTodayReportCount = async (): Promise<number> => {
+  if (isWeb) {
+    const reports = await webReadReports();
+    const today = webTodayKey();
+    return reports.filter((r) => r.date === today).length;
+  }
   try {
     const db = getDatabase();
     const todayDate = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
@@ -81,6 +121,9 @@ export const getAllReports = async (
   limit: number = 10,
   offset: number = 0
 ) => {
+  if (isWeb) {
+    return [];
+  }
   const db = getDatabase();
   try {
     let query = `SELECT * FROM reports WHERE 1=1`;
@@ -140,6 +183,9 @@ export const getAllReports = async (
 
 // Function to delete a report
 export const deleteReports = async (reportIds: string[]): Promise<void> => {
+  if (isWeb) {
+    return;
+  }
   const db = getDatabase();
   try {
     if (reportIds.length === 0) {
@@ -167,6 +213,9 @@ export const deleteReports = async (reportIds: string[]): Promise<void> => {
 
 // Function to create a group with a unique ID
 export const createGroup = async (name: string, description?: string): Promise<string> => {
+  if (isWeb) {
+    return `group_${Date.now()}`;
+  }
   const db = getDatabase();
   try {
     const groupId = 'group_' + Math.random().toString(36).substr(2, 9); // Generate a unique group ID
@@ -185,6 +234,9 @@ export const createGroup = async (name: string, description?: string): Promise<s
 
 // Function to add multiple reports to a group
 export const addReportsToGroup = async (groupId: string, reportIds: string[]): Promise<void> => {
+  if (isWeb) {
+    return;
+  }
   const db = getDatabase();
   try {
     for (const reportId of reportIds) {
@@ -218,6 +270,9 @@ export const getReportsByGroup = async (
   groupId: string,
   filters: { name?: string; fromDate?: string; toDate?: string; gender?: string } = {}
 ) => {
+  if (isWeb) {
+    return [];
+  }
   const db = getDatabase();
   try {
     let query = `
@@ -259,6 +314,9 @@ export const getReportsByGroup = async (
 
 // Function to delete multiple reports from a specific group
 export const deleteReportsFromGroup = async (groupId: string, reportIds: string[]): Promise<void> => {
+  if (isWeb) {
+    return;
+  }
   const db = getDatabase();
   try {
     await db.execAsync('BEGIN TRANSACTION');
@@ -283,6 +341,9 @@ export const deleteReportsFromGroup = async (groupId: string, reportIds: string[
 
 // Function to get the count of reports in a group
 export const getReportCountByGroup = async (groupId: string): Promise<number> => {
+  if (isWeb) {
+    return 0;
+  }
   const db = getDatabase();
   try {
     const result = await db.getFirstAsync(
@@ -298,6 +359,9 @@ export const getReportCountByGroup = async (groupId: string): Promise<number> =>
 
 // Function to get all groups with report counts
 export const getAllGroups = async () => {
+  if (isWeb) {
+    return [];
+  }
   const db = getDatabase();
   try {
     const groups = await db.getAllAsync(
@@ -316,6 +380,9 @@ export const getAllGroups = async () => {
 
 // Function to delete multiple groups
 export const deleteGroups = async (groupIds: string[]): Promise<void> => {
+  if (isWeb) {
+    return;
+  }
   const db = getDatabase();
   try {
     if (groupIds.length === 0) {
@@ -342,6 +409,11 @@ export const saveSettings = async (
   address: string,
   image?: string
 ) => {
+  if (isWeb) {
+    const payload = { image: image ?? null, phoneNumber: phoneNumber ?? null, address: address ?? null };
+    await AsyncStorage.setItem(WEB_SETTINGS_KEY, JSON.stringify(payload));
+    return true;
+  }
   const db = getDatabase();
   try {
     await db.runAsync(
@@ -359,6 +431,15 @@ export const saveSettings = async (
 
 // Get current settings
 export const getSettings = async () => {
+  if (isWeb) {
+    const raw = await AsyncStorage.getItem(WEB_SETTINGS_KEY);
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw) as { image?: string | null; phoneNumber?: string | null; address?: string | null };
+    } catch {
+      return null;
+    }
+  }
   const db = getDatabase();
   try {
 
@@ -374,12 +455,36 @@ export const getSettings = async () => {
 
 // Update just the image
 export const updateImage = async (image: string) => {
+  if (isWeb) {
+    const existingRaw = await AsyncStorage.getItem(WEB_SETTINGS_KEY);
+    const existing =
+      existingRaw && typeof existingRaw === "string"
+        ? (JSON.parse(existingRaw) as any)
+        : {};
+    await AsyncStorage.setItem(
+      WEB_SETTINGS_KEY,
+      JSON.stringify({ ...existing, image })
+    );
+    return;
+  }
   const db = getDatabase();
   await db.runAsync(`UPDATE settings SET image = ? WHERE id = 1`, [image]);
 };
 
 // Update just the phone number
 export const updatePhoneNumber = async (phoneNumber: string) => {
+  if (isWeb) {
+    const existingRaw = await AsyncStorage.getItem(WEB_SETTINGS_KEY);
+    const existing =
+      existingRaw && typeof existingRaw === "string"
+        ? (JSON.parse(existingRaw) as any)
+        : {};
+    await AsyncStorage.setItem(
+      WEB_SETTINGS_KEY,
+      JSON.stringify({ ...existing, phoneNumber })
+    );
+    return;
+  }
   const db = getDatabase();
   await db.runAsync(
     `UPDATE settings SET phone_number = ? WHERE id = 1`, 
@@ -389,6 +494,18 @@ export const updatePhoneNumber = async (phoneNumber: string) => {
 
 // Update just the address
 export const updateAddress = async (address: string) => {
+  if (isWeb) {
+    const existingRaw = await AsyncStorage.getItem(WEB_SETTINGS_KEY);
+    const existing =
+      existingRaw && typeof existingRaw === "string"
+        ? (JSON.parse(existingRaw) as any)
+        : {};
+    await AsyncStorage.setItem(
+      WEB_SETTINGS_KEY,
+      JSON.stringify({ ...existing, address })
+    );
+    return;
+  }
   const db = getDatabase();
   await db.runAsync(`UPDATE settings SET address = ? WHERE id = 1`, [address]);
 };
@@ -403,6 +520,9 @@ interface ReportData {
 }
 
 export const exportGroupReportsToCSV = async (groupId: string, groupName: string): Promise<string> => {
+  if (isWeb) {
+    throw new Error("CSV export is not supported on web yet.");
+  }
   try {
     const db = getDatabase();
     // 1. Fetch reports
@@ -458,6 +578,10 @@ export const exportGroupReportsToCSV = async (groupId: string, groupName: string
 
 
 export const getTotalReportCount = async () => {
+  if (isWeb) {
+    const reports = await webReadReports();
+    return reports.length;
+  }
   try {
     const db =  getDatabase();
     const result = await db.getFirstAsync(`SELECT COUNT(*) as count FROM reports`);

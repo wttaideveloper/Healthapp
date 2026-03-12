@@ -561,7 +561,25 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation }) => {
               title1="ft in"
               title2="cm"
               style={{ width: "40%" }}
-              setValue={setSelectedHeightUnit}
+              setValue={(unit: string) => {
+                setSelectedHeightUnit(unit);
+                setValue((prev) => {
+                  if (unit === "cm") {
+                    return {
+                      ...prev,
+                      height_Cm: prev.height_Cm || "170",
+                      height_Ft: "",
+                      height_In: "",
+                    };
+                  }
+                  return {
+                    ...prev,
+                    height_Ft: prev.height_Ft || "5",
+                    height_In: prev.height_In || "5",
+                    height_Cm: "",
+                  };
+                });
+              }}
               value={selectedHeightUnit}
             ></Switch>
           </View>

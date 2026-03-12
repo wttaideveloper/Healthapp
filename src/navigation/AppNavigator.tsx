@@ -1,6 +1,6 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import React from "react";
-import { ActivityIndicator, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ChangeLanguage from "../screens/ChangesLanguage";
 import IntroScreen1 from "../screens/IntroScreen1";
@@ -74,6 +74,7 @@ const AppNavigator: React.FC = () => {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator />
+        <Text style={{ marginTop: 10, color: "#475569" }}>Loading...</Text>
       </View>
     );
   }

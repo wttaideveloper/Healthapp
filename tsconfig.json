@@ -4,5 +4,6 @@
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
     "jsx": "preserve"
-  }
+  },
+  "exclude": ["dist", "node_modules"]
 }

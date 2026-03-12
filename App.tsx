@@ -5,13 +5,45 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { SubscriptionProvider } from "./src/context/subScriptionContext";
 import { AuthProvider } from "./src/context/authContext";
 import { initDatabase } from "./src/components/utils/database";
-import Purchases from "react-native-purchases";
-import { Platform } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { Platform, Text, View } from "react-native";
+import ErrorBoundary from "./src/components/ErrorBoundary";
 
 const App: React.FC = () => {
+  const [fatalError, setFatalError] = React.useState<string | null>(null);
+
   useEffect(() => {
     InitializeDb();
-    initializeRevenueCat();
+  }, []);
+
+  useEffect(() => {
+    if (Platform.OS !== "web") {
+      return;
+    }
+
+    const onError = (event: ErrorEvent) => {
+      const message =
+        event.error instanceof Error
+          ? event.error.stack ?? event.error.message
+          : String(event.message);
+      setFatalError(message);
+    };
+
+    const onUnhandledRejection = (event: PromiseRejectionEvent) => {
+      const reason =
+        event.reason instanceof Error
+          ? event.reason.stack ?? event.reason.message
+          : String(event.reason);
+      setFatalError(reason);
+    };
+
+    window.addEventListener("error", onError);
+    window.addEventListener("unhandledrejection", onUnhandledRejection);
+
+    return () => {
+      window.removeEventListener("error", onError);
+      window.removeEventListener("unhandledrejection", onUnhandledRejection);
+    };
   }, []);
 
   const InitializeDb = async (retryCount = 0) => {
@@ -35,52 +67,32 @@ const App: React.FC = () => {
     }
   };
 
-  const initializeRevenueCat = async () => {
-    try {
-      // Set log level for debugging
-      Purchases.setLogLevel(Purchases.LOG_LEVEL.DEBUG);
-
-      const iosApiKey = process.env.EXPO_PUBLIC_REVENUECAT_IOS_API_KEY;
-      const androidApiKey = process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY;
-
-      const apiKey = Platform.OS === 'ios'
-        ? iosApiKey
-        : androidApiKey;
-
-      if (!apiKey) {
-        console.warn(`RevenueCat API key is missing for ${Platform.OS}. Skipping Purchases.configure.`);
-        return;
-      }
-
-      if (!__DEV__ && apiKey.startsWith("test_")) {
-        console.warn("RevenueCat is using a test API key in non-dev build.");
-      }
-
-      await Purchases.configure({ apiKey });
-
-      console.log('✅ RevenueCat configured successfully');
-
-      // Check initial subscription status
-      const customerInfo = await Purchases.getCustomerInfo();
-      console.log('Initial customer info:', customerInfo.entitlements.active);
-      console.log('Does customer have active subscription?', Object.keys(customerInfo.entitlements.active).length > 0);
-    } catch (error) {
-      console.error('❌ Error configuring RevenueCat:', error);
-    }
-  };
-
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={{ flex: 1 }} edges={["top", "left", "right"]}>
-        <AuthProvider>
-          <SubscriptionProvider>
-            <NavigationContainer>
-              <AppNavigator />
-            </NavigationContainer>
-          </SubscriptionProvider>
-        </AuthProvider>
-      </SafeAreaView>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <SafeAreaView style={{ flex: 1 }} edges={["top", "left", "right"]}>
+          {fatalError ? (
+            <View style={{ flex: 1, padding: 16 }}>
+              <Text style={{ fontSize: 18, fontWeight: "700", marginBottom: 12 }}>
+                App crashed on startup (web)
+              </Text>
+              <Text selectable style={{ fontSize: 12 }}>
+                {fatalError}
+              </Text>
+            </View>
+          ) : null}
+          <ErrorBoundary>
+            <AuthProvider>
+              <SubscriptionProvider>
+                <NavigationContainer>
+                  <AppNavigator />
+                </NavigationContainer>
+              </SubscriptionProvider>
+            </AuthProvider>
+          </ErrorBoundary>
+        </SafeAreaView>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 };
 
