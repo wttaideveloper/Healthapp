@@ -28,6 +28,8 @@ import * as Sharing from "expo-sharing";
 import { useTranslation } from "react-i18next";
 import { calculateBMIValues } from "../components/utils/BmiCalculation";
 import { useFocusEffect } from "@react-navigation/native";
+import { useAuth } from "../context/authContext";
+import { getApiRoot } from "../components/utils/api";
 
 type ReportScreenProps = DrawerScreenProps<DrawerParamList, "ReportScreen">;
 
@@ -45,6 +47,7 @@ const TERMS_OF_USE_URL =
   "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/";
 const PRIVACY_POLICY_URL =
   "https://example.com/privacy-policy";
+const REPORT_PDF_PATH = process.env.EXPO_PUBLIC_REPORT_PDF_PATH ?? "/reports/pdf";
 
 const healthTips = [
   {
@@ -131,6 +134,7 @@ const healthTips = [
 ];
 const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
   const { t } = useTranslation();
+  const { accessToken } = useAuth();
   const goBackOrMain = React.useCallback(() => {
     if (navigation.canGoBack()) {
       navigation.goBack();
@@ -497,6 +501,11 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
     const htmlContent = reportHtml;
 
     try {
+      if (Platform.OS === "web") {
+        await downloadPdfWeb(htmlContent, `${userName}_health_Report.pdf`);
+        return;
+      }
+
       const htmlToPdf = getHtmlToPdf();
       if (!htmlToPdf) {
         Alert.alert("Not supported", "PDF export is not supported on web.");
@@ -549,6 +558,11 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
     const htmlContent = reportHtml;
 
     try {
+      if (Platform.OS === "web") {
+        await downloadPdfWeb(htmlContent, `${userName}_health_Report.pdf`);
+        return;
+      }
+
       const htmlToPdf = getHtmlToPdf();
       if (!htmlToPdf) {
         Alert.alert("Not supported", "PDF download is not supported on web.");
@@ -595,6 +609,51 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
       console.error("Error downloading PDF:", error);
       Alert.alert("Error", "Failed to download PDF");
     }
+  };
+
+  const downloadPdfWeb = async (html: string, fileName: string) => {
+    // Preferred: backend renders HTML to PDF.
+    // Fallback: open browser print dialog (user can "Save as PDF").
+    const API_BASE_URL = getApiRoot();
+    if (API_BASE_URL) {
+      try {
+        const resp = await fetch(`${API_BASE_URL}${REPORT_PDF_PATH}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+          },
+          body: JSON.stringify({ html, fileName }),
+        });
+
+        if (!resp.ok) {
+          throw new Error(`PDF render failed: ${resp.status}`);
+        }
+
+        const ab = await resp.arrayBuffer();
+        const blob = new Blob([ab], { type: "application/pdf" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        return;
+      } catch (error) {
+        console.warn("Backend PDF render failed, falling back to print:", error);
+      }
+    }
+
+    const w = window.open("", "_blank");
+    if (!w) {
+      Alert.alert("Popup blocked", "Please allow popups to download/print the report.");
+      return;
+    }
+    w.document.open();
+    w.document.write(html);
+    w.document.close();
+    w.focus();
+    w.print();
   };
 
   // Back handler is registered via useFocusEffect above.

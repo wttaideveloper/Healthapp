@@ -13,6 +13,7 @@ import Font from "./CustomisedFont";
 import { icons } from "./images";
 import { LinearGradient } from "expo-linear-gradient";
 import Button from "./Button";
+import { getSubscriptionSummaries, initIAP } from "./utils/purchase";
 // import { useNavigation } from "@react-navigation/native";
 
 interface upgradeModalProps {
@@ -30,7 +31,41 @@ const UpgradeModal: React.FC<upgradeModalProps> = ({
   children,
   navigationTo
 }) => {
-    // const navigation = useNavigation();
+  const [planPrice, setPlanPrice] = React.useState("$49/year");
+  const [planName, setPlanName] = React.useState("Annual Pro subscription");
+
+  React.useEffect(() => {
+    if (!visible || Platform.OS === "web") {
+      return;
+    }
+
+    const loadPlanSummary = async () => {
+      try {
+        await initIAP();
+        const summaries = await getSubscriptionSummaries();
+        const preferred =
+          summaries.find((item) => item.packageType.toUpperCase() === "ANNUAL") ??
+          summaries[0];
+
+        if (!preferred) {
+          return;
+        }
+
+        if (preferred.priceString) {
+          setPlanPrice(preferred.priceString);
+        }
+        if (preferred.title || preferred.description) {
+          setPlanName(preferred.title || preferred.description);
+        }
+      } catch {
+        // Keep fallback plan text.
+      }
+    };
+
+    loadPlanSummary().catch(() => undefined);
+  }, [visible]);
+
+  // const navigation = useNavigation();
   return (
     <Modal transparent visible={visible} animationType="slide">
       {/* <TouchableWithoutFeedback onPress={onClose}> */}
@@ -79,10 +114,16 @@ const UpgradeModal: React.FC<upgradeModalProps> = ({
               text="proMembersDesc"
               style={{ color: "#274273", fontSize: 14, fontWeight: 400 ,textAlign:"center",marginVertical:10}}
               ></Font>
-              <Font
-              text={Platform.OS === "ios" ? "$49" : "$39"}
-              style={{ color: "#274273", fontSize: 40, fontWeight: 600 ,textAlign:"center",marginVertical:10}}
-              ></Font>
+              <Text
+                style={{ color: "#274273", fontSize: 40, fontWeight: "600", textAlign: "center", marginVertical: 10 }}
+              >
+                {planPrice}
+              </Text>
+              <Text
+                style={{ color: "#274273", fontSize: 16, fontWeight: "600", textAlign: "center", marginBottom: 10 }}
+              >
+                {planName}
+              </Text>
           <View style={{flexDirection:"row"}}>
               <Button title="upgrade" onPress={navigationTo} style={{padding:10}} ></Button>
           </View>

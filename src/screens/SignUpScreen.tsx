@@ -51,7 +51,9 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
         password,
       });
 
-      navigation.replace("VerifyEmail", { email: result.email });
+      if (result.status === "needs_verification") {
+        navigation.replace("VerifyEmail", { email: result.email });
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to sign up");
     }

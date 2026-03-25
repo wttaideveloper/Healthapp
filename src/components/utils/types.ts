@@ -7,6 +7,14 @@ export interface HealthReport {
   date: string;
   createdAt?: string;
   groupIds?: string[];
+
+  // SQLite/web row compatibility (some screens use snake_case fields).
+  user_id?: string;
+  user_name?: string;
+  user_email?: string;
+  report_data?: string; // JSON string
+  answers?: string; // JSON string
+  created_at?: string;
 }
 
 export interface Group {

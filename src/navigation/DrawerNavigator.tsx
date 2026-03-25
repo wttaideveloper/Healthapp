@@ -4,7 +4,7 @@ import BottomTabNavigator from "./BottomTabNavigator";
 import ProfileScreen from "../screens/PurchaseScreen";
 import HistoryScreen from "../screens/HistoryScreen";
 import { CustomDrawerContent } from "../components/CustomDrawer";
-import { Image, TouchableOpacity, View } from "react-native";
+import { Image, Platform, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from "react-native";
 import { icons } from "../components/images";
 import PurchaseScreen from "../screens/PurchaseScreen";
 import { LinearGradient } from "expo-linear-gradient";
@@ -21,9 +21,16 @@ import GroupDetailsScreen from "../screens/GroupDetailsScreen";
 import FilterScreen from "../screens/FilterScreen";
 import { useSubscription } from "../context/subScriptionContext";
 import AboutAppScreen from "../screens/AboutAppScreen";
+import HomeScreen from "../screens/HomeScreen";
+import UpgradeModal from "../components/upgradeModal";
+import { useAuth } from "../context/authContext";
+import i18n from "../components/i18n";
+import CheckoutResultScreen from "../screens/CheckoutResultScreen";
 
 export type DrawerParamList = {
   Main: undefined;
+  success: undefined;
+  cancel: undefined;
   Profile: undefined;
   Settings: undefined;
   Purchase: undefined;
@@ -189,7 +196,7 @@ const HeaderRight = ({ navigation }) => {
   const { isSubscribed } = useSubscription();
 
   return isSubscribed ? null : (
-    <TouchableOpacity onPress={() => navigation.navigate("Purchase")}>
+    <TouchableOpacity onPress={() => navigation.navigate("Main", { screen: "Purchase" })}>
           <LinearGradient
             colors={["#FDE182", "#F6F3EC", "#CCA02D"]}
             start={{ x: 0, y: 0 }}
@@ -234,10 +241,208 @@ const HeaderRight = ({ navigation }) => {
 };
 const Stack = createStackNavigator<StackParamList>();
 const Drawer = createDrawerNavigator<DrawerParamList>();
+const WebStack = createStackNavigator<DrawerParamList>();
+
+const WebShellHeader: React.FC<{
+  navigation: any;
+  hasPremium: boolean;
+  onRequireUpgrade: () => void;
+}> = ({ navigation, hasPremium, onRequireUpgrade }) => {
+  const { user } = useAuth();
+  const initial = (user?.name?.trim()?.[0] ?? user?.email?.trim()?.[0] ?? "A").toUpperCase();
+  const languageLabel = (i18n.language ?? "en").split("-")[0];
+
+  const [reportsOpen, setReportsOpen] = React.useState(false);
+
+  const goRoot = (name: string, params?: any) => {
+    setReportsOpen(false);
+    navigation.navigate(name, params);
+  };
+
+  const goReports = (routeName: "PrintScreen" | "ReportSettings", params?: any) => {
+    if (!hasPremium) {
+      onRequireUpgrade();
+      return;
+    }
+    goRoot(routeName, params);
+  };
+
+  return (
+    <View style={webStyles.navbar}>
+      <View style={webStyles.brand}>
+        <Image source={icons.menuLogo} style={webStyles.brandLogo} />
+      </View>
+
+      <View style={webStyles.links}>
+        <TouchableOpacity style={webStyles.linkBtn} onPress={() => goRoot("Purchase")}>
+          <Text style={webStyles.linkText}>Purchase</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={webStyles.linkBtn}
+          onPress={() => {
+            if (hasPremium) {
+              goRoot("HistoryScreen");
+            } else {
+              onRequireUpgrade();
+            }
+          }}
+        >
+          <Text style={webStyles.linkText}>History</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={webStyles.linkBtn} onPress={() => goRoot("AboutAppScreen")}>
+          <Text style={webStyles.linkText}>About</Text>
+        </TouchableOpacity>
+
+        <View style={webStyles.dropdownWrap as any}>
+          <TouchableOpacity
+            style={webStyles.linkBtn}
+            onPress={() => setReportsOpen((v) => !v)}
+          >
+            <Text style={webStyles.linkText}>Reports</Text>
+            <Text style={webStyles.caret}>▼</Text>
+          </TouchableOpacity>
+          {reportsOpen ? (
+            <View style={webStyles.dropdown as any}>
+              <TouchableOpacity
+                style={webStyles.dropdownItem}
+                onPress={() => goReports("PrintScreen", { screen: "Questionnaire" })}
+              >
+                <Text style={webStyles.dropdownText}>Print Questionnaire</Text>
+                {!hasPremium ? (
+                  <Image source={icons.proSymbol} style={webStyles.proPill} />
+                ) : null}
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={webStyles.dropdownItem}
+                onPress={() => goReports("PrintScreen", { screen: "Report" })}
+              >
+                <Text style={webStyles.dropdownText}>Print Report</Text>
+                {!hasPremium ? (
+                  <Image source={icons.proSymbol} style={webStyles.proPill} />
+                ) : null}
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={webStyles.dropdownItem}
+                onPress={() => goReports("ReportSettings")}
+              >
+                <Text style={webStyles.dropdownText}>Report Settings</Text>
+                {!hasPremium ? (
+                  <Image source={icons.proSymbol} style={webStyles.proPill} />
+                ) : null}
+              </TouchableOpacity>
+            </View>
+          ) : null}
+        </View>
+
+        <TouchableOpacity style={webStyles.linkBtn} onPress={() => goRoot("Purchase")}>
+          <Text style={webStyles.linkText}>Activation Key</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={webStyles.right}>
+        <TouchableOpacity
+          style={webStyles.langPill}
+          onPress={() => {
+            // RootStack screen
+            navigation.getParent?.()?.navigate?.("ChangeLanguage");
+          }}
+        >
+          <View style={webStyles.avatar}>
+            <Text style={webStyles.avatarText}>{initial}</Text>
+          </View>
+          <Text style={webStyles.langText}>{languageLabel}</Text>
+          <Text style={webStyles.caret}>▼</Text>
+        </TouchableOpacity>
+
+        {!hasPremium ? (
+          <TouchableOpacity style={webStyles.upgradeBtn} onPress={() => goRoot("Purchase")}>
+            <Text style={webStyles.upgradeText}>UPGRADE TO</Text>
+            <Image source={icons.proSymbol} style={webStyles.upgradeProIcon} />
+          </TouchableOpacity>
+        ) : null}
+      </View>
+    </View>
+  );
+};
+
+const WebNavigator: React.FC = () => {
+  const { isSubscribed } = useSubscription();
+  const hasPremium = Boolean(isSubscribed);
+  const [showUpgradeModal, setShowUpgradeModal] = React.useState(false);
+  const navRef = React.useRef<any>(null);
+
+  const WebPage: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    return (
+      <View style={webStyles.page}>
+        <View style={webStyles.pageInner}>{children}</View>
+      </View>
+    );
+  };
+
+  const wrap =
+    <P extends object>(Component: React.ComponentType<P>) =>
+    (props: P) =>
+      (
+        <WebPage>
+          <Component {...props} />
+        </WebPage>
+      );
+
+  return (
+    <>
+      <WebStack.Navigator
+        id={undefined}
+        initialRouteName="Main"
+        screenOptions={({ navigation }) => {
+          // Capture a navigation instance so UpgradeModal can route to Purchase.
+          navRef.current = navigation;
+          return {
+            header: () => (
+              <WebShellHeader
+                navigation={navigation}
+                hasPremium={hasPremium}
+                onRequireUpgrade={() => setShowUpgradeModal(true)}
+              />
+            ),
+            headerShown: true,
+            // Ensure the scene has a constrained height so overflow scrolling works on web.
+            contentStyle: { flex: 1, minHeight: 0 } as any,
+            cardStyle: { backgroundColor: "#F6FBFF", flex: 1 } as any,
+          };
+        }}
+      >
+        <WebStack.Screen name="Main" component={wrap(HomeScreen as any)} />
+        <WebStack.Screen name="success" component={wrap(CheckoutResultScreen as any)} />
+        <WebStack.Screen name="cancel" component={wrap(CheckoutResultScreen as any)} />
+        <WebStack.Screen name="Purchase" component={wrap(PurchaseScreen as any)} />
+        <WebStack.Screen name="HistoryScreen" component={wrap(HistoryScreen as any)} />
+        <WebStack.Screen name="AboutAppScreen" component={wrap(AboutAppScreen as any)} />
+        <WebStack.Screen name="ReportSettings" component={wrap(ReportSettings as any)} />
+        <WebStack.Screen name="PrintScreen" component={wrap(PrintScreen as any)} />
+        <WebStack.Screen name="healthAgeTest" component={wrap(HealthAgeTest as any)} />
+        <WebStack.Screen name="QuestionsScreen" component={wrap(QuestionsScreen as any)} />
+        <WebStack.Screen name="InterestScreen" component={wrap(InterestScreen as any)} />
+        <WebStack.Screen name="ReportScreen" component={wrap(ReportScreen as any)} />
+        <WebStack.Screen name="GroupDetailsScreen" component={wrap(GroupDetailsScreen as any)} />
+        <WebStack.Screen name="FilterScreen" component={wrap(FilterScreen as any)} />
+      </WebStack.Navigator>
+
+      <UpgradeModal
+        visible={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        navigationTo={() => {
+          setShowUpgradeModal(false);
+          navRef.current?.navigate?.("Purchase");
+        }}
+      />
+    </>
+  );
+};
 
 const DrawerScreens: React.FC = () => {
   return (
     <Drawer.Navigator
+      id={undefined}
       drawerContent={(props) => <CustomDrawerContent {...props} />}
       initialRouteName="Main"
     >
@@ -284,7 +489,7 @@ const DrawerScreens: React.FC = () => {
               <HeaderRight navigation={navigation} />
             </View>
           ),
-          headerTitle: () => "",
+          headerTitle: () => null,
           // headerLeft: () => (
           // <View
           //   style={{
@@ -363,7 +568,7 @@ const DrawerScreens: React.FC = () => {
             borderBottomWidth: 0,
           },
           headerTitleAlign: "center",
-          headerTitle: () => "",
+          headerTitle: () => null,
           headerLeft: () => (
             <View
               style={{
@@ -400,7 +605,7 @@ const DrawerScreens: React.FC = () => {
             borderBottomWidth: 0,
           },
           headerTitleAlign: "center",
-          headerTitle: () => "",
+          headerTitle: () => null,
           headerLeft: () => (
             <View
               style={{
@@ -423,7 +628,7 @@ const DrawerScreens: React.FC = () => {
               ></Image>
             </View>
           ),
-          headerRight: () => <HeaderRight navigation={navigation} />,
+          headerRight: () => null,
         })}
       />
       <Drawer.Screen
@@ -437,7 +642,7 @@ const DrawerScreens: React.FC = () => {
             borderBottomWidth: 0,
           },
           headerTitleAlign: "center",
-          headerTitle: () => "",
+          headerTitle: () => null,
           headerLeft: () => (
             <View
               style={{
@@ -474,7 +679,7 @@ const DrawerScreens: React.FC = () => {
             borderBottomWidth: 0,
           },
           headerTitleAlign: "center",
-          headerTitle: () => "",
+          headerTitle: () => null,
           headerLeft: () => (
             <View
               style={{
@@ -504,55 +709,55 @@ const DrawerScreens: React.FC = () => {
         name="healthAgeTest"
         component={HealthAgeTest}
         options={({ navigation }) => ({
-          header: () => "",
+          header: () => null,
           headerTitleAlign: "center",
-          headerTitle: () => "",
-          headerLeft: () => "",
-          headerRight: () => "",
+          headerTitle: () => null,
+          headerLeft: () => null,
+          headerRight: () => null,
         })}
       />
       <Drawer.Screen
         name="QuestionsScreen"
         component={QuestionsScreen}
         options={({ navigation }) => ({
-          header: () => "",
+          header: () => null,
           headerTitleAlign: "center",
-          headerTitle: () => "",
-          headerLeft: () => "",
-          headerRight: () => "",
+          headerTitle: () => null,
+          headerLeft: () => null,
+          headerRight: () => null,
         })}
       />
       <Drawer.Screen
         name="InterestScreen"
         component={InterestScreen}
         options={({ navigation }) => ({
-          header: () => "",
+          header: () => null,
           headerTitleAlign: "center",
-          headerTitle: () => "",
-          headerLeft: () => "",
-          headerRight: () => "",
+          headerTitle: () => null,
+          headerLeft: () => null,
+          headerRight: () => null,
         })}
       />
       <Drawer.Screen
         name="ReportScreen"
         component={ReportScreen}
         options={({ navigation }) => ({
-          header: () => "",
+          header: () => null,
           headerTitleAlign: "center",
-          headerTitle: () => "",
-          headerLeft: () => "",
-          headerRight: () => "",
+          headerTitle: () => null,
+          headerLeft: () => null,
+          headerRight: () => null,
         })}
       />
       <Drawer.Screen
         name="ReportSettings"
         component={ReportSettings}
         options={({ navigation }) => ({
-          header: () => "",
+          header: () => null,
           headerTitleAlign: "center",
-          headerTitle: () => "",
-          headerLeft: () => "",
-          headerRight: () => "",
+          headerTitle: () => null,
+          headerLeft: () => null,
+          headerRight: () => null,
         })}
       />
       <Drawer.Screen
@@ -592,7 +797,7 @@ const DrawerScreens: React.FC = () => {
               <HeaderRight navigation={navigation} />
             </View>
           ),
-          headerTitle: () => "",
+          headerTitle: () => null,
 
         })}
       />
@@ -600,30 +805,38 @@ const DrawerScreens: React.FC = () => {
         name="PrintScreen"
         component={PrintScreen}
         options={({ navigation }) => ({
-          header: () => "",
+          header: () => null,
           headerTitleAlign: "center",
-          headerTitle: () => "",
-          headerLeft: () => "",
-          headerRight: () => "",
+          headerTitle: () => null,
+          headerLeft: () => null,
+          headerRight: () => null,
         })}
       />
       <Drawer.Screen
         name="FilterScreen"
         component={FilterScreen}
         options={({ navigation }) => ({
-          header: () => "",
+          header: () => null,
           headerTitleAlign: "center",
-          headerTitle: () => "",
-          headerLeft: () => "",
-          headerRight: () => "",
+          headerTitle: () => null,
+          headerLeft: () => null,
+          headerRight: () => null,
         })}
       />
     </Drawer.Navigator>
   );
 };
 const DrawerNavigator: React.FC = () => {
+  const { width } = useWindowDimensions();
+  const WEB_DESKTOP_MIN_WIDTH = 900;
+
+  // Web desktop gets the top navbar layout. Web narrow (mobile-sized) uses the normal drawer UI.
+  if (Platform.OS === "web" && width >= WEB_DESKTOP_MIN_WIDTH) {
+    return <WebNavigator />;
+  }
+
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator id={undefined} screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Drawer" component={DrawerScreens} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen name="HistoryScreen" component={HistoryScreen} />
@@ -641,3 +854,107 @@ const DrawerNavigator: React.FC = () => {
 };
 
 export default DrawerNavigator;
+
+const webStyles = StyleSheet.create({
+  navbar: {
+    height: 64,
+    backgroundColor: "#F6FBFF",
+    borderBottomWidth: 1,
+    borderBottomColor: "#E6EEF6",
+    paddingHorizontal: 24,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  brand: { flexDirection: "row", alignItems: "center" },
+  brandLogo: { width: 150, height: 40, resizeMode: "contain" },
+  links: { flexDirection: "row", alignItems: "center", gap: 18 },
+  linkBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 6,
+  },
+  linkText: { fontSize: 14, color: "#1F2A37", fontWeight: "500" },
+  caret: { fontSize: 10, color: "#6B7280" },
+  right: { flexDirection: "row", alignItems: "center", gap: 12 },
+  langPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E6EEF6",
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 999,
+  },
+  avatar: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: "#1D4ED8",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  avatarText: { color: "white", fontSize: 12, fontWeight: "700" },
+  langText: { color: "#111827", fontSize: 13, fontWeight: "600" },
+  upgradeBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    borderWidth: 1,
+    borderColor: "#E0B44C",
+    backgroundColor: "rgba(255,255,255,0.85)",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 999,
+  },
+  upgradeText: { fontSize: 11, color: "#8A5B00", fontWeight: "700" },
+  upgradeProIcon: { width: 46, height: 18, resizeMode: "contain" },
+  dropdownWrap: { position: "relative" },
+  dropdown: {
+    position: "absolute",
+    top: 40,
+    left: 0,
+    width: 220,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E6EEF6",
+    borderRadius: 12,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOpacity: 0.12,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 8 },
+    zIndex: 9999,
+  },
+  dropdownItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+  },
+  dropdownText: { fontSize: 13, color: "#111827", fontWeight: "500" },
+  proPill: { width: 48, height: 18, resizeMode: "contain" },
+  page: {
+    flex: 1,
+    backgroundColor: "#F6FBFF",
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    // The web "main content" scroll container (header stays fixed above).
+    overflowY: "auto" as any,
+    overflowX: "hidden" as any,
+    minHeight: 0,
+    paddingBottom: 24,
+  },
+  pageInner: {
+    flex: 1,
+    width: "100%",
+    maxWidth: 1200,
+    alignSelf: "center",
+    minHeight: 0,
+  },
+} as any);

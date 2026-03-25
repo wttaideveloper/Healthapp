@@ -3,6 +3,7 @@ import {
   BackHandler,
   FlatList,
   Image,
+  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -364,6 +365,8 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
       <FlatList
         data={questionsData[currentIndex].options}
         keyExtractor={(item) => item.text}
+        style={Platform.OS === "web" ? { flex: 1, width: "100%", minHeight: 0 } : undefined}
+        contentContainerStyle={Platform.OS === "web" ? { paddingBottom: 10 } : undefined}
         renderItem={({ item }) => (
           <>
             {console.log(item, "item")}
@@ -398,6 +401,8 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
           //   left:20,
           flexDirection: "row",
           justifyContent: "space-between",
+          marginTop: Platform.OS === "web" ? "auto" : 0,
+          paddingBottom: Platform.OS === "web" ? 24 : 0,
         }}
       >
         <TouchableOpacity
@@ -455,7 +460,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     flexDirection: "column",
-    justifyContent: "space-between",
+    justifyContent: Platform.OS === "web" ? "flex-start" : "space-between",
   },
   question: { fontSize: 20 },
   subQuestion: { fontSize: 12, fontWeight: 400 },

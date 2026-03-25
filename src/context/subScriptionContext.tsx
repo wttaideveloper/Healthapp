@@ -1,16 +1,23 @@
-import React, { createContext, useState, useContext, useEffect, ReactNode } from "react";
+import React, { createContext, useMemo, useState, useContext, useEffect, ReactNode, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
     clearCachedSubscriptionStatus,
+    initIAP,
+    syncRevenueCatStatusToBackend,
+    syncRevenueCatUser,
+    verifySubscriptionStatusRevenueCat,
     verifySubscriptionStatusBackend,
     verifySubscriptionStatusSafe,
 } from "../components/utils/purchase";
 import { useAuth } from "./authContext";
+import { Platform } from "react-native";
 
 interface SubscriptionContextProps {
     isSubscribed: boolean;
     autoRenewing: boolean;
     expiryDate: Date | null;
+    subscriptionSource: "none" | "iap" | "enterprise" | "stripe" | "mixed";
+    providerStatus: string | null;
     refreshSubscription: (forceLive?: boolean) => Promise<void>;
     setDebugSubscriptionOverride: (enabled: boolean | null) => Promise<void>;
     debugSubscriptionOverride: boolean | null;
@@ -22,6 +29,8 @@ const SubscriptionContext = createContext<SubscriptionContextProps>({
     isSubscribed: false,
     autoRenewing: false,
     expiryDate: null,
+    subscriptionSource: "none",
+    providerStatus: null,
     refreshSubscription: async () => { },
     setDebugSubscriptionOverride: async () => { },
     debugSubscriptionOverride: null,
@@ -32,21 +41,45 @@ interface ProviderProps {
 }
 
 export const SubscriptionProvider: React.FC<ProviderProps> = ({ children }) => {
-    const { accessToken, isHydrated: isAuthHydrated } = useAuth();
+    const { accessToken, user, isHydrated: isAuthHydrated } = useAuth();
     const [isSubscribed, setIsSubscribed] = useState(false);
     const [autoRenewing, setAutoRenewing] = useState(false);
     const [expiryDate, setExpiryDate] = useState<Date | null>(null);
+    const [subscriptionSource, setSubscriptionSource] = useState<"none" | "iap" | "enterprise" | "stripe" | "mixed">("none");
+    const [providerStatus, setProviderStatus] = useState<string | null>(null);
     const [debugSubscriptionOverride, setDebugSubscriptionOverrideState] = useState<boolean | null>(null);
 
-    const refreshSubscription = async (forceLive = false) => {
+    const refreshSubscription = useCallback(async (forceLive = false) => {
+        // 1) Backend/license + Stripe(web) status (cached-first).
         let result = await verifySubscriptionStatusSafe();
+        let backendResult: { isValid: boolean; autoRenewing: boolean; expiryDate: Date | null } | null = null;
         if (forceLive) {
             if (!accessToken) {
                 await clearCachedSubscriptionStatus();
                 result = { isValid: false, autoRenewing: false, expiryDate: null };
             } else {
-                const backendResult = await verifySubscriptionStatusBackend(accessToken);
+                backendResult = await verifySubscriptionStatusBackend(accessToken);
                 result = backendResult ?? { isValid: false, autoRenewing: false, expiryDate: null };
+            }
+        }
+
+        // 2) RevenueCat store subscription (native only).
+        let revenueCat: { isValid: boolean; autoRenewing: boolean; expiryDate: Date | null } | null = null;
+        if (Platform.OS !== "web") {
+            try {
+                await initIAP();
+                await syncRevenueCatUser(user?.id ?? null);
+                revenueCat = await verifySubscriptionStatusRevenueCat();
+                if (forceLive && accessToken) {
+                    const didSync = await syncRevenueCatStatusToBackend(accessToken, user?.id ?? null);
+                    if (didSync) {
+                        backendResult = await verifySubscriptionStatusBackend(accessToken);
+                        result = backendResult ?? result;
+                    }
+                }
+            } catch (error) {
+                console.warn("RevenueCat refresh failed:", error);
+                revenueCat = null;
             }
         }
 
@@ -54,29 +87,64 @@ export const SubscriptionProvider: React.FC<ProviderProps> = ({ children }) => {
         if (__DEV__) {
             const storedOverride = await AsyncStorage.getItem(DEBUG_SUB_OVERRIDE_KEY);
             override = storedOverride === "true" ? true : storedOverride === "false" ? false : null;
-            setDebugSubscriptionOverrideState(override);
+            // Avoid re-render loops: only update if value actually changed.
+            setDebugSubscriptionOverrideState((prev) => (prev === override ? prev : override));
         }
 
         if (override === true) {
-            setIsSubscribed(true);
-            setAutoRenewing(true);
-            setExpiryDate(new Date(Date.now() + 365 * 24 * 60 * 60 * 1000));
+            setIsSubscribed((prev) => (prev ? prev : true));
+            setAutoRenewing((prev) => (prev ? prev : true));
+            // Keep a stable expiry date while override is enabled to avoid render loops.
+            setExpiryDate((prev) => prev ?? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000));
+            setSubscriptionSource("mixed");
+            setProviderStatus("active");
             return;
         }
 
         if (override === false) {
-            setIsSubscribed(false);
-            setAutoRenewing(false);
-            setExpiryDate(null);
+            setIsSubscribed((prev) => (prev ? false : prev));
+            setAutoRenewing((prev) => (prev ? false : prev));
+            setExpiryDate((prev) => (prev === null ? prev : null));
+            setSubscriptionSource("none");
+            setProviderStatus(null);
             return;
         }
 
-        setIsSubscribed(result.isValid);
-        setExpiryDate(result.expiryDate ?? null);
-        setAutoRenewing(result.autoRenewing ?? false);
-    };
+        const mergedIsValid = Boolean(result.isValid) || Boolean(revenueCat?.isValid);
+        const mergedAutoRenewing = Boolean(result.autoRenewing) || Boolean(revenueCat?.autoRenewing);
+        const mergedExpiry =
+            result.expiryDate && revenueCat?.expiryDate
+                ? result.expiryDate > revenueCat.expiryDate
+                    ? result.expiryDate
+                    : revenueCat.expiryDate
+                : result.expiryDate ?? revenueCat?.expiryDate ?? null;
 
-    const setDebugSubscriptionOverride = async (enabled: boolean | null) => {
+        const source: "none" | "iap" | "enterprise" | "stripe" | "mixed" =
+            !mergedIsValid
+                ? "none"
+                : revenueCat?.isValid && result.isValid
+                    ? "mixed"
+                    : result.provider === "stripe"
+                        ? "stripe"
+                        : revenueCat?.isValid
+                            ? "iap"
+                        : "enterprise";
+
+        setIsSubscribed((prev) => (prev === mergedIsValid ? prev : mergedIsValid));
+        setAutoRenewing((prev) => (prev === mergedAutoRenewing ? prev : mergedAutoRenewing));
+        setSubscriptionSource((prev) => (prev === source ? prev : source));
+        setProviderStatus((prev) => (prev === (result.providerStatus ?? null) ? prev : (result.providerStatus ?? null)));
+        setExpiryDate((prev) => {
+            const prevTime = prev ? prev.getTime() : null;
+            const nextTime = mergedExpiry ? mergedExpiry.getTime() : null;
+            if (prevTime === nextTime) {
+                return prev;
+            }
+            return mergedExpiry;
+        });
+    }, [accessToken, user?.id]);
+
+    const setDebugSubscriptionOverride = useCallback(async (enabled: boolean | null) => {
         if (!__DEV__) {
             return;
         }
@@ -88,7 +156,7 @@ export const SubscriptionProvider: React.FC<ProviderProps> = ({ children }) => {
         }
 
         await refreshSubscription(false);
-    };
+    }, [refreshSubscription]);
 
     useEffect(() => {
         const bootstrapSubscription = async () => {
@@ -100,7 +168,7 @@ export const SubscriptionProvider: React.FC<ProviderProps> = ({ children }) => {
         bootstrapSubscription().catch((error) => {
             console.error("Failed to bootstrap subscription state:", error);
         });
-    }, []);
+    }, [refreshSubscription]);
 
     useEffect(() => {
         if (!isAuthHydrated) {
@@ -114,18 +182,34 @@ export const SubscriptionProvider: React.FC<ProviderProps> = ({ children }) => {
         refreshOnAuthChange().catch((error) => {
             console.error("Failed to refresh subscription state:", error);
         });
-    }, [accessToken, isAuthHydrated]);
+    }, [accessToken, isAuthHydrated, refreshSubscription]);
+
+    const contextValue = useMemo(
+        () => ({
+            isSubscribed,
+            autoRenewing,
+            expiryDate,
+            subscriptionSource,
+            providerStatus,
+            refreshSubscription,
+            setDebugSubscriptionOverride,
+            debugSubscriptionOverride,
+        }),
+        [
+            isSubscribed,
+            autoRenewing,
+            expiryDate,
+            subscriptionSource,
+            providerStatus,
+            refreshSubscription,
+            setDebugSubscriptionOverride,
+            debugSubscriptionOverride,
+        ]
+    );
 
     return (
         <SubscriptionContext.Provider
-            value={{
-                isSubscribed,
-                autoRenewing,
-                expiryDate,
-                refreshSubscription,
-                setDebugSubscriptionOverride,
-                debugSubscriptionOverride,
-            }}
+            value={contextValue}
         >
             {children}
         </SubscriptionContext.Provider>

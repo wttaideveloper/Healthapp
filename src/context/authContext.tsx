@@ -5,6 +5,7 @@ import {
   SignInInput,
   SignInResult,
   SignUpInput,
+  SignUpResult,
   authService,
 } from "../components/utils/authService";
 
@@ -17,7 +18,7 @@ type AuthContextValue = {
   pendingVerificationEmail: string | null;
   useMockAuth: boolean;
   signIn: (input: SignInInput) => Promise<SignInResult>;
-  signUp: (input: SignUpInput) => Promise<{ email: string }>;
+  signUp: (input: SignUpInput) => Promise<SignUpResult>;
   verifyEmail: (code: string) => Promise<void>;
   resendVerification: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -119,15 +120,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const signUp = async (input: SignUpInput): Promise<{ email: string }> => {
+  const signUp = async (input: SignUpInput): Promise<SignUpResult> => {
     setIsLoading(true);
 
     try {
       const result = await authService.signUp(input);
-      setPendingVerificationEmail(result.email);
-      setPendingVerificationPassword(input.password);
-      await clearSession();
-      return { email: result.email };
+      if (result.status === "needs_verification") {
+        setPendingVerificationEmail(result.email);
+        setPendingVerificationPassword(input.password);
+        await clearSession();
+        return result;
+      }
+
+      await persistSession(result.user, result.session.accessToken);
+      setPendingVerificationEmail(null);
+      setPendingVerificationPassword(null);
+      return result;
     } finally {
       setIsLoading(false);
     }

@@ -27,12 +27,13 @@ const BottomTabNavigator: React.FC<{ navigation: any }> = ({ navigation }) => {
   return (
     <>
       <Tab.Navigator
+        id={undefined}
         screenOptions={({ route }) => ({
           tabBarIcon: ({ focused }) => {
             let iconName;
-            if (route.name === t("home")) {
+            if (route.name === "Home") {
               iconName = focused ? icons.homeLogo : icons.homeLogo;
-            } else if (route.name === t("purchase")) {
+            } else if (route.name === "Purchase") {
               iconName = focused ? icons.purchase : icons.purchase;
             } else {
               iconName = focused ? icons.history : icons.history;
@@ -53,21 +54,30 @@ const BottomTabNavigator: React.FC<{ navigation: any }> = ({ navigation }) => {
             fontWeight: "bold",
             color: "#ffffff",
           },
-          headerTitle: () => "",
-          headerRight: () => "",
+          headerTitle: () => null,
+          headerRight: () => null,
         })}
       >
-        <Tab.Screen name={t("home")} component={HomeScreen} />
-        <Tab.Screen name={t("purchase")} component={PurchaseScreen} />
         <Tab.Screen
-          name={t("history")}
+          name="Home"
+          component={HomeScreen}
+          options={{ tabBarLabel: t("home") }}
+        />
+        <Tab.Screen
+          name="Purchase"
+          component={PurchaseScreen}
+          options={{ tabBarLabel: t("purchase") }}
+        />
+        <Tab.Screen
+          name="History"
           component={HistoryScreen}
+          options={{ tabBarLabel: t("history") }}
           listeners={({ navigation: tabNavigation }) => ({
             tabPress: (e) => {
-              e.preventDefault();
               if (hasPremium) {
-                tabNavigation.navigate(t("history"));
+                tabNavigation.navigate("History");
               } else {
+                (e as any).preventDefault?.();
                 setShowModal(true);
               }
             },
@@ -81,7 +91,7 @@ const BottomTabNavigator: React.FC<{ navigation: any }> = ({ navigation }) => {
         }}
         navigationTo={() => {
           setShowModal(false);
-          navigation.navigate(t("purchase"));
+          navigation.navigate("Purchase");
         }}
       />
     </>

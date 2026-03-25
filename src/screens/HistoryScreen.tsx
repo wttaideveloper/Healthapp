@@ -141,6 +141,17 @@ const HistoryScreen: React.FC<NavigationProps> = () => {
     gender: filterGender,
   };
 
+  const safeJsonParse = useCallback(<T,>(value: unknown, fallback: T): T => {
+    if (typeof value !== "string") return fallback;
+    const trimmed = value.trim();
+    if (!trimmed || trimmed === "undefined" || trimmed === "null") return fallback;
+    try {
+      return JSON.parse(trimmed) as T;
+    } catch {
+      return fallback;
+    }
+  }, []);
+
   // const checkSubscription = async () => {
   //   const { isValid } = await verifySubscriptionStatus();
   //   console.log("Subscription is valid:", isValid);
@@ -643,9 +654,27 @@ const HistoryScreen: React.FC<NavigationProps> = () => {
             reports.length ? (
               <View>
                 {reports.map((val, index) => {
-                  const reportDetails = JSON.parse(val.report_data);
-                  const answersArray = JSON.parse(val.answers);
+                  const reportDetails = safeJsonParse<any>(val.report_data, {});
+                  const answersArray = safeJsonParse<any[]>(val.answers, []);
                   console.log(reportDetails, "reportDetails");
+                  const displayName =
+                    reportDetails?.name ??
+                    reportDetails?.Name ??
+                    (val as any)?.user_name ??
+                    (val as any)?.userName ??
+                    "Unknown";
+                  const displayGender =
+                    reportDetails?.gender ?? reportDetails?.Gender ?? "Unknown";
+                  const displayAge = reportDetails?.age ?? reportDetails?.Age ?? "-";
+                  const displayHeight =
+                    reportDetails?.height ?? reportDetails?.Height ?? "-";
+                  const displayWeight =
+                    reportDetails?.weight ?? reportDetails?.Weight ?? "-";
+                  const displayHealthAge =
+                    reportDetails?.healthAge ??
+                    reportDetails?.HealthAge ??
+                    reportDetails?.health_age ??
+                    "-";
 
                   return (
                     <TouchableOpacity
@@ -671,7 +700,7 @@ const HistoryScreen: React.FC<NavigationProps> = () => {
                         }}
                       >
                         <Font
-                          text={reportDetails.name}
+                          text={String(displayName)}
                           style={{
                             color: "#274273",
                             fontWeight: 700,
@@ -718,7 +747,7 @@ const HistoryScreen: React.FC<NavigationProps> = () => {
                           }}
                         >
                           <Font
-                            text={reportDetails.gender}
+                            text={String(displayGender)}
                             style={{
                               color: "#274273",
                               fontWeight: 500,
@@ -726,7 +755,7 @@ const HistoryScreen: React.FC<NavigationProps> = () => {
                             }}
                           ></Font>
                           <Font
-                            text={reportDetails.age}
+                            text={String(displayAge)}
                             style={{
                               color: "#274273",
                               fontWeight: 500,
@@ -734,7 +763,7 @@ const HistoryScreen: React.FC<NavigationProps> = () => {
                             }}
                           ></Font>
                           <Font
-                            text={reportDetails.height}
+                            text={String(displayHeight)}
                             style={{
                               color: "#274273",
                               fontWeight: 500,
@@ -742,7 +771,7 @@ const HistoryScreen: React.FC<NavigationProps> = () => {
                             }}
                           ></Font>
                           <Font
-                            text={reportDetails.weight}
+                            text={String(displayWeight)}
                             style={{
                               color: "#274273",
                               fontWeight: 500,
@@ -774,7 +803,7 @@ const HistoryScreen: React.FC<NavigationProps> = () => {
                             }}
                           ></Font>
                           <Font
-                            text={` : ${reportDetails.healthAge}`}
+                            text={` : ${String(displayHealthAge)}`}
                             style={{
                               color: "#274273",
                               fontWeight: 700,

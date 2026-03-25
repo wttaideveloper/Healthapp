@@ -13,6 +13,10 @@ import Font from "./CustomisedFont";
 import UpgradeModal from "./upgradeModal";
 import { useSubscription } from "../context/subScriptionContext";
 import { useAuth } from "../context/authContext";
+import { clearCachedSubscriptionStatus } from "./utils/purchase";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const DEBUG_SUB_OVERRIDE_KEY = "debug_subscription_override";
 
 export const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (
   props
@@ -158,7 +162,18 @@ export const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (
         <TouchableOpacity
           style={styles.logoutButton}
           onPress={async () => {
+            // Clear auth + premium caches, then reset to the auth stack.
             await signOut();
+            await clearCachedSubscriptionStatus();
+            await AsyncStorage.removeItem(DEBUG_SUB_OVERRIDE_KEY);
+
+            // Drawer navigator is nested under RootStack; reset parent so we land on SignIn.
+            props.navigation.closeDrawer();
+            const parent = props.navigation.getParent();
+            (parent as any)?.reset?.({
+              index: 0,
+              routes: [{ name: "SignIn" }],
+            });
           }}
         >
           <Text style={styles.logoutButtonText}>Logout</Text>
@@ -204,7 +219,7 @@ export const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (
         }}
         navigationTo={() => {
           setShowModal(false);
-          props.navigation.navigate("Purchase");
+          props.navigation.navigate("Main", { screen: "Purchase" });
         }}
       ></UpgradeModal>
     </ScrollView>

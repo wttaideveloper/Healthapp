@@ -1,9 +1,17 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { apiRequest, getApiRoot } from "./api";
 
 export type AuthUser = {
   id: string;
   name: string;
   email: string;
+  role?: "user" | "admin";
+  isLicensed?: boolean;
+  isEmailVerified?: boolean;
+  status?: "pending" | "active";
+  licenseId?: string | null;
+
+  // Backwards-compat for older screens.
   emailVerified: boolean;
 };
 
@@ -32,14 +40,12 @@ export type SignInResult =
   | { status: "authenticated"; user: AuthUser; session: AuthSession }
   | { status: "needs_verification"; email: string };
 
-export type SignUpResult = {
-  status: "needs_verification";
-  email: string;
-};
+export type SignUpResult =
+  | { status: "authenticated"; user: AuthUser; session: AuthSession }
+  | { status: "needs_verification"; email: string };
 
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ?? "";
 const SHOULD_FORCE_MOCK = process.env.EXPO_PUBLIC_USE_MOCK_AUTH === "true";
-const USE_MOCK_AUTH = SHOULD_FORCE_MOCK || (!API_BASE_URL && __DEV__);
+const USE_MOCK_AUTH = SHOULD_FORCE_MOCK || (!getApiRoot() && __DEV__);
 
 const MOCK_USERS_KEY = "mock_auth_users";
 
@@ -54,6 +60,11 @@ type StoredMockUser = {
 const randomId = () => `${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
 
 const normalizeEmail = (email: string) => email.trim().toLowerCase();
+
+const isValidEmail = (email: string): boolean => {
+  // Pragmatic check; backend still enforces normalization + validation.
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+};
 
 const getMockUsers = async (): Promise<StoredMockUser[]> => {
   const raw = await AsyncStorage.getItem(MOCK_USERS_KEY);
@@ -80,49 +91,6 @@ const toAuthUser = (user: StoredMockUser): AuthUser => ({
   emailVerified: user.emailVerified,
 });
 
-const request = async <T>(
-  path: string,
-  options: RequestInit = {},
-  token?: string | null
-): Promise<T> => {
-  if (!API_BASE_URL) {
-    throw new Error(
-      "Missing EXPO_PUBLIC_API_BASE_URL. Set this env var or enable mock auth with EXPO_PUBLIC_USE_MOCK_AUTH=true."
-    );
-  }
-
-  const headers = new Headers(options.headers ?? {});
-  headers.set("Content-Type", "application/json");
-  if (token) {
-    headers.set("Authorization", `Bearer ${token}`);
-  }
-
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...options,
-    headers,
-  });
-
-  let payload: unknown = null;
-  try {
-    payload = await response.json();
-  } catch {
-    payload = null;
-  }
-
-  if (!response.ok) {
-    const message =
-      typeof payload === "object" &&
-      payload !== null &&
-      "message" in payload &&
-      typeof (payload as { message?: unknown }).message === "string"
-        ? (payload as { message: string }).message
-        : "Authentication request failed";
-    throw new Error(message);
-  }
-
-  return payload as T;
-};
-
 const buildUserFromBackend = (raw: unknown): AuthUser | null => {
   if (!raw || typeof raw !== "object") {
     return null;
@@ -133,27 +101,38 @@ const buildUserFromBackend = (raw: unknown): AuthUser | null => {
     typeof source.id === "string"
       ? source.id
       : typeof source._id === "string"
-      ? source._id
-      : null;
+        ? source._id
+        : null;
 
   const email = typeof source.email === "string" ? source.email : null;
   const name =
     typeof source.name === "string"
       ? source.name
       : typeof source.fullName === "string"
-      ? source.fullName
-      : "";
+        ? source.fullName
+        : "";
 
   if (!id || !email) {
     return null;
   }
 
+  const isEmailVerified =
+    typeof source.isEmailVerified === "boolean"
+      ? source.isEmailVerified
+      : typeof source.emailVerified === "boolean"
+        ? source.emailVerified
+        : true;
+
   return {
     id,
     email,
     name,
-    emailVerified:
-      typeof source.emailVerified === "boolean" ? source.emailVerified : true,
+    role: source.role === "admin" || source.role === "user" ? source.role : undefined,
+    isLicensed: typeof source.isLicensed === "boolean" ? source.isLicensed : undefined,
+    isEmailVerified,
+    status: source.status === "pending" || source.status === "active" ? source.status : undefined,
+    licenseId: typeof source.licenseId === "string" ? source.licenseId : null,
+    emailVerified: isEmailVerified,
   };
 };
 
@@ -167,8 +146,8 @@ const buildSessionFromBackend = (raw: unknown): AuthSession | null => {
     typeof source.accessToken === "string"
       ? source.accessToken
       : typeof source.token === "string"
-      ? source.token
-      : null;
+        ? source.token
+        : null;
 
   if (!accessToken) {
     return null;
@@ -276,22 +255,22 @@ export const authService = {
       return mockSignIn(input);
     }
 
-    const payload = await request<unknown>("/auth/sign-in", {
+    const email = normalizeEmail(input.email);
+    if (!isValidEmail(email)) {
+      throw new Error("Please enter a valid email address.");
+    }
+    if (!input.password) {
+      throw new Error("Password is required.");
+    }
+
+    const payload = await apiRequest<unknown>("/auth/login", {
       method: "POST",
-      body: JSON.stringify(input),
+      body: JSON.stringify({ email, password: input.password }),
     });
 
     const source = payload as Record<string, unknown>;
-    const needsVerification = source?.needsVerification === true;
     const user = buildUserFromBackend(source?.user);
-    const session = buildSessionFromBackend(source?.session ?? source);
-
-    if (needsVerification || !user?.emailVerified) {
-      return {
-        status: "needs_verification",
-        email: input.email,
-      };
-    }
+    const session = buildSessionFromBackend(source);
 
     if (!user || !session) {
       throw new Error("Invalid sign-in response from server");
@@ -309,20 +288,34 @@ export const authService = {
       return mockSignUp(input);
     }
 
-    const payload = await request<unknown>("/auth/sign-up", {
+    const email = normalizeEmail(input.email);
+    if (!input.name?.trim()) {
+      throw new Error("Name is required.");
+    }
+    if (!isValidEmail(email)) {
+      throw new Error("Please enter a valid email address.");
+    }
+    if (!input.password || input.password.length < 6) {
+      throw new Error("Password must be at least 6 characters.");
+    }
+    const checkBackendHealth = await apiRequest("/health", { method: "GET" });
+    if (!checkBackendHealth || typeof checkBackendHealth !== "object") {
+      throw new Error("Unable to connect to authentication server.");
+    }
+
+    const payload = await apiRequest<unknown>("/auth/register", {
       method: "POST",
-      body: JSON.stringify(input),
+      body: JSON.stringify({ name: input.name.trim(), email, password: input.password }),
     });
 
     const source = payload as Record<string, unknown>;
+    const user = buildUserFromBackend(source?.user);
+    const session = buildSessionFromBackend(source);
+    if (user && session) {
+      return { status: "authenticated", user, session };
+    }
 
-    return {
-      status: "needs_verification",
-      email:
-        typeof source?.email === "string"
-          ? source.email
-          : normalizeEmail(input.email),
-    };
+    throw new Error("Invalid sign-up response from server");
   },
 
   async verifyEmail(input: VerifyEmailInput): Promise<void> {
@@ -330,22 +323,15 @@ export const authService = {
       await mockVerifyEmail(input);
       return;
     }
-
-    await request<unknown>("/auth/verify-email", {
-      method: "POST",
-      body: JSON.stringify(input),
-    });
+    // Backend does not expose an email verification endpoint in the provided API.
+    throw new Error("Email verification is not supported by the backend yet.");
   },
 
   async resendVerification(email: string): Promise<void> {
     if (USE_MOCK_AUTH) {
       return;
     }
-
-    await request<unknown>("/auth/resend-verification", {
-      method: "POST",
-      body: JSON.stringify({ email }),
-    });
+    throw new Error("Email verification is not supported by the backend yet.");
   },
 
   async me(accessToken: string): Promise<AuthUser> {
@@ -353,10 +339,8 @@ export const authService = {
       return mockMe(accessToken);
     }
 
-    const payload = await request<unknown>("/auth/me", { method: "GET" }, accessToken);
-    const user = buildUserFromBackend(
-      (payload as Record<string, unknown>)?.user ?? payload
-    );
+    const payload = await apiRequest<unknown>("/auth/me", { method: "GET" }, accessToken);
+    const user = buildUserFromBackend(payload);
 
     if (!user) {
       throw new Error("Invalid user response from server");

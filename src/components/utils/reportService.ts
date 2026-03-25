@@ -7,6 +7,7 @@ import * as Sharing from 'expo-sharing';
 import { generateCSV } from './csvGenerator';
 
 const isWeb = Platform.OS === "web";
+const webImpl = () => require("./reportService.web") as typeof import("./reportService.web");
 const WEB_REPORTS_KEY = "web_reports";
 const WEB_SETTINGS_KEY = "web_settings";
 
@@ -39,15 +40,7 @@ export const addReport = async (
   groupIds?: string[]
 ): Promise<string> => {
   if (isWeb) {
-    const reportId = `report_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-    const reports = await webReadReports();
-    reports.push({
-      id: reportId,
-      date: webTodayKey(),
-      payload: { userId, userName, userEmail, title, answers, reportData, groupIds },
-    });
-    await webWriteReports(reports);
-    return reportId;
+    return webImpl().addReport(userId, userName, userEmail, title, answers, reportData, groupIds);
   }
   const db = getDatabase();
   try {
@@ -91,9 +84,7 @@ export const addReport = async (
 
 export const getTodayReportCount = async (): Promise<number> => {
   if (isWeb) {
-    const reports = await webReadReports();
-    const today = webTodayKey();
-    return reports.filter((r) => r.date === today).length;
+    return webImpl().getTodayReportCount();
   }
   try {
     const db = getDatabase();
@@ -122,7 +113,7 @@ export const getAllReports = async (
   offset: number = 0
 ) => {
   if (isWeb) {
-    return [];
+    return webImpl().getAllReports(filters, limit, offset);
   }
   const db = getDatabase();
   try {
@@ -184,7 +175,7 @@ export const getAllReports = async (
 // Function to delete a report
 export const deleteReports = async (reportIds: string[]): Promise<void> => {
   if (isWeb) {
-    return;
+    return webImpl().deleteReports(reportIds);
   }
   const db = getDatabase();
   try {
@@ -214,7 +205,7 @@ export const deleteReports = async (reportIds: string[]): Promise<void> => {
 // Function to create a group with a unique ID
 export const createGroup = async (name: string, description?: string): Promise<string> => {
   if (isWeb) {
-    return `group_${Date.now()}`;
+    return webImpl().createGroup(name, description);
   }
   const db = getDatabase();
   try {
@@ -235,7 +226,7 @@ export const createGroup = async (name: string, description?: string): Promise<s
 // Function to add multiple reports to a group
 export const addReportsToGroup = async (groupId: string, reportIds: string[]): Promise<void> => {
   if (isWeb) {
-    return;
+    return webImpl().addReportsToGroup(groupId, reportIds);
   }
   const db = getDatabase();
   try {
@@ -271,7 +262,7 @@ export const getReportsByGroup = async (
   filters: { name?: string; fromDate?: string; toDate?: string; gender?: string } = {}
 ) => {
   if (isWeb) {
-    return [];
+    return webImpl().getReportsByGroup(groupId, filters);
   }
   const db = getDatabase();
   try {
@@ -315,7 +306,7 @@ export const getReportsByGroup = async (
 // Function to delete multiple reports from a specific group
 export const deleteReportsFromGroup = async (groupId: string, reportIds: string[]): Promise<void> => {
   if (isWeb) {
-    return;
+    return webImpl().deleteReportsFromGroup(groupId, reportIds);
   }
   const db = getDatabase();
   try {
@@ -342,7 +333,7 @@ export const deleteReportsFromGroup = async (groupId: string, reportIds: string[
 // Function to get the count of reports in a group
 export const getReportCountByGroup = async (groupId: string): Promise<number> => {
   if (isWeb) {
-    return 0;
+    return webImpl().getReportCountByGroup(groupId);
   }
   const db = getDatabase();
   try {
@@ -360,7 +351,7 @@ export const getReportCountByGroup = async (groupId: string): Promise<number> =>
 // Function to get all groups with report counts
 export const getAllGroups = async () => {
   if (isWeb) {
-    return [];
+    return webImpl().getAllGroups();
   }
   const db = getDatabase();
   try {
@@ -381,7 +372,7 @@ export const getAllGroups = async () => {
 // Function to delete multiple groups
 export const deleteGroups = async (groupIds: string[]): Promise<void> => {
   if (isWeb) {
-    return;
+    return webImpl().deleteGroups(groupIds);
   }
   const db = getDatabase();
   try {
@@ -410,9 +401,8 @@ export const saveSettings = async (
   image?: string
 ) => {
   if (isWeb) {
-    const payload = { image: image ?? null, phoneNumber: phoneNumber ?? null, address: address ?? null };
-    await AsyncStorage.setItem(WEB_SETTINGS_KEY, JSON.stringify(payload));
-    return true;
+    // Web implementation supports partial updates; preserve existing fields.
+    return webImpl().saveSettings(image ?? null, phoneNumber ?? null, address ?? null);
   }
   const db = getDatabase();
   try {
@@ -432,13 +422,7 @@ export const saveSettings = async (
 // Get current settings
 export const getSettings = async () => {
   if (isWeb) {
-    const raw = await AsyncStorage.getItem(WEB_SETTINGS_KEY);
-    if (!raw) return null;
-    try {
-      return JSON.parse(raw) as { image?: string | null; phoneNumber?: string | null; address?: string | null };
-    } catch {
-      return null;
-    }
+    return webImpl().getSettings();
   }
   const db = getDatabase();
   try {
@@ -456,16 +440,7 @@ export const getSettings = async () => {
 // Update just the image
 export const updateImage = async (image: string) => {
   if (isWeb) {
-    const existingRaw = await AsyncStorage.getItem(WEB_SETTINGS_KEY);
-    const existing =
-      existingRaw && typeof existingRaw === "string"
-        ? (JSON.parse(existingRaw) as any)
-        : {};
-    await AsyncStorage.setItem(
-      WEB_SETTINGS_KEY,
-      JSON.stringify({ ...existing, image })
-    );
-    return;
+    return webImpl().updateImage(image);
   }
   const db = getDatabase();
   await db.runAsync(`UPDATE settings SET image = ? WHERE id = 1`, [image]);
@@ -474,16 +449,7 @@ export const updateImage = async (image: string) => {
 // Update just the phone number
 export const updatePhoneNumber = async (phoneNumber: string) => {
   if (isWeb) {
-    const existingRaw = await AsyncStorage.getItem(WEB_SETTINGS_KEY);
-    const existing =
-      existingRaw && typeof existingRaw === "string"
-        ? (JSON.parse(existingRaw) as any)
-        : {};
-    await AsyncStorage.setItem(
-      WEB_SETTINGS_KEY,
-      JSON.stringify({ ...existing, phoneNumber })
-    );
-    return;
+    return webImpl().updatePhoneNumber(phoneNumber);
   }
   const db = getDatabase();
   await db.runAsync(
@@ -495,16 +461,7 @@ export const updatePhoneNumber = async (phoneNumber: string) => {
 // Update just the address
 export const updateAddress = async (address: string) => {
   if (isWeb) {
-    const existingRaw = await AsyncStorage.getItem(WEB_SETTINGS_KEY);
-    const existing =
-      existingRaw && typeof existingRaw === "string"
-        ? (JSON.parse(existingRaw) as any)
-        : {};
-    await AsyncStorage.setItem(
-      WEB_SETTINGS_KEY,
-      JSON.stringify({ ...existing, address })
-    );
-    return;
+    return webImpl().updateAddress(address);
   }
   const db = getDatabase();
   await db.runAsync(`UPDATE settings SET address = ? WHERE id = 1`, [address]);
@@ -521,7 +478,7 @@ interface ReportData {
 
 export const exportGroupReportsToCSV = async (groupId: string, groupName: string): Promise<string> => {
   if (isWeb) {
-    throw new Error("CSV export is not supported on web yet.");
+    return webImpl().exportGroupReportsToCSV(groupId, groupName);
   }
   try {
     const db = getDatabase();
@@ -579,8 +536,7 @@ export const exportGroupReportsToCSV = async (groupId: string, groupName: string
 
 export const getTotalReportCount = async () => {
   if (isWeb) {
-    const reports = await webReadReports();
-    return reports.length;
+    return webImpl().getTotalReportCount();
   }
   try {
     const db =  getDatabase();

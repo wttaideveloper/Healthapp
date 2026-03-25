@@ -415,18 +415,18 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation }) => {
           >
             {selectedHeightUnit == "cm" ? (
               <>
-                {console.log("Height options:", heightOptionsInCm)}
-                {console.log("Index of 170:", heightOptionsInCm.indexOf("170"))}
                 <WheelPickerExpo
-                  key={`heightCm-picker-${value.height_Cm}-${selectedHeightUnit}`}
+                  // Key must not depend on value, otherwise the picker remounts on every change (web resets to 0).
+                  key={`heightCm-picker-${selectedHeightUnit}`}
                   width={Dimensions.get("window").width} // Use device width
                   height={300}
-                  initialSelectedIndex={
-                    value.height_Cm &&
-                    heightOptionsInCm.includes(value.height_Cm)
-                      ? heightOptionsInCm.indexOf(value.height_Cm)
-                      : heightOptionsInCm.indexOf("170")
-                  }
+                  initialSelectedIndex={(() => {
+                    const idx =
+                      value.height_Cm && heightOptionsInCm.includes(value.height_Cm)
+                        ? heightOptionsInCm.indexOf(value.height_Cm)
+                        : heightOptionsInCm.indexOf("170");
+                    return idx >= 0 ? idx : 0;
+                  })()}
                   // initialSelectedIndex={heightOptionsInCm.indexOf("170")}
                   items={heightOptionsInCm.map((age) => ({
                     label: age,
@@ -463,7 +463,8 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation }) => {
             ) : (
               <>
                 <WheelPickerExpo
-                  key={`heightFt-picker-${value.height_Ft}-${selectedHeightUnit}`}
+                  // Key must not depend on value, otherwise the picker remounts on every change (web resets to 0).
+                  key={`heightFt-picker-${selectedHeightUnit}`}
                   // width={Dimensions.get("window").width} // Use device width
                   // height={300}
                   // initialSelectedIndex={
@@ -471,11 +472,13 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation }) => {
                   //     ? weightOptionsInLb.indexOf("120")
                   //     : weightOptionsInKg.indexOf("54")
                   // }
-                  initialSelectedIndex={
-                    value.height_Ft && heightOptions.includes(value.height_Ft)
-                      ? heightOptions.indexOf(value.height_Ft)
-                      : heightOptions.indexOf("5")
-                  }
+                  initialSelectedIndex={(() => {
+                    const idx =
+                      value.height_Ft && heightOptions.includes(value.height_Ft)
+                        ? heightOptions.indexOf(value.height_Ft)
+                        : heightOptions.indexOf("5");
+                    return idx >= 0 ? idx : 0;
+                  })()}
                   width={"50%"}
                   height={300}
                   // initialSelectedIndex={5} // Default to age 18 (index 17)
@@ -511,16 +514,18 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation }) => {
                   }}
                 />
                 <WheelPickerExpo
-                  key={`heightIn-picker-${value.height_In}-${selectedHeightUnit}`}
+                  // Key must not depend on value, otherwise the picker remounts on every change (web resets to 0).
+                  key={`heightIn-picker-${selectedHeightUnit}`}
                   width={"50%"}
                   height={300}
                   // initialSelectedIndex={6} // Default to age 18 (index 17)
-                  initialSelectedIndex={
-                    value.height_In &&
-                    heightOptionsInInches.includes(value.height_In)
-                      ? heightOptionsInInches.indexOf(value.height_In)
-                      : heightOptionsInInches.indexOf("5")
-                  }
+                  initialSelectedIndex={(() => {
+                    const idx =
+                      value.height_In && heightOptionsInInches.includes(value.height_In)
+                        ? heightOptionsInInches.indexOf(value.height_In)
+                        : heightOptionsInInches.indexOf("5");
+                    return idx >= 0 ? idx : 0;
+                  })()}
                   items={heightOptionsInInches.map((age) => ({
                     label: age,
                     value: age,
@@ -1803,6 +1808,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation }) => {
           //   left:20,
           flexDirection: "row",
           justifyContent: "space-between",
+          paddingBottom: Platform.OS === "web" ? 24 : 0,
         }}
       >
         <TouchableOpacity

@@ -1,287 +1,10 @@
-// import React, { useEffect, useState } from "react";
-// import {
-//   View,
-//   StyleSheet,
-//   Platform,
-//   Image,
-//   ActivityIndicator,
-//   Alert,
-//   Linking,
-//   Text,
-//   TouchableOpacity,
-//   ScrollView,
-// } from "react-native";
-// import { useFocusEffect } from "@react-navigation/native";
-// import { LinearGradient } from "expo-linear-gradient";
-// import { useTranslation } from "react-i18next";
-// import type { PurchasesPackage } from "react-native-purchases";
-
-// import Button from "../components/Button";
-// import Font from "../components/CustomisedFont";
-// import { icons } from "../components/images";
-// import { useSubscription } from "../context/subScriptionContext";
-// import {
-//   getSubscriptions,
-//   initIAP,
-//   purchaseSubscription,
-// } from "../components/utils/purchase";
-
-// // Using Apple's Standard EULA and Privacy Policy as placeholders
-// const TERMS_OF_USE_URL = "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/";
-// const PRIVACY_POLICY_URL = "https://www.apple.com/legal/privacy/";
-
-// const PurchaseScreen: React.FC = () => {
-//   const {
-//     isSubscribed,
-//     refreshSubscription,
-//     setDebugSubscriptionOverride,
-//     debugSubscriptionOverride,
-//   } = useSubscription();
-//   const { t } = useTranslation();
-
-//   const [subscriptions, setSubscriptions] = useState<PurchasesPackage[]>([]);
-//   const [isLoading, setIsLoading] = useState(true);
-//   const [actionLoading, setActionLoading] = useState(false);
-
-//   const loadOfferings = async (): Promise<void> => {
-//     const subs = await getSubscriptions();
-//     setSubscriptions(subs);
-//   };
-
-//   useEffect(() => {
-//     const setup = async () => {
-//       await initIAP();
-//       await loadOfferings();
-//     };
-//     setup();
-//   }, []);
-
-//   const openLegalLink = async (url: string) => {
-//     try {
-//       const supported = await Linking.canOpenURL(url);
-//       if (supported) {
-//         await Linking.openURL(url);
-//       } else {
-//         Alert.alert(t("Error"), "Unable to open link");
-//       }
-//     } catch (error) {
-//       console.error("Failed to open legal link:", error);
-//     }
-//   };
-
-//   // Fixed FocusEffect to prevent infinite loops
-//   useFocusEffect(
-//     React.useCallback(() => {
-//       let isActive = true;
-
-//       const checkSubscription = async () => {
-//         if (actionLoading) return;
-//         setIsLoading(true);
-//         try {
-//           if (isActive) {
-//             await refreshSubscription(true);
-//             await loadOfferings();
-//           }
-//         } catch (error) {
-//           console.error("Subscription refresh failed:", error);
-//         } finally {
-//           if (isActive) setIsLoading(false);
-//         }
-//       };
-
-//       checkSubscription();
-//       return () => { isActive = false; };
-//     }, [])
-//   );
-
-//   const handlePurchase = async () => {
-//     setActionLoading(true);
-//     try {
-//       await purchaseSubscription(subscriptions);
-//       Alert.alert("✅ " + t("UpgradeComplete"), t("NowAProMember"));
-//       await refreshSubscription(true);
-//     } catch (error: unknown) {
-//       const message = error instanceof Error ? error.message : "Purchase failed.";
-//       Alert.alert("❌ " + t("Error"), message);
-//     } finally {
-//       setActionLoading(false);
-//     }
-//   };
-
-//   const handleDevSubscriptionToggle = async () => {
-//     if (actionLoading) return;
-//     setActionLoading(true);
-//     try {
-//       await setDebugSubscriptionOverride(!isSubscribed);
-//     } catch (error) {
-//       console.error("Debug toggle failed:", error);
-//     } finally {
-//       setActionLoading(false);
-//     }
-//   };
-
-//   const benefits = [
-//     { text: "UnlimitedReports" },
-//     { text: "FullReportHistory" },
-//     { text: "PrintYourQuestionnaire" },
-//     { text: "printYourReport" },
-//   ];
-
-//   if (isLoading) {
-//     return (
-//       <View style={styles.loadingContainer}>
-//         <ActivityIndicator size="large" color="#0B9FD4" />
-//       </View>
-//     );
-//   }
-
-//   return (
-//     <View style={{ flex: 1, backgroundColor: "white" }}>
-//       <ScrollView
-//         style={styles.container}
-//         contentContainerStyle={{ paddingBottom: 120 }}
-//       >
-//         {isSubscribed ? (
-//           <View style={styles.proBadgeCard}>
-//             <Font text="NowAProMember" style={styles.proBadgeTitle} />
-//             <Font text="Lifetime Access Enabled" style={styles.proBadgeSub} />
-//           </View>
-//         ) : (
-//           <>
-//             <LinearGradient
-//               start={{ x: 0, y: 1 }}
-//               end={{ x: 1, y: 0 }}
-//               colors={["#ffe0a4", "#ffeebb", "#fee1a1"]}
-//               style={styles.priceCard}
-//             >
-//               <View style={styles.priceTextContainer}>
-//                 <Font
-//                   text={Platform.OS === "ios" ? "$49" : "$39"}
-//                   style={styles.priceValue}
-//                 />
-//                 <Font text="Lifetime Access" style={styles.priceLabel} />
-//               </View>
-//               <Image source={icons.proVersion} style={styles.proIcon} />
-//             </LinearGradient>
-
-//             <View style={styles.headerTextContainer}>
-//               <Font text="goBeyond" style={styles.headerTitle} />
-//               <Font text="JoinPro" style={styles.headerSub} />
-//             </View>
-
-//             <View style={styles.benefitsCard}>
-//               <Font text="WhyJoinPro" style={styles.sectionTitle} />
-//               <View style={styles.divider} />
-//               {benefits.map((val, index) => (
-//                 <View key={index} style={styles.benefitRow}>
-//                   <Image source={icons.tick} style={styles.tickIcon} />
-//                   <Font text={val.text} style={styles.benefitText} />
-//                 </View>
-//               ))}
-
-//               {/* Integrated Legal Section for Guidelines */}
-//               <View style={styles.legalSection}>
-//                 <Text style={styles.disclosureText}>
-//                   One-time purchase for lifetime access. No recurring charges or auto-renewals.
-//                 </Text>
-//                 <View style={styles.linkRow}>
-//                   <TouchableOpacity onPress={() => openLegalLink(TERMS_OF_USE_URL)}>
-//                     <Text style={styles.legalLink}>Terms of Use</Text>
-//                   </TouchableOpacity>
-//                   <Text style={styles.linkSeparator}> • </Text>
-//                   <TouchableOpacity onPress={() => openLegalLink(PRIVACY_POLICY_URL)}>
-//                     <Text style={styles.legalLink}>Privacy Policy</Text>
-//                   </TouchableOpacity>
-//                 </View>
-//               </View>
-//             </View>
-//           </>
-//         )}
-
-//         {__DEV__ && (
-//           <Button
-//             style={{
-//               padding: 10,
-//               marginTop: 12,
-//             }}
-//             title={isSubscribed ? "DEV: Disable Subscription" : "DEV: Enable Subscription"}
-//             onPress={handleDevSubscriptionToggle}
-//             disabled={actionLoading}
-//           />
-//         )}
-//       </ScrollView>
-
-//       {/* Action Button */}
-//       {!isSubscribed && (
-//         <View style={styles.bottomButtonContainer}>
-//           {actionLoading ? (
-//             <ActivityIndicator />
-//           ) : (
-//             <Button
-//               style={{
-//                 padding: 10,
-//                 marginTop: 12,
-//               }}
-//               title="upgrade" onPress={handlePurchase} />
-//           )}
-//         </View>
-//       )}
-//     </View>
-//   );
-// };
-
-// const styles = StyleSheet.create({
-//   container: { flex: 1, paddingHorizontal: 20, paddingTop: 10 },
-//   loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
-//   priceCard: {
-//     borderRadius: 14,
-//     flexDirection: "row",
-//     borderWidth: 1,
-//     borderColor: "#EAECF1",
-//     justifyContent: "space-evenly",
-//     alignItems: "center",
-//     padding: 15,
-//     marginVertical: 10,
-//   },
-//   priceTextContainer: { alignItems: "center", gap: 5 },
-//   priceValue: { fontSize: 40, fontWeight: "700", color: "#B8751D" },
-//   priceLabel: { fontSize: 14, fontWeight: "600", color: "#B8751D" },
-//   proIcon: { width: 90, height: 90 },
-//   headerTextContainer: { marginVertical: 20, gap: 8, alignItems: "center" },
-//   headerTitle: { color: "#274273", fontWeight: "700", fontSize: 22 },
-//   headerSub: { color: "#274273", fontWeight: "400", fontSize: 14 },
-//   benefitsCard: {
-//     backgroundColor: "#F8FAFB",
-//     borderRadius: 24,
-//     padding: 24,
-//     borderWidth: 1,
-//     borderColor: "#EAECF1",
-//   },
-//   sectionTitle: { color: "#274273", fontWeight: "700", fontSize: 18 },
-//   divider: { height: 1, backgroundColor: "#E6ECF2", marginVertical: 12 },
-//   benefitRow: { flexDirection: "row", alignItems: "center", gap: 12, marginVertical: 6 },
-//   tickIcon: { width: 22, height: 22 },
-//   benefitText: { color: "#274273", fontSize: 15 },
-//   legalSection: { marginTop: 20, paddingTop: 15, borderTopWidth: 1, borderTopColor: "#E6ECF2", alignItems: "center" },
-//   disclosureText: { color: "#7D8699", fontSize: 11, textAlign: "center", marginBottom: 10, lineHeight: 16 },
-//   linkRow: { flexDirection: "row", alignItems: "center" },
-//   legalLink: { color: "#0B9FD4", fontSize: 12, textDecorationLine: "underline", fontWeight: "500" },
-//   linkSeparator: { color: "#7D8699", marginHorizontal: 8 },
-//   bottomButtonContainer: { position: "absolute", bottom: 30, left: 20, right: 20 },
-//   proBadgeCard: { borderRadius: 20, backgroundColor: "#F8FAFB", padding: 25, marginTop: 20, alignItems: "center", borderWidth: 1, borderColor: "#EAECF1" },
-//   proBadgeTitle: { color: "#274273", fontWeight: "700", fontSize: 20 },
-//   proBadgeSub: { color: "#0B9FD4", fontWeight: "600", fontSize: 14, marginTop: 5 },
-// });
-
-// export default PurchaseScreen;
-
-
 import React, { useState } from "react";
 import {
   View,
   StyleSheet,
   ActivityIndicator,
   Alert,
+  Platform,
   Text,
   TouchableOpacity,
   TextInput,
@@ -293,52 +16,193 @@ import Button from "../components/Button";
 import Font from "../components/CustomisedFont";
 import { useSubscription } from "../context/subScriptionContext";
 import { useAuth } from "../context/authContext";
-import { activateLicenseKey } from "../components/utils/purchase";
+import {
+  activateLicenseKey,
+  cancelSubscription,
+  getRevenueCatConfigurationError,
+  getSubscriptions,
+  getSubscriptionSummaries,
+  initIAP,
+  purchaseSubscription,
+  restorePurchases,
+  startStripeCheckout,
+  startStripePortal,
+  syncRevenueCatStatusToBackend,
+  type RevenueCatPackageSummary,
+} from "../components/utils/purchase";
 
 const TERMS_OF_USE_URL = "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/";
 const PRIVACY_POLICY_URL = "https://www.apple.com/legal/privacy/";
+const FALLBACK_PLAN_PRICE = "$49/year";
+const FALLBACK_PLAN_DESCRIPTION = "Annual Pro subscription";
+
+const formatDate = (value: Date | null): string | null => {
+  if (!value) return null;
+  return value.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+};
 
 const PurchaseScreen: React.FC = () => {
   const {
     isSubscribed,
+    autoRenewing,
+    expiryDate,
+    subscriptionSource,
+    providerStatus,
     refreshSubscription,
     setDebugSubscriptionOverride,
   } = useSubscription();
-  const { accessToken } = useAuth();
+  const { accessToken, user } = useAuth();
 
   const [licenseKey, setLicenseKey] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+  const [availablePlans, setAvailablePlans] = useState<RevenueCatPackageSummary[]>([]);
+  const [selectedPackageIdentifier, setSelectedPackageIdentifier] = useState<string | null>(null);
+  const [storeError, setStoreError] = useState<string | null>(null);
+  const [webNotice, setWebNotice] = useState<string | null>(null);
+
   const isInitialMount = React.useRef(true);
+  const refreshInFlight = React.useRef(false);
+  const refreshSubscriptionRef = React.useRef(refreshSubscription);
+
+  React.useEffect(() => {
+    refreshSubscriptionRef.current = refreshSubscription;
+  }, [refreshSubscription]);
+
+  React.useEffect(() => {
+    if (Platform.OS !== "web" || typeof window === "undefined") {
+      return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const checkoutSignal =
+      params.get("checkout") ??
+      params.get("checkout_status") ??
+      params.get("session_status") ??
+      params.get("stripe");
+
+    const pathSignal = window.location.pathname.toLowerCase();
+    const normalized = (checkoutSignal ?? "").toLowerCase();
+    const isSuccessPath = pathSignal.includes("/success");
+    const isCancelPath = pathSignal.includes("/cancel");
+
+    if (!checkoutSignal && !isSuccessPath && !isCancelPath) {
+      return;
+    }
+
+    if (normalized.includes("success") || normalized === "paid" || normalized === "complete") {
+      setWebNotice("Checkout completed. Verifying your subscription status...");
+      refreshSubscription(true).catch(() => undefined);
+      return;
+    }
+
+    if (normalized.includes("cancel")) {
+      setWebNotice("Checkout was canceled. You can try again any time.");
+      return;
+    }
+
+    if (isSuccessPath) {
+      setWebNotice("Checkout/portal update received. Verifying your subscription status...");
+      refreshSubscription(true).catch(() => undefined);
+      return;
+    }
+
+    if (isCancelPath) {
+      setWebNotice("Action canceled. Your current subscription status is unchanged.");
+    }
+  }, [refreshSubscription]);
+
+  const selectedPlan = React.useMemo(() => {
+    if (!availablePlans.length) return null;
+    return (
+      availablePlans.find((item) => item.identifier === selectedPackageIdentifier) ??
+      availablePlans.find((item) => item.packageType.toUpperCase() === "ANNUAL") ??
+      availablePlans[0]
+    );
+  }, [availablePlans, selectedPackageIdentifier]);
+
+  const loadNativePlanOptions = React.useCallback(async () => {
+    if (Platform.OS === "web") {
+      return;
+    }
+
+    const configError = getRevenueCatConfigurationError();
+    if (configError) {
+      setStoreError(configError);
+      setAvailablePlans([]);
+      setSelectedPackageIdentifier(null);
+      return;
+    }
+
+    try {
+      await initIAP();
+      const summaries = await getSubscriptionSummaries();
+      if (!summaries.length) {
+        setStoreError("Store plan unavailable right now. Please try again.");
+        setAvailablePlans([]);
+        setSelectedPackageIdentifier(null);
+        return;
+      }
+
+      setStoreError(null);
+      setAvailablePlans(summaries);
+      setSelectedPackageIdentifier((prev) => {
+        if (prev && summaries.some((item) => item.identifier === prev)) {
+          return prev;
+        }
+
+        const annual = summaries.find((item) => item.packageType.toUpperCase() === "ANNUAL");
+        return annual?.identifier ?? summaries[0]?.identifier ?? null;
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to load plans from store.";
+      setStoreError(message);
+      setAvailablePlans([]);
+      setSelectedPackageIdentifier(null);
+    }
+  }, []);
 
   useFocusEffect(
     React.useCallback(() => {
       let isActive = true;
 
       const refresh = async () => {
-        // Only show the full-screen loader on the very first mount
+        if (refreshInFlight.current) {
+          return;
+        }
+        refreshInFlight.current = true;
+
         if (isInitialMount.current) {
           setIsLoading(true);
         }
 
         try {
-          if (isActive) {
-            // Pass 'false' if you don't want a hard-fetch every single focus
-            await refreshSubscription(true);
+          if (!isActive) return;
+          await refreshSubscriptionRef.current(true);
+          if (Platform.OS !== "web") {
+            await loadNativePlanOptions();
           }
         } finally {
           if (isActive) {
             setIsLoading(false);
-            isInitialMount.current = false; // Mark initial load as done
+            isInitialMount.current = false;
           }
+          refreshInFlight.current = false;
         }
       };
 
-      refresh();
+      refresh().catch((error) => {
+        console.warn("Failed to refresh purchase screen:", error);
+      });
+
       return () => {
         isActive = false;
       };
-    }, [refreshSubscription]) // Ensure this is memoized in context!
+    }, [loadNativePlanOptions])
   );
 
   const handleActivateLicense = async () => {
@@ -354,6 +218,7 @@ const PurchaseScreen: React.FC = () => {
 
     setActionLoading(true);
     try {
+      await setDebugSubscriptionOverride(null);
       await activateLicenseKey(accessToken, licenseKey);
       await refreshSubscription(true);
       Alert.alert("License activated", "Pro features are now enabled.");
@@ -371,18 +236,99 @@ const PurchaseScreen: React.FC = () => {
 
     setActionLoading(true);
     try {
-      // Logic: Toggle current state
       await setDebugSubscriptionOverride(!isSubscribed);
-
-      // IMPORTANT: Don't call refreshSubscription(true) here manually 
-      // if your context already updates the local 'isSubscribed' state, 
-      // as it triggers a double render.
-    } catch (e) {
+    } catch {
       Alert.alert("Dev Error", "Failed to toggle");
     } finally {
       setActionLoading(false);
     }
   };
+
+  const handleSubscribe = async () => {
+    if (actionLoading) return;
+    if (!accessToken) {
+      Alert.alert("Sign in required", "Please sign in before starting a subscription.");
+      return;
+    }
+
+    if (Platform.OS !== "web" && storeError) {
+      Alert.alert("RevenueCat setup required", storeError);
+      return;
+    }
+
+    setActionLoading(true);
+    try {
+      await setDebugSubscriptionOverride(null);
+      if (Platform.OS === "web") {
+        await startStripeCheckout(accessToken);
+        return;
+      }
+
+      await initIAP();
+      const packages = await getSubscriptions();
+      await purchaseSubscription(packages, selectedPackageIdentifier);
+      await syncRevenueCatStatusToBackend(accessToken, user?.id ?? null);
+      await refreshSubscription(true);
+      Alert.alert("Upgrade complete", "Subscription is active. Pro features are unlocked.");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to subscribe";
+      Alert.alert("Subscription failed", message);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleRestore = async () => {
+    if (actionLoading) return;
+
+    setActionLoading(true);
+    try {
+      await setDebugSubscriptionOverride(null);
+      const restored = await restorePurchases();
+      if (accessToken) {
+        await syncRevenueCatStatusToBackend(accessToken, user?.id ?? null);
+      }
+      await refreshSubscription(true);
+
+      if (restored?.isValid) {
+        const expiryLabel = formatDate(restored.expiryDate);
+        Alert.alert(
+          "Restore complete",
+          expiryLabel ? `Subscription restored until ${expiryLabel}.` : "Subscription restored successfully."
+        );
+      } else {
+        Alert.alert("Restore complete", "No active subscription was found to restore.");
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to restore purchases";
+      Alert.alert("Restore failed", message);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleManageSubscription = async () => {
+    try {
+      if (Platform.OS === "web") {
+        if (!accessToken) {
+          Alert.alert("Sign in required", "Please sign in before opening billing settings.");
+          return;
+        }
+        await startStripePortal(accessToken);
+        return;
+      }
+      await cancelSubscription();
+    } catch (error) {
+      const message = error instanceof Error
+        ? error.message
+        : Platform.OS === "web"
+          ? "Unable to open billing portal"
+          : "Unable to open subscription management";
+      Alert.alert("Action failed", message);
+    }
+  };
+
+  const expiryLabel = formatDate(expiryDate);
 
   if (isLoading) {
     return (
@@ -392,20 +338,133 @@ const PurchaseScreen: React.FC = () => {
     );
   }
 
+  const planPrice = selectedPlan?.priceString || FALLBACK_PLAN_PRICE;
+  const planTitle = selectedPlan?.title || selectedPlan?.description || FALLBACK_PLAN_DESCRIPTION;
+  const planPeriod = selectedPlan?.billingPeriod ? `Billing period: ${selectedPlan.billingPeriod}` : "";
+  const showPlanOptions = Platform.OS !== "web" && (availablePlans.length > 1 || __DEV__);
+  const sourceLabel =
+    subscriptionSource === "iap"
+      ? "In-app purchase (RevenueCat)"
+      : subscriptionSource === "stripe"
+        ? "Stripe subscription"
+      : subscriptionSource === "enterprise"
+        ? "Enterprise license key"
+        : subscriptionSource === "mixed"
+          ? "RevenueCat + backend license sync"
+          : "Not active";
+  const stripeCancelAtPeriodEnd =
+    subscriptionSource === "stripe" &&
+    isSubscribed &&
+    !autoRenewing &&
+    Boolean(expiryLabel);
+  const statusMessage = stripeCancelAtPeriodEnd
+    ? `Your subscription is scheduled to end on ${expiryLabel}.`
+    : autoRenewing
+      ? `Subscription is active${expiryLabel ? ` until ${expiryLabel}` : ""}.`
+      : `Premium access is active${expiryLabel ? ` until ${expiryLabel}` : ""}.`;
+
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
       <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 120 }}>
         {isSubscribed ? (
           <View style={styles.proBadgeCard}>
+            <Text style={styles.proTag}>PRO</Text>
             <Font text="NowAProMember" style={styles.proBadgeTitle} />
-            <Text style={styles.proBadgeSub}>Your license is active and all pro features are unlocked.</Text>
+            <Text style={styles.proBadgeSub}>
+              {statusMessage}
+            </Text>
+            <Text style={styles.sourceNote}>Access source: {sourceLabel}</Text>
+            {providerStatus ? (
+              <Text style={styles.sourceSubNote}>Provider status: {providerStatus}</Text>
+            ) : null}
+            {Platform.OS !== "web" ? (
+              <>
+                <Button
+                  style={{ padding: 10, marginTop: 12 }}
+                  title="Restore Purchases"
+                  onPress={handleRestore}
+                  disabled={actionLoading}
+                />
+                <Button
+                  style={{ padding: 10, marginTop: 12 }}
+                  title="Manage Subscription"
+                  onPress={handleManageSubscription}
+                  disabled={actionLoading}
+                />
+              </>
+            ) : (
+              <Button
+                style={{ padding: 10, marginTop: 12 }}
+                title="Manage Billing"
+                onPress={handleManageSubscription}
+                disabled={actionLoading}
+              />
+            )}
           </View>
         ) : (
           <View style={styles.licenseCard}>
-            <Text style={styles.licenseTitle}>Activate Pro License</Text>
+            {webNotice ? (
+              <View style={styles.noticeCard}>
+                <Text style={styles.noticeText}>{webNotice}</Text>
+              </View>
+            ) : null}
+            <Text style={styles.licenseTitle}>Health Age Pro</Text>
             <Text style={styles.licenseSubtitle}>
-              Enter your license key from the backend/admin panel to unlock all premium features.
+              Subscribe yearly for full premium access. If you were given a manual license key from your admin panel,
+              you can activate it below instead of purchasing.
             </Text>
+
+            {Platform.OS !== "web" && storeError ? (
+              <View style={styles.errorCard}>
+                <Text style={styles.errorTitle}>Store configuration required</Text>
+                <Text style={styles.errorBody}>{storeError}</Text>
+                <Button
+                  style={{ padding: 10, marginTop: 10 }}
+                  title="Retry Store Load"
+                  onPress={loadNativePlanOptions}
+                  disabled={actionLoading}
+                />
+              </View>
+            ) : null}
+
+            <View style={styles.planCard}>
+              <Text style={styles.planPrice}>{planPrice}</Text>
+              <Text style={styles.planName}>{planTitle}</Text>
+              <Text style={styles.planMeta}>Recurring annual subscription. Cancel any time from your store settings.</Text>
+              {planPeriod ? <Text style={styles.planMeta}>{planPeriod}</Text> : null}
+            </View>
+
+            {showPlanOptions ? (
+              <View style={styles.optionsWrap}>
+                {availablePlans.map((plan) => {
+                  const active = plan.identifier === selectedPlan?.identifier;
+                  const optionTitle =
+                    plan.title ||
+                    plan.description ||
+                    (__DEV__ ? plan.identifier : "Annual Plan");
+                  return (
+                    <TouchableOpacity
+                      key={plan.identifier}
+                      style={[styles.optionCard, active ? styles.optionCardActive : null]}
+                      onPress={() => setSelectedPackageIdentifier(plan.identifier)}
+                      disabled={actionLoading}
+                    >
+                      <Text style={[styles.optionTitle, active ? styles.optionTitleActive : null]}>
+                        {optionTitle}
+                      </Text>
+                      <Text style={[styles.optionPrice, active ? styles.optionTitleActive : null]}>
+                        {plan.priceString || planPrice}
+                      </Text>
+                      {__DEV__ ? (
+                        <Text style={[styles.optionDebug, active ? styles.optionTitleActive : null]}>
+                          {plan.identifier}
+                        </Text>
+                      ) : null}
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            ) : null}
 
             <TextInput
               style={styles.licenseInput}
@@ -423,6 +482,40 @@ const PurchaseScreen: React.FC = () => {
               disabled={actionLoading}
             />
 
+            <Text style={styles.orText}>or</Text>
+            <Button
+              style={{ padding: 10, marginTop: 8 }}
+              title={Platform.OS === "web" ? "Subscribe (Stripe)" : "Subscribe"}
+              onPress={handleSubscribe}
+              disabled={actionLoading}
+            />
+
+            {Platform.OS !== "web" ? (
+              <>
+                <Button
+                  style={{ padding: 10, marginTop: 8 }}
+                  title="Restore Purchases"
+                  onPress={handleRestore}
+                  disabled={actionLoading}
+                />
+                <TouchableOpacity
+                  style={{ marginTop: 10, alignItems: "center" }}
+                  onPress={handleManageSubscription}
+                  disabled={actionLoading}
+                >
+                  <Text style={styles.refreshText}>Manage existing subscription</Text>
+                </TouchableOpacity>
+              </>
+            ) : (
+              <TouchableOpacity
+                style={{ marginTop: 10, alignItems: "center" }}
+                onPress={handleManageSubscription}
+                disabled={actionLoading}
+              >
+                <Text style={styles.refreshText}>Open Stripe billing portal</Text>
+              </TouchableOpacity>
+            )}
+
             <TouchableOpacity
               style={{ marginTop: 10, alignItems: "center" }}
               onPress={() => refreshSubscription(true)}
@@ -435,7 +528,10 @@ const PurchaseScreen: React.FC = () => {
 
         <View style={styles.legalSection}>
           <Text style={styles.disclosureText}>
-            Premium access is controlled by your account license status from our backend.
+            Premium access is tied to your signed-in account. Native apps use store subscriptions through RevenueCat.
+          </Text>
+          <Text style={styles.disclosureText}>
+            Web checkout uses Stripe. Admin-issued license keys can also unlock premium access.
           </Text>
           <Text style={styles.disclosureText}>Terms: {TERMS_OF_USE_URL}</Text>
           <Text style={styles.disclosureText}>Privacy: {PRIVACY_POLICY_URL}</Text>
@@ -473,6 +569,93 @@ const styles = StyleSheet.create({
   },
   licenseTitle: { color: "#274273", fontWeight: "700", fontSize: 20 },
   licenseSubtitle: { color: "#274273", fontSize: 14, marginTop: 8, marginBottom: 12 },
+  planCard: {
+    borderWidth: 1,
+    borderColor: "#E5DCC7",
+    borderRadius: 14,
+    padding: 14,
+    backgroundColor: "#FFF9EE",
+    marginBottom: 14,
+  },
+  errorCard: {
+    borderWidth: 1,
+    borderColor: "#F1C5C5",
+    borderRadius: 12,
+    padding: 12,
+    backgroundColor: "#FFF2F2",
+    marginBottom: 12,
+  },
+  errorTitle: {
+    color: "#8A1717",
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  errorBody: {
+    color: "#9C2A2A",
+    fontSize: 13,
+    marginTop: 4,
+    lineHeight: 18,
+  },
+  planPrice: {
+    color: "#8A5B00",
+    fontSize: 26,
+    fontWeight: "700",
+  },
+  planName: {
+    color: "#274273",
+    fontSize: 14,
+    fontWeight: "600",
+    marginTop: 4,
+  },
+  planMeta: {
+    color: "#7D8699",
+    fontSize: 12,
+    lineHeight: 18,
+    marginTop: 6,
+  },
+  noticeCard: {
+    borderWidth: 1,
+    borderColor: "#C9E3FF",
+    borderRadius: 10,
+    padding: 10,
+    backgroundColor: "#EEF7FF",
+    marginBottom: 12,
+  },
+  noticeText: {
+    color: "#214F87",
+    fontSize: 13,
+    fontWeight: "600",
+    lineHeight: 18,
+  },
+  optionsWrap: {
+    marginBottom: 12,
+    gap: 8,
+  },
+  optionCard: {
+    borderWidth: 1,
+    borderColor: "#D8DEEA",
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    backgroundColor: "#FBFCFE",
+  },
+  optionCardActive: {
+    borderColor: "#1663d6",
+    backgroundColor: "#EEF5FF",
+  },
+  optionTitle: {
+    color: "#1B2F54",
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  optionTitleActive: {
+    color: "#0C3E8A",
+  },
+  optionPrice: {
+    color: "#5D6980",
+    marginTop: 4,
+    fontSize: 13,
+  },
   licenseInput: {
     borderWidth: 1,
     borderColor: "#d8deea",
@@ -488,6 +671,13 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "500",
   },
+  orText: {
+    marginTop: 14,
+    textAlign: "center",
+    color: "#7D8699",
+    fontSize: 12,
+    fontWeight: "600",
+  },
   legalSection: {
     marginTop: 20,
     paddingTop: 15,
@@ -501,15 +691,44 @@ const styles = StyleSheet.create({
   },
   proBadgeCard: {
     borderRadius: 20,
-    backgroundColor: "#F8FAFB",
+    backgroundColor: "#EEF7FF",
     padding: 25,
     marginTop: 20,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#EAECF1",
+    borderColor: "#C9E3FF",
+  },
+  proTag: {
+    backgroundColor: "#0C64D8",
+    color: "#FFFFFF",
+    fontSize: 11,
+    fontWeight: "700",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    overflow: "hidden",
+    marginBottom: 8,
   },
   proBadgeTitle: { color: "#274273", fontWeight: "700", fontSize: 20 },
   proBadgeSub: { color: "#0B9FD4", fontWeight: "600", fontSize: 14, marginTop: 5, textAlign: "center" },
+  sourceNote: {
+    marginTop: 10,
+    color: "#315E99",
+    fontWeight: "600",
+    fontSize: 12,
+    textAlign: "center",
+  },
+  sourceSubNote: {
+    marginTop: 4,
+    color: "#4B6D99",
+    fontSize: 11,
+    textAlign: "center",
+  },
+  optionDebug: {
+    marginTop: 4,
+    fontSize: 11,
+    color: "#516280",
+  },
   bottomLoaderContainer: { position: "absolute", bottom: 30, left: 20, right: 20 },
 });
 
