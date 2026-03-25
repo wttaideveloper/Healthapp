@@ -12,6 +12,33 @@ import ErrorBoundary from "./src/components/ErrorBoundary";
 const App: React.FC = () => {
   const [fatalError, setFatalError] = React.useState<string | null>(null);
 
+  const linking = React.useMemo(
+    () => ({
+      prefixes: [],
+      config: {
+        screens: {
+          InitialScreen: {
+            path: "",
+            screens: {
+              Main: "",
+              Purchase: "purchase",
+              HistoryScreen: "history",
+              AboutAppScreen: "about",
+              ReportSettings: "report-settings",
+              success: "success",
+              cancel: "cancel",
+            },
+          },
+          ChangeLanguage: "change-language",
+          SignIn: "signin",
+          SignUp: "signup",
+          VerifyEmail: "verify-email",
+        },
+      },
+    }),
+    []
+  );
+
   useEffect(() => {
     InitializeDb();
   }, []);
@@ -84,7 +111,7 @@ const App: React.FC = () => {
           <ErrorBoundary>
             <AuthProvider>
               <SubscriptionProvider>
-                <NavigationContainer>
+                <NavigationContainer linking={linking}>
                   <AppNavigator />
                 </NavigationContainer>
               </SubscriptionProvider>

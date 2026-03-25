@@ -269,9 +269,9 @@ const WebShellHeader: React.FC<{
 
   return (
     <View style={webStyles.navbar}>
-      <View style={webStyles.brand}>
+      <TouchableOpacity style={webStyles.brand} onPress={() => goRoot("Main")}>
         <Image source={icons.menuLogo} style={webStyles.brandLogo} />
-      </View>
+      </TouchableOpacity>
 
       <View style={webStyles.links}>
         <TouchableOpacity style={webStyles.linkBtn} onPress={() => goRoot("Purchase")}>

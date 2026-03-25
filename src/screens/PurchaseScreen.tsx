@@ -352,6 +352,9 @@ const PurchaseScreen: React.FC = () => {
         : subscriptionSource === "mixed"
           ? "RevenueCat + backend license sync"
           : "Not active";
+  const canOpenStripeBilling =
+    Platform.OS === "web" &&
+    (subscriptionSource === "stripe" || subscriptionSource === "mixed");
   const stripeCancelAtPeriodEnd =
     subscriptionSource === "stripe" &&
     isSubscribed &&
@@ -392,13 +395,17 @@ const PurchaseScreen: React.FC = () => {
                   disabled={actionLoading}
                 />
               </>
-            ) : (
+            ) : canOpenStripeBilling ? (
               <Button
                 style={{ padding: 10, marginTop: 12 }}
                 title="Manage Billing"
                 onPress={handleManageSubscription}
                 disabled={actionLoading}
               />
+            ) : (
+              <Text style={styles.sourceSubNote}>
+                Billing portal is available only for Stripe subscriptions.
+              </Text>
             )}
           </View>
         ) : (
