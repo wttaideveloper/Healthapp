@@ -36,7 +36,28 @@ export type DrawerParamList = {
   Profile: undefined;
   Settings: undefined;
   Purchase: undefined;
-  healthAgeTest: undefined;
+  healthAgeTest:
+    | {
+        resumeFromQuestions?: boolean;
+        resumeStep?: number;
+        prefill?: {
+          name?: string;
+          age?: string;
+          gender?: string;
+          selectedHeightUnit?: string;
+          selectedWeightUnit?: string;
+          selectedGlucoseUnit?: string;
+          fasting?: boolean;
+          heightValue?: string;
+          weightValue?: string;
+          bloodPressureSys?: string;
+          bloodPressureDia?: string;
+          bloodGlucose_mg?: string;
+          bloodGlucose_mmol?: string;
+          blood_glucose_mmol_points?: string;
+        };
+      }
+    | undefined;
   HistoryScreen: undefined;
   ReportSettings: undefined;
   AboutAppScreen: undefined;
@@ -126,7 +147,28 @@ export type StackParamList = {
   Settings: undefined;
   AboutAppScreen: undefined;
   Purchase: undefined;
-  healthAgeTest: undefined;
+  healthAgeTest:
+    | {
+        resumeFromQuestions?: boolean;
+        resumeStep?: number;
+        prefill?: {
+          name?: string;
+          age?: string;
+          gender?: string;
+          selectedHeightUnit?: string;
+          selectedWeightUnit?: string;
+          selectedGlucoseUnit?: string;
+          fasting?: boolean;
+          heightValue?: string;
+          weightValue?: string;
+          bloodPressureSys?: string;
+          bloodPressureDia?: string;
+          bloodGlucose_mg?: string;
+          bloodGlucose_mmol?: string;
+          blood_glucose_mmol_points?: string;
+        };
+      }
+    | undefined;
   ReportSettings: undefined;
   HistoryScreen: undefined;
   PrintScreen: {
@@ -253,7 +295,10 @@ const WebShellHeader: React.FC<{
 }> = ({ navigation, hasPremium, onRequireUpgrade }) => {
   const { user, signOut } = useAuth();
   const initial = (user?.name?.trim()?.[0] ?? user?.email?.trim()?.[0] ?? "A").toUpperCase();
-  const languageCode = (i18n.language ?? "en").split("-")[0].toLowerCase();
+  const [currentLanguage, setCurrentLanguage] = React.useState(
+    (i18n.language ?? "en").split("-")[0].toLowerCase()
+  );
+  const languageCode = currentLanguage;
   const languageLabel =
     languageCode === "en"
       ? "English"
@@ -262,9 +307,27 @@ const WebShellHeader: React.FC<{
       : languageCode.toUpperCase();
 
   const [reportsOpen, setReportsOpen] = React.useState(false);
+  const [languageOpen, setLanguageOpen] = React.useState(false);
+  const languageOptions = [
+    { code: "en", label: "English" },
+    { code: "hi", label: "हिन्दी" },
+    { code: "es", label: "Español" },
+    { code: "ja", label: "日本語" },
+    { code: "fr", label: "Français" },
+    { code: "zh", label: "中文" },
+    { code: "ko", label: "한국어" },
+    { code: "ru", label: "Русский" },
+    { code: "pt", label: "Português" },
+    { code: "de", label: "Deutsch" },
+    { code: "vi", label: "Tiếng Việt" },
+    { code: "mg", label: "Malagasy" },
+    { code: "da", label: "Dansk" },
+    { code: "ta", label: "தமிழ்" },
+  ];
 
   const goRoot = (name: string, params?: any) => {
     setReportsOpen(false);
+    setLanguageOpen(false);
     navigation.navigate(name, params);
   };
 
@@ -288,6 +351,17 @@ const WebShellHeader: React.FC<{
       });
     } catch (error) {
       console.error("Web logout failed:", error);
+    }
+  };
+
+  const handleSelectLanguage = async (code: string) => {
+    try {
+      await i18n.changeLanguage(code);
+      await AsyncStorage.setItem("language", code);
+      setCurrentLanguage(code);
+      setLanguageOpen(false);
+    } catch (error) {
+      console.error("Language change failed:", error);
     }
   };
 
@@ -321,7 +395,10 @@ const WebShellHeader: React.FC<{
           <View style={webStyles.dropdownWrap as any}>
             <TouchableOpacity
               style={webStyles.linkBtn}
-              onPress={() => setReportsOpen((v) => !v)}
+              onPress={() => {
+                setLanguageOpen(false);
+                setReportsOpen((v) => !v);
+              }}
             >
               <Text style={webStyles.linkText}>Reports</Text>
               <Text style={webStyles.caret}>▼</Text>
@@ -368,18 +445,39 @@ const WebShellHeader: React.FC<{
           <TouchableOpacity style={webStyles.logoutPillBtn} onPress={handleLogout}>
             <Text style={webStyles.logoutPillText}>Logout</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={webStyles.langPill}
-            onPress={() => {
-              navigation.getParent?.()?.navigate?.("ChangeLanguage");
-            }}
-          >
-            <View style={webStyles.avatar}>
-              <Text style={webStyles.avatarText}>{initial}</Text>
-            </View>
-            <Text style={webStyles.langText}>{languageLabel}</Text>
-            <Text style={webStyles.caret}>▼</Text>
-          </TouchableOpacity>
+          <View style={webStyles.dropdownWrap as any}>
+            <TouchableOpacity
+              style={webStyles.langPill}
+              onPress={() => {
+                setReportsOpen(false);
+                setLanguageOpen((v) => !v);
+              }}
+            >
+              <View style={webStyles.avatar}>
+                <Text style={webStyles.avatarText}>{initial}</Text>
+              </View>
+              <Text style={webStyles.langText}>{languageLabel}</Text>
+              <Text style={webStyles.caret}>▼</Text>
+            </TouchableOpacity>
+            {languageOpen ? (
+              <View style={[webStyles.dropdown as any, webStyles.languageDropdown]}>
+                {languageOptions.map((option) => {
+                  const active = option.code === languageCode;
+                  return (
+                    <TouchableOpacity
+                      key={option.code}
+                      style={webStyles.dropdownItem}
+                      onPress={() => handleSelectLanguage(option.code)}
+                    >
+                      <Text style={[webStyles.dropdownText, active ? webStyles.dropdownTextActive : null]}>
+                        {option.label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            ) : null}
+          </View>
 
           {!hasPremium ? (
             <TouchableOpacity style={webStyles.upgradeBtn} onPress={() => goRoot("Purchase")}>
@@ -1006,7 +1104,15 @@ const webStyles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   dropdownText: { fontSize: 13, color: "#111827", fontWeight: "500" },
+  dropdownTextActive: { color: "#0F4FA8", fontWeight: "700" },
   proPill: { width: 48, height: 18, resizeMode: "contain" },
+  languageDropdown: {
+    width: 190,
+    left: "auto",
+    right: 0,
+    maxHeight: 320,
+    overflowY: "auto" as any,
+  },
   page: {
     flex: 1,
     backgroundColor: "#FFFFFF",

@@ -29,7 +29,7 @@ import { Dimensions } from "react-native";
 
 type HealthAgeTestProps = DrawerScreenProps<DrawerParamList, "healthAgeTest">;
 
-const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation }) => {
+const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const isWebDesktop = Platform.OS === "web" && width >= 900;
@@ -90,12 +90,66 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation }) => {
     blood_glucose_mmol_points: "",
   });
   const [popup, setPopup] = React.useState(true);
+  const [stepError, setStepError] = React.useState<string | null>(null);
   const [selectedAge, setSelectedAge] = React.useState("");
   const [selectedHeightUnit, setSelectedHeightUnit] = React.useState("ft in");
   const [selectedWeightUnit, setSelectedWeightUnit] = React.useState("Lb");
   const [selectedWaistUnit, setSelectedWaistUnit] = React.useState("In");
   const [selectedGlucoseUnit, setSelectedGlucoseUnit] = React.useState("mg/dL");
   const [switchValue, setSwitchValue] = React.useState("fasting");
+  const restoredFromQuestionsRef = React.useRef(false);
+
+  React.useEffect(() => {
+    const resumePayload = route.params;
+    if (
+      restoredFromQuestionsRef.current ||
+      !resumePayload?.resumeFromQuestions ||
+      !resumePayload?.prefill
+    ) {
+      return;
+    }
+
+    const prefill = resumePayload.prefill;
+    const isImperialHeight = prefill.selectedHeightUnit === "ft in";
+    const isImperialWeight = prefill.selectedWeightUnit === "Lb";
+    const [heightFt = "", heightIn = ""] = isImperialHeight
+      ? (prefill.heightValue || "").split(".")
+      : ["", ""];
+
+    setValue((prev) => ({
+      ...prev,
+      name: prefill.name ?? prev.name,
+      age: prefill.age ?? prev.age,
+      gender: prefill.gender ?? prev.gender,
+      height_Ft: isImperialHeight ? heightFt : "",
+      height_In: isImperialHeight ? heightIn : "",
+      height_Cm: !isImperialHeight ? prefill.heightValue ?? "" : "",
+      weight_Lb: isImperialWeight ? prefill.weightValue ?? "" : "",
+      weight_Kg: !isImperialWeight ? prefill.weightValue ?? "" : "",
+      blood_pressure_sys: prefill.bloodPressureSys ?? prev.blood_pressure_sys,
+      blood_pressure_dia: prefill.bloodPressureDia ?? prev.blood_pressure_dia,
+      blood_glucose_mg: prefill.bloodGlucose_mg ?? prev.blood_glucose_mg,
+      blood_glucose_mmol:
+        prefill.bloodGlucose_mmol ?? prev.blood_glucose_mmol,
+      blood_glucose_mmol_points:
+        prefill.blood_glucose_mmol_points ?? prev.blood_glucose_mmol_points,
+    }));
+
+    setSelectedAge(prefill.age ?? "");
+    if (prefill.selectedHeightUnit) setSelectedHeightUnit(prefill.selectedHeightUnit);
+    if (prefill.selectedWeightUnit) setSelectedWeightUnit(prefill.selectedWeightUnit);
+    if (prefill.selectedGlucoseUnit) setSelectedGlucoseUnit(prefill.selectedGlucoseUnit);
+    setSwitchValue(prefill.fasting === false ? "nonFasting" : "fasting");
+    setPopup(false);
+    setStepError(null);
+    setStep(resumePayload.resumeStep ?? 8);
+    restoredFromQuestionsRef.current = true;
+    navigation.setParams({
+      resumeFromQuestions: false,
+      resumeStep: undefined,
+      prefill: undefined,
+    });
+  }, [route.params]);
   // const [selected, setSelectedWaistUnit] = React.useState("In");
 
   const ageOptions = Array.from({ length: 65 }, (_, i) => (i + 16).toString());
@@ -163,10 +217,13 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation }) => {
       return (
         <>
           <CustomInput
-            title={questions}
+            title="whatIsYourName"
             placeHolder={t("enterName")}
             value={value.name}
-            onChangeText={(val) => setValue((prev) => ({ ...prev, name: val }))}
+            onChangeText={(val) => {
+              setValue((prev) => ({ ...prev, name: val }));
+              if (stepError) setStepError(null);
+            }}
           ></CustomInput>
           <View style={{ height: 300 }}></View>
         </>
@@ -175,13 +232,14 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation }) => {
       return (
         <>
           <CustomInput
-            title={questions}
+            title="whatIsYourAge"
             placeHolder={t("age")}
             value={selectedAge}
             type={"numeric"}
             onChangeText={(val) => {
               setValue((prev) => ({ ...prev, age: val }));
               setSelectedAge(val);
+              if (stepError) setStepError(null);
             }}
           ></CustomInput>
           <WheelPickerExpo
@@ -196,6 +254,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation }) => {
             onChange={({ item }) => {
               setSelectedAge(item.label);
               setValue((prev) => ({ ...prev, age: item.label }));
+              if (stepError) setStepError(null);
             }}
             renderItem={(props) => {
               return (
@@ -252,6 +311,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation }) => {
             <TouchableOpacity
               onPress={() => {
                 setValue((prev) => ({ ...prev, gender: "male" }));
+                if (stepError) setStepError(null);
               }}
               style={{
                 borderWidth: 1,
@@ -279,6 +339,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation }) => {
             <TouchableOpacity
               onPress={() => {
                 setValue((prev) => ({ ...prev, gender: "female" }));
+                if (stepError) setStepError(null);
               }}
               style={{
                 borderWidth: 1,
@@ -1798,6 +1859,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation }) => {
             <Image source={icons.healthAgeLogo} style={{ width: 24, height: 42 }} />
           </View>
           {renderItem()}
+          {stepError ? <Text style={styles.stepErrorText}>{stepError}</Text> : null}
         </View>
 
         <View
@@ -1851,24 +1913,30 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation }) => {
             onPress={() => {
               if (step >= 1 && step < 8) {
                 setPopup(false);
-                if (step == 1 && value.name == "") {
+                if (step == 1 && value.name.trim() == "") {
+                  setStepError("Name is required.");
                   Alert.alert(t("enterThisFields"), "", [{ text: t("Fs_Close") }]);
                   return;
                 }
                 if (step == 2 && value.age == "") {
+                  setStepError("Age is required.");
                   Alert.alert(t("enterThisFields"), "", [{ text: t("Fs_Close") }]);
                   return;
                 }
                 if (step == 3 && value.gender == "") {
+                  setStepError("Gender is required.");
                   Alert.alert(t("enterThisFields"), "", [{ text: t("Fs_Close") }]);
                   return;
                 }
-                setStep(step + 1);
+                setStepError(null);
+                setStep((prev) => Math.min(prev + 1, 8));
               } else {
                 if (value.name == "" || value.age == "" || value.gender == "") {
+                  setStepError("Please complete required fields.");
                   Alert.alert(t("enterRequiredFields"), "", [{ text: t("Fs_Close") }]);
                   return;
                 }
+                setStepError(null);
                 setStep(1);
                 setSelectedAge("");
 
@@ -1999,6 +2067,12 @@ const styles = StyleSheet.create({
   },
   webNavText: {
     fontSize: 15,
+  },
+  stepErrorText: {
+    marginTop: 8,
+    color: "#B42318",
+    fontSize: 13,
+    fontWeight: "600",
   },
   itemContainer: {
     justifyContent: "center",

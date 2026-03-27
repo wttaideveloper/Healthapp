@@ -168,9 +168,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
           <Text style={styles.webHeadline}>{t("helpCalculateHealthAge")}</Text>
 
-          <View style={styles.webImageWrap}>
-            <Image source={icons.homeHero} style={styles.webImage} />
-          </View>
           <View style={styles.webCtaRow}>
             <TouchableOpacity onPress={onStartAssessment} activeOpacity={0.88} style={styles.webCtaBtn}>
               <LinearGradient
@@ -182,6 +179,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                 <Text style={styles.webCtaText}>{t("startAssessment")}</Text>
               </LinearGradient>
             </TouchableOpacity>
+          </View>
+
+          <View style={styles.webImageWrap}>
+            <Image source={icons.homeHero} style={styles.webImage} />
           </View>
         </View>
       </LinearGradient>
@@ -390,14 +391,15 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   webCtaRow: {
-    marginTop: 8,
+    marginTop: 4,
+    marginBottom: 18,
     width: "100%",
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: "flex-start",
+    justifyContent: "flex-start",
   },
   webCtaBtn: {
     width: "100%",
-    maxWidth: 640,
+    maxWidth: 560,
     borderRadius: 999,
     overflow: "hidden",
   },

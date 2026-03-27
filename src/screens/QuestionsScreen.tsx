@@ -5,8 +5,8 @@ import {
   Image,
   Platform,
   StyleSheet,
-  Text,
   TouchableOpacity,
+  useWindowDimensions,
   View,
 } from "react-native";
 import React from "react";
@@ -149,6 +149,8 @@ const questionsData = [
 
 const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
   const { t } = useTranslation();
+  const { width } = useWindowDimensions();
+  const isWebDesktop = Platform.OS === "web" && width >= 900;
   const [currentIndex, setCurrentIndex] = React.useState(0);
   const [selectedAnswers, setSelectedAnswers] = React.useState<
     { questionId: number; text: string; points: number }[]
@@ -281,43 +283,66 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
     }
   };
 
-    const confirmExit = () => {
-      Alert.alert(
-        t("leavePage"),
-        t("leavePageConfirmation"),
-        [
-          { text: t("Hs_Cancel"), style: "cancel" },
-          {
-            text: t("home"),
-            onPress: () => {
-              setSelectedAnswers([]);
-              setCurrentIndex(0);
-              navigation.navigate("Main")
-            }, // Or replace('Main')
+  React.useEffect(() => {
+    const backAction = () => {
+      if (currentIndex === 0) {
+        navigation.navigate("healthAgeTest", {
+          resumeFromQuestions: true,
+          resumeStep: 8,
+          prefill: {
+            name: route.params?.name,
+            age: route.params?.age,
+            gender: route.params?.gender,
+            selectedHeightUnit: route.params?.selectedHeightUnit,
+            selectedWeightUnit: route.params?.selectedWeightUnit,
+            selectedGlucoseUnit: route.params?.selectedGlucoseUnit,
+            fasting: route.params?.fasting,
+            heightValue: route.params?.heightValue,
+            weightValue: route.params?.weightValue,
+            bloodPressureSys: route.params?.bloodPressureSys,
+            bloodPressureDia: route.params?.bloodPressureDia,
+            bloodGlucose_mg: route.params?.bloodGlucose_mg,
+            bloodGlucose_mmol: route.params?.bloodGlucose_mmol,
+            blood_glucose_mmol_points: route.params?.blood_glucose_mmol_points,
           },
-        ],
-        { cancelable: true }
-      );
+        });
+      } else {
+        setCurrentIndex((prev) => Math.max(prev - 1, 0));
+      }
+      return true; // Prevent default back action
     };
-  
-    React.useEffect(() => {
-      const backAction = () => {
-        confirmExit();
-        return true; // Prevent default back action
-      };
-  
-      const backHandler = BackHandler.addEventListener(
-        "hardwareBackPress",
-        backAction
-      );
-  
-      return () => backHandler.remove();
-    }, []);
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, [currentIndex, navigation, route.params]);
 
   const handleBack = () => {
     if (currentIndex == 0) {
-      confirmExit();
-      // navigation.navigate("Main");
+      // Return to the previous assessment form flow without losing inputs.
+      navigation.navigate("healthAgeTest", {
+        resumeFromQuestions: true,
+        resumeStep: 8,
+        prefill: {
+          name: route.params?.name,
+          age: route.params?.age,
+          gender: route.params?.gender,
+          selectedHeightUnit: route.params?.selectedHeightUnit,
+          selectedWeightUnit: route.params?.selectedWeightUnit,
+          selectedGlucoseUnit: route.params?.selectedGlucoseUnit,
+          fasting: route.params?.fasting,
+          heightValue: route.params?.heightValue,
+          weightValue: route.params?.weightValue,
+          bloodPressureSys: route.params?.bloodPressureSys,
+          bloodPressureDia: route.params?.bloodPressureDia,
+          bloodGlucose_mg: route.params?.bloodGlucose_mg,
+          bloodGlucose_mmol: route.params?.bloodGlucose_mmol,
+          blood_glucose_mmol_points: route.params?.blood_glucose_mmol_points,
+        },
+      });
     } else {
       setCurrentIndex(currentIndex - 1);
     }
@@ -394,7 +419,7 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
         )}
       />
       <View
-        style={{
+        style={[{
           width: "100%",
           position: "static",
           //   bottom: 30,
@@ -403,23 +428,23 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
           justifyContent: "space-between",
           marginTop: Platform.OS === "web" ? "auto" : 0,
           paddingBottom: Platform.OS === "web" ? 24 : 0,
-        }}
+        }, isWebDesktop ? styles.webBottomRow : null]}
       >
         <TouchableOpacity
           onPress={() => {
             handleBack();
           }}
-          style={{
+          style={[{
             flexDirection: "row",
             justifyContent: "center",
             alignItems: "center",
             gap: 4,
             padding: 5,
-          }}
+          }, isWebDesktop ? styles.webNavBtn : null]}
         >
           <Image source={icons.Arrow} style={{ width: 10, height: 16 }}></Image>
           <Font
-            style={{ fontWeight: "500", color: "#0C9FD5" }}
+            style={{ fontWeight: "500", color: "#0C9FD5", ...(isWebDesktop ? styles.webNavText : {}) }}
             text="back"
           ></Font>
         </TouchableOpacity>
@@ -427,16 +452,16 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
           onPress={() => {
             handleNext();
           }}
-          style={{
+          style={[{
             flexDirection: "row",
             justifyContent: "center",
             alignItems: "center",
             gap: 4,
             padding: 5,
-          }}
+          }, isWebDesktop ? styles.webNavBtn : null]}
         >
           <Font
-            style={{ fontWeight: "500", color: "#0C9FD5" }}
+            style={{ fontWeight: "500", color: "#0C9FD5", ...(isWebDesktop ? styles.webNavText : {}) }}
             text={"next"}
           ></Font>
           <Image
@@ -479,4 +504,20 @@ const styles = StyleSheet.create({
   },
   nextButtonText: { color: "white", textAlign: "center", fontSize: 18 },
   result: { fontSize: 24, textAlign: "center" },
+  webBottomRow: {
+    paddingBottom: 26,
+    paddingHorizontal: 6,
+  },
+  webNavBtn: {
+    minWidth: 112,
+    height: 38,
+    borderWidth: 1,
+    borderColor: "#0C9FD5",
+    borderRadius: 999,
+    paddingHorizontal: 16,
+    paddingVertical: 0,
+  },
+  webNavText: {
+    fontSize: 15,
+  },
 });

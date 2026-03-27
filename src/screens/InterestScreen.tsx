@@ -33,6 +33,8 @@ import CustomInput from "../components/CustomInput";
 import { addReport } from "../components/utils/reportService";
 import { useTranslation } from "react-i18next";
 import { useSubscription } from "../context/subScriptionContext";
+import { isValidEmail } from "../components/utils/validation";
+import { useAuth } from "../context/authContext";
 import {
   FREE_DAILY_TASK_LIMIT,
   getDailyLimitStatus,
@@ -109,6 +111,7 @@ const InterestScreen: React.FC<InterestScreenProps> = ({
 }) => {
     const { t } = useTranslation();
   const { isSubscribed } = useSubscription();
+  const { user } = useAuth();
   const [otherText, setOtherText] = React.useState("");
 
   const [interestList, setInterestList] = React.useState<
@@ -133,6 +136,21 @@ const InterestScreen: React.FC<InterestScreenProps> = ({
     Zip: "",
     Address: "",
   });
+  const [formError, setFormError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    const fallbackName =
+      route?.params?.reportData?.name?.trim?.() ||
+      user?.name?.trim?.() ||
+      "";
+    const fallbackEmail = user?.email?.trim?.() || "";
+
+    setValue((prev) => ({
+      ...prev,
+      Name: prev.Name || fallbackName,
+      Email: prev.Email || fallbackEmail,
+    }));
+  }, [route?.params?.reportData?.name, user?.email, user?.name]);
   
   // React.useEffect(() => {
   //   const backAction = () => {
@@ -275,8 +293,20 @@ const InterestScreen: React.FC<InterestScreenProps> = ({
   const handleNext = () => {
     if (step == 1) {
       // if (interestList.length == 0) return;
+      setFormError(null);
       setStep(2);
     } else {
+      const name = value.Name.trim();
+      const email = value.Email.trim().toLowerCase();
+      if (!name || !email) {
+        setFormError("Name and email are required.");
+        return;
+      }
+      if (!isValidEmail(email)) {
+        setFormError("Please enter a valid email address.");
+        return;
+      }
+      setFormError(null);
       handleCalculate();
     
     }
@@ -392,17 +422,19 @@ confirmExit();
               title="Is_Name"
               placeHolder={t("enterName")}
               value={value.Name}
-              onChangeText={(val) =>
-                setValue((prev) => ({ ...prev, Name: val }))
-              }
+              onChangeText={(val) => {
+                setValue((prev) => ({ ...prev, Name: val }));
+                if (formError) setFormError(null);
+              }}
             ></CustomInput>
             <CustomInput
               title="Is_Email"
               placeHolder={"Enter Email"}
               value={value.Email}
-              onChangeText={(val) =>
-                setValue((prev) => ({ ...prev, Email: val }))
-              }
+              onChangeText={(val) => {
+                setValue((prev) => ({ ...prev, Email: val }));
+                if (formError) setFormError(null);
+              }}
             ></CustomInput>
             <CustomInput
               title="Is_Address"
@@ -432,6 +464,9 @@ confirmExit();
           </View>
         )}
       </ScrollView>
+      {step == 2 && formError ? (
+        <Text style={styles.formErrorText}>{formError}</Text>
+      ) : null}
       {step == 1 && interestList.some((item) => item.Id === 12) && (
         <CustomInput
           placeHolder="Other"
@@ -526,6 +561,13 @@ const styles = StyleSheet.create({
   },
   nextButtonText: { color: "white", textAlign: "center", fontSize: 18 },
   result: { fontSize: 24, textAlign: "center" },
+  formErrorText: {
+    color: "#B42318",
+    marginTop: 4,
+    marginBottom: 8,
+    fontSize: 13,
+    fontWeight: "600",
+  },
   header: {},
   headerText: {
     fontSize: 18,

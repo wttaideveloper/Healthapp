@@ -27,7 +27,7 @@ import * as MediaLibrary from 'expo-media-library';
 import * as Sharing from "expo-sharing";
 import { useTranslation } from "react-i18next";
 import { calculateBMIValues } from "../components/utils/BmiCalculation";
-import { useFocusEffect } from "@react-navigation/native";
+import { CommonActions, useFocusEffect } from "@react-navigation/native";
 import { useAuth } from "../context/authContext";
 import { getApiRoot } from "../components/utils/api";
 
@@ -135,12 +135,14 @@ const healthTips = [
 const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
   const { t } = useTranslation();
   const { accessToken } = useAuth();
-  const goBackOrMain = React.useCallback(() => {
-    if (navigation.canGoBack()) {
-      navigation.goBack();
-      return;
-    }
-    navigation.navigate("Main");
+  const goHomeFromReport = React.useCallback(() => {
+    // Always close report to Home to avoid returning to Interests and re-submitting.
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: "Main" as never }],
+      })
+    );
   }, [navigation]);
 
   const getHtmlToPdf = React.useCallback(() => {
@@ -175,13 +177,13 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
   useFocusEffect(
     React.useCallback(() => {
       const backAction = () => {
-        goBackOrMain();
+        goHomeFromReport();
         return true;
       };
 
       const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
       return () => backHandler.remove();
-    }, [goBackOrMain])
+    }, [goHomeFromReport])
   );
   const { answers } = route?.params;
   const { healthAge, potentialAge } = route?.params?.reportData;
@@ -672,7 +674,7 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
           style={{ fontWeight: 700, fontSize: 20, color: "#262F40" }}
         ></Font>
         <TouchableOpacity
-          onPress={goBackOrMain}
+          onPress={goHomeFromReport}
           style={{
             flexDirection: "row",
             gap: 4,
