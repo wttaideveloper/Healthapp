@@ -250,7 +250,13 @@ const WebShellHeader: React.FC<{
 }> = ({ navigation, hasPremium, onRequireUpgrade }) => {
   const { user } = useAuth();
   const initial = (user?.name?.trim()?.[0] ?? user?.email?.trim()?.[0] ?? "A").toUpperCase();
-  const languageLabel = (i18n.language ?? "en").split("-")[0];
+  const languageCode = (i18n.language ?? "en").split("-")[0].toLowerCase();
+  const languageLabel =
+    languageCode === "en"
+      ? "English"
+      : languageCode === "hi"
+      ? "हिन्दी"
+      : languageCode.toUpperCase();
 
   const [reportsOpen, setReportsOpen] = React.useState(false);
 
@@ -269,97 +275,98 @@ const WebShellHeader: React.FC<{
 
   return (
     <View style={webStyles.navbar}>
-      <TouchableOpacity style={webStyles.brand} onPress={() => goRoot("Main")}>
-        <Image source={icons.menuLogo} style={webStyles.brandLogo} />
-      </TouchableOpacity>
-
-      <View style={webStyles.links}>
-        <TouchableOpacity style={webStyles.linkBtn} onPress={() => goRoot("Purchase")}>
-          <Text style={webStyles.linkText}>Purchase</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={webStyles.linkBtn}
-          onPress={() => {
-            if (hasPremium) {
-              goRoot("HistoryScreen");
-            } else {
-              onRequireUpgrade();
-            }
-          }}
-        >
-          <Text style={webStyles.linkText}>History</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={webStyles.linkBtn} onPress={() => goRoot("AboutAppScreen")}>
-          <Text style={webStyles.linkText}>About</Text>
+      <View style={webStyles.navInner}>
+        <TouchableOpacity style={webStyles.brand} onPress={() => goRoot("Main")}>
+          <Image source={icons.menuLogo} style={webStyles.brandLogo} />
         </TouchableOpacity>
 
-        <View style={webStyles.dropdownWrap as any}>
+        <View style={webStyles.links}>
+          <TouchableOpacity style={webStyles.linkBtn} onPress={() => goRoot("Purchase")}>
+            <Text style={webStyles.linkText}>Purchase</Text>
+          </TouchableOpacity>
           <TouchableOpacity
             style={webStyles.linkBtn}
-            onPress={() => setReportsOpen((v) => !v)}
+            onPress={() => {
+              if (hasPremium) {
+                goRoot("HistoryScreen");
+              } else {
+                onRequireUpgrade();
+              }
+            }}
           >
-            <Text style={webStyles.linkText}>Reports</Text>
-            <Text style={webStyles.caret}>▼</Text>
+            <Text style={webStyles.linkText}>History</Text>
           </TouchableOpacity>
-          {reportsOpen ? (
-            <View style={webStyles.dropdown as any}>
-              <TouchableOpacity
-                style={webStyles.dropdownItem}
-                onPress={() => goReports("PrintScreen", { screen: "Questionnaire" })}
-              >
-                <Text style={webStyles.dropdownText}>Print Questionnaire</Text>
-                {!hasPremium ? (
-                  <Image source={icons.proSymbol} style={webStyles.proPill} />
-                ) : null}
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={webStyles.dropdownItem}
-                onPress={() => goReports("PrintScreen", { screen: "Report" })}
-              >
-                <Text style={webStyles.dropdownText}>Print Report</Text>
-                {!hasPremium ? (
-                  <Image source={icons.proSymbol} style={webStyles.proPill} />
-                ) : null}
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={webStyles.dropdownItem}
-                onPress={() => goReports("ReportSettings")}
-              >
-                <Text style={webStyles.dropdownText}>Report Settings</Text>
-                {!hasPremium ? (
-                  <Image source={icons.proSymbol} style={webStyles.proPill} />
-                ) : null}
-              </TouchableOpacity>
-            </View>
-          ) : null}
+          <TouchableOpacity style={webStyles.linkBtn} onPress={() => goRoot("AboutAppScreen")}>
+            <Text style={webStyles.linkText}>About</Text>
+          </TouchableOpacity>
+
+          <View style={webStyles.dropdownWrap as any}>
+            <TouchableOpacity
+              style={webStyles.linkBtn}
+              onPress={() => setReportsOpen((v) => !v)}
+            >
+              <Text style={webStyles.linkText}>Reports</Text>
+              <Text style={webStyles.caret}>▼</Text>
+            </TouchableOpacity>
+            {reportsOpen ? (
+              <View style={webStyles.dropdown as any}>
+                <TouchableOpacity
+                  style={webStyles.dropdownItem}
+                  onPress={() => goReports("PrintScreen", { screen: "Questionnaire" })}
+                >
+                  <Text style={webStyles.dropdownText}>Print Questionnaire</Text>
+                  {!hasPremium ? (
+                    <Image source={icons.proSymbol} style={webStyles.proPill} />
+                  ) : null}
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={webStyles.dropdownItem}
+                  onPress={() => goReports("PrintScreen", { screen: "Report" })}
+                >
+                  <Text style={webStyles.dropdownText}>Print Report</Text>
+                  {!hasPremium ? (
+                    <Image source={icons.proSymbol} style={webStyles.proPill} />
+                  ) : null}
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={webStyles.dropdownItem}
+                  onPress={() => goReports("ReportSettings")}
+                >
+                  <Text style={webStyles.dropdownText}>Report Settings</Text>
+                  {!hasPremium ? (
+                    <Image source={icons.proSymbol} style={webStyles.proPill} />
+                  ) : null}
+                </TouchableOpacity>
+              </View>
+            ) : null}
+          </View>
+
+          <TouchableOpacity style={webStyles.linkBtn} onPress={() => goRoot("Purchase")}>
+            <Text style={webStyles.linkText}>Activation Key</Text>
+          </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={webStyles.linkBtn} onPress={() => goRoot("Purchase")}>
-          <Text style={webStyles.linkText}>Activation Key</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={webStyles.right}>
-        <TouchableOpacity
-          style={webStyles.langPill}
-          onPress={() => {
-            // RootStack screen
-            navigation.getParent?.()?.navigate?.("ChangeLanguage");
-          }}
-        >
-          <View style={webStyles.avatar}>
-            <Text style={webStyles.avatarText}>{initial}</Text>
-          </View>
-          <Text style={webStyles.langText}>{languageLabel}</Text>
-          <Text style={webStyles.caret}>▼</Text>
-        </TouchableOpacity>
-
-        {!hasPremium ? (
-          <TouchableOpacity style={webStyles.upgradeBtn} onPress={() => goRoot("Purchase")}>
-            <Text style={webStyles.upgradeText}>UPGRADE TO</Text>
-            <Image source={icons.proSymbol} style={webStyles.upgradeProIcon} />
+        <View style={webStyles.right}>
+          <TouchableOpacity
+            style={webStyles.langPill}
+            onPress={() => {
+              navigation.getParent?.()?.navigate?.("ChangeLanguage");
+            }}
+          >
+            <View style={webStyles.avatar}>
+              <Text style={webStyles.avatarText}>{initial}</Text>
+            </View>
+            <Text style={webStyles.langText}>{languageLabel}</Text>
+            <Text style={webStyles.caret}>▼</Text>
           </TouchableOpacity>
-        ) : null}
+
+          {!hasPremium ? (
+            <TouchableOpacity style={webStyles.upgradeBtn} onPress={() => goRoot("Purchase")}>
+              <Text style={webStyles.upgradeText}>UPGRADE TO</Text>
+              <Image source={icons.proSymbol} style={webStyles.upgradeProIcon} />
+            </TouchableOpacity>
+          ) : null}
+        </View>
       </View>
     </View>
   );
@@ -378,6 +385,13 @@ const WebNavigator: React.FC = () => {
       </View>
     );
   };
+  const WebPageFullBleed: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    return (
+      <View style={[webStyles.page, webStyles.pageNoPadding]}>
+        <View style={webStyles.pageInnerFluid}>{children}</View>
+      </View>
+    );
+  };
 
   const wrap =
     <P extends object>(Component: React.ComponentType<P>) =>
@@ -386,6 +400,14 @@ const WebNavigator: React.FC = () => {
         <WebPage>
           <Component {...props} />
         </WebPage>
+      );
+  const wrapFullBleed =
+    <P extends object>(Component: React.ComponentType<P>) =>
+    (props: P) =>
+      (
+        <WebPageFullBleed>
+          <Component {...props} />
+        </WebPageFullBleed>
       );
 
   return (
@@ -411,7 +433,7 @@ const WebNavigator: React.FC = () => {
           };
         }}
       >
-        <WebStack.Screen name="Main" component={wrap(HomeScreen as any)} />
+        <WebStack.Screen name="Main" component={wrapFullBleed(HomeScreen as any)} />
         <WebStack.Screen name="success" component={wrap(CheckoutResultScreen as any)} />
         <WebStack.Screen name="cancel" component={wrap(CheckoutResultScreen as any)} />
         <WebStack.Screen name="Purchase" component={wrap(PurchaseScreen as any)} />
@@ -857,37 +879,44 @@ export default DrawerNavigator;
 
 const webStyles = StyleSheet.create({
   navbar: {
-    height: 64,
-    backgroundColor: "#F6FBFF",
+    height: 74,
+    backgroundColor: "#FFFFFF",
     borderBottomWidth: 1,
-    borderBottomColor: "#E6EEF6",
-    paddingHorizontal: 24,
+    borderBottomColor: "#E8EEF5",
+    paddingHorizontal: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  navInner: {
+    width: "100%",
+    maxWidth: 1180,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
   brand: { flexDirection: "row", alignItems: "center" },
-  brandLogo: { width: 150, height: 40, resizeMode: "contain" },
-  links: { flexDirection: "row", alignItems: "center", gap: 18 },
+  brandLogo: { width: 178, height: 50, resizeMode: "contain" },
+  links: { flexDirection: "row", alignItems: "center", gap: 14 },
   linkBtn: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
     paddingVertical: 8,
-    paddingHorizontal: 6,
+    paddingHorizontal: 8,
   },
-  linkText: { fontSize: 14, color: "#1F2A37", fontWeight: "500" },
+  linkText: { fontSize: 31 / 2, color: "#121826", fontWeight: "500" },
   caret: { fontSize: 10, color: "#6B7280" },
   right: { flexDirection: "row", alignItems: "center", gap: 12 },
   langPill: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: 10,
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
-    borderColor: "#E6EEF6",
+    borderColor: "#DCE8F4",
     paddingHorizontal: 10,
-    paddingVertical: 8,
+    paddingVertical: 7,
     borderRadius: 999,
   },
   avatar: {
@@ -899,20 +928,20 @@ const webStyles = StyleSheet.create({
     justifyContent: "center",
   },
   avatarText: { color: "white", fontSize: 12, fontWeight: "700" },
-  langText: { color: "#111827", fontSize: 13, fontWeight: "600" },
+  langText: { color: "#111827", fontSize: 28 / 2, fontWeight: "500" },
   upgradeBtn: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: 6,
     borderWidth: 1,
     borderColor: "#E0B44C",
-    backgroundColor: "rgba(255,255,255,0.85)",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    backgroundColor: "#FFFFFF",
+    paddingHorizontal: 11,
+    paddingVertical: 6,
     borderRadius: 999,
   },
-  upgradeText: { fontSize: 11, color: "#8A5B00", fontWeight: "700" },
-  upgradeProIcon: { width: 46, height: 18, resizeMode: "contain" },
+  upgradeText: { fontSize: 11, color: "#A07400", fontWeight: "700" },
+  upgradeProIcon: { width: 48, height: 18, resizeMode: "contain" },
   dropdownWrap: { position: "relative" },
   dropdown: {
     position: "absolute",
@@ -941,20 +970,30 @@ const webStyles = StyleSheet.create({
   proPill: { width: 48, height: 18, resizeMode: "contain" },
   page: {
     flex: 1,
-    backgroundColor: "#F6FBFF",
-    paddingHorizontal: 24,
-    paddingTop: 16,
+    backgroundColor: "#FFFFFF",
+    paddingHorizontal: 18,
+    paddingTop: 0,
     // The web "main content" scroll container (header stays fixed above).
     overflowY: "auto" as any,
     overflowX: "hidden" as any,
     minHeight: 0,
-    paddingBottom: 24,
+    paddingBottom: 0,
   },
   pageInner: {
     flex: 1,
     width: "100%",
-    maxWidth: 1200,
+    maxWidth: 1180,
     alignSelf: "center",
+    minHeight: 0,
+  },
+  pageNoPadding: {
+    paddingHorizontal: 0,
+  },
+  pageInnerFluid: {
+    flex: 1,
+    width: "100%",
+    maxWidth: "100%",
+    alignSelf: "stretch",
     minHeight: 0,
   },
 } as any);

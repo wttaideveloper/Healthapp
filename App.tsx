@@ -8,9 +8,14 @@ import { initDatabase } from "./src/components/utils/database";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Platform, Text, View } from "react-native";
 import ErrorBoundary from "./src/components/ErrorBoundary";
+import WebPreloader from "./src/components/WebPreloader";
 
 const App: React.FC = () => {
   const [fatalError, setFatalError] = React.useState<string | null>(null);
+  const [isBootReady, setIsBootReady] = React.useState(Platform.OS !== "web");
+  const [isNavReady, setIsNavReady] = React.useState(Platform.OS !== "web");
+  const [showWebPreloader, setShowWebPreloader] = React.useState(Platform.OS === "web");
+  const bootStartRef = React.useRef<number>(Date.now());
 
   const linking = React.useMemo(
     () => ({
@@ -42,6 +47,26 @@ const App: React.FC = () => {
   useEffect(() => {
     InitializeDb();
   }, []);
+
+  useEffect(() => {
+    if (Platform.OS !== "web" || !showWebPreloader) {
+      return;
+    }
+
+    if (!isBootReady || !isNavReady) {
+      return;
+    }
+
+    const minimumVisibleMs = 900;
+    const elapsed = Date.now() - bootStartRef.current;
+    const waitMs = Math.max(0, minimumVisibleMs - elapsed);
+
+    const timer = setTimeout(() => {
+      setShowWebPreloader(false);
+    }, waitMs);
+
+    return () => clearTimeout(timer);
+  }, [isBootReady, isNavReady, showWebPreloader]);
 
   useEffect(() => {
     if (Platform.OS !== "web") {
@@ -80,6 +105,7 @@ const App: React.FC = () => {
     try {
       await initDatabase();
       console.log('Database initialized successfully');
+      setIsBootReady(true);
     } catch (error) {
       console.error(`Database initialization failed (attempt ${retryCount + 1}):`, error);
 
@@ -90,6 +116,7 @@ const App: React.FC = () => {
         }, RETRY_DELAY);
       } else {
         console.error('Database initialization failed after all retries');
+        setIsBootReady(true);
       }
     }
   };
@@ -111,12 +138,13 @@ const App: React.FC = () => {
           <ErrorBoundary>
             <AuthProvider>
               <SubscriptionProvider>
-                <NavigationContainer linking={linking}>
+                <NavigationContainer linking={linking} onReady={() => setIsNavReady(true)}>
                   <AppNavigator />
                 </NavigationContainer>
               </SubscriptionProvider>
             </AuthProvider>
           </ErrorBoundary>
+          <WebPreloader visible={showWebPreloader} />
         </SafeAreaView>
       </SafeAreaProvider>
     </GestureHandlerRootView>

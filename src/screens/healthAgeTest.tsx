@@ -2,12 +2,12 @@ import {
   Alert,
   BackHandler,
   Image,
-  KeyboardAvoidingView,
   Platform,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
+  useWindowDimensions,
   View,
 } from "react-native";
 import React from "react";
@@ -31,6 +31,9 @@ type HealthAgeTestProps = DrawerScreenProps<DrawerParamList, "healthAgeTest">;
 
 const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation }) => {
   const { t } = useTranslation();
+  const { width } = useWindowDimensions();
+  const isWebDesktop = Platform.OS === "web" && width >= 900;
+  const fullPickerWidth = isWebDesktop ? 560 : Dimensions.get("window").width;
   const confirmExit = () => {
     Alert.alert(
       t("leavePage"),
@@ -418,7 +421,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation }) => {
                 <WheelPickerExpo
                   // Key must not depend on value, otherwise the picker remounts on every change (web resets to 0).
                   key={`heightCm-picker-${selectedHeightUnit}`}
-                  width={Dimensions.get("window").width} // Use device width
+                  width={fullPickerWidth}
                   height={300}
                   initialSelectedIndex={(() => {
                     const idx =
@@ -745,7 +748,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation }) => {
               )} */}
               <WheelPickerExpo
                 key={`weight-picker-${selectedWeightUnit}`}
-                width={Dimensions.get("window").width} // Use device width
+                width={fullPickerWidth}
                 height={300}
                 // initialSelectedIndex={
                 //   selectedWeightUnit == "Lb"
@@ -1017,7 +1020,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation }) => {
             <>
               <WheelPickerExpo
                 key={`waist-picker-${selectedWaistUnit}`}
-                width={Dimensions.get("window").width} // Use device width
+                width={fullPickerWidth}
                 height={300}
                 initialSelectedIndex={
                   selectedWaistUnit == "In"
@@ -1713,259 +1716,240 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation }) => {
   console.log(value.height_In, "value.height_In");
 
   return (
-    <View style={styles.container}>
-      <View>
+    <View style={[styles.container, isWebDesktop ? styles.webContainer : null]}>
+      <View style={[styles.contentWrap, isWebDesktop ? styles.webContentWrap : null]}>
         <View
-          style={{
-            flexDirection: "row",
-            width: "100%",
-            gap: 4,
-            justifyContent: "center",
-            marginVertical: 20,
-          }}
+          style={[
+            {
+              flexDirection: "row",
+              width: "100%",
+              gap: 4,
+              justifyContent: "center",
+              marginVertical: 20,
+            },
+            isWebDesktop ? { marginTop: 28, marginBottom: 18 } : null,
+          ]}
         >
           {[1, 2, 3, 4, 5, 6, 7, 8].map((e, i) => (
             <View
               key={i}
               style={{
                 backgroundColor: step >= e ? "#2C2E33" : "#D2DAEE",
-                //   padding: 2,
                 height: 4,
-                //   paddingHorizontal: 10,
                 width: 29,
                 borderRadius: 99999,
-                // margin: 5,
               }}
             />
           ))}
         </View>
-        {/* pop up  */}
 
-        {popup && (
+        {popup ? (
           <View
-            style={{
-              width: "100%",
-              flexDirection: "row",
-              justifyContent: "center",
-            }}
-          >
-            <View
-              style={{
+            style={[
+              {
+                width: "100%",
                 flexDirection: "row",
                 justifyContent: "center",
-                gap: 10,
-                backgroundColor: "#DFE9F0",
-                borderRadius: 14,
-                padding: 20,
-                width: 329,
-              }}
-            >
-              <Image
-                source={icons.bulb}
-                style={{ width: 16, height: 16 }}
-              ></Image>
-              <View style={{ width: 253 }}>
-                <Font
-                  text="getStarted"
-                  style={{ fontSize: 13, fontWeight: 400 }}
-                ></Font>
+              },
+              isWebDesktop ? { justifyContent: "flex-start" } : null,
+            ]}
+          >
+              <View
+                style={[
+                  {
+                    flexDirection: "row",
+                    alignItems: "flex-start",
+                    gap: 10,
+                    backgroundColor: "#DFE9F0",
+                    borderRadius: 16,
+                    paddingVertical: 14,
+                    paddingHorizontal: 14,
+                    width: 329,
+                  },
+                  isWebDesktop ? { width: "100%", borderRadius: 18 } : null,
+                ]}
+              >
+                <Image source={icons.bulb} style={{ width: 16, height: 16 }} />
+              <View style={{ flex: 1, paddingRight: 18 }}>
+                <Font text="getStarted" style={{ fontSize: 13, fontWeight: 400 }} />
               </View>
               <TouchableOpacity
                 onPress={() => setPopup(false)}
                 style={{
                   position: "absolute",
-                  top: 5,
+                  top: 8,
                   right: 10,
+                  width: 24,
+                  height: 24,
+                  borderRadius: 12,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "rgba(255,255,255,0.45)",
                 }}
               >
-                <Image
-                  source={icons.close}
-                  style={{
-                    width: 22,
-                    height: 22,
-                  }}
-                ></Image>
+                <Image source={icons.close} style={{ width: 20, height: 20 }} />
               </TouchableOpacity>
             </View>
           </View>
-        )}
-      </View>
-      <View style={{ width: "100%", marginVertical: 20 }}>
-        <View style={{ width: "100%", marginVertical: 20 }}>
-          <Image
-            source={icons.healthAgeLogo}
-            style={{ width: 24, height: 42 }}
-          ></Image>
+        ) : null}
+
+        <View style={{ width: "100%", marginVertical: isWebDesktop ? 12 : 20 }}>
+          <View style={{ width: "100%", marginVertical: isWebDesktop ? 8 : 20 }}>
+            <Image source={icons.healthAgeLogo} style={{ width: 24, height: 42 }} />
+          </View>
+          {renderItem()}
         </View>
-        {renderItem()}
-      </View>
 
-      <View
-        style={{
-          width: "100%",
-          position: "static",
-          //   bottom: 30,
-          //   left:20,
-          flexDirection: "row",
-          justifyContent: "space-between",
-          paddingBottom: Platform.OS === "web" ? 24 : 0,
-        }}
-      >
-        <TouchableOpacity
-          onPress={() => {
-            if (step > 1 && step <= 8) {
-              setStep(step - 1);
-            } else {
-              setPopup(true);
-              confirmExit();
-              // navigation.navigate("Main");
-            }
-          }}
-          style={{
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: 4,
-            padding: 5,
-          }}
+        <View
+          style={[
+            {
+              width: "100%",
+              position: "static",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              paddingBottom: Platform.OS === "web" ? 24 : 0,
+            },
+            isWebDesktop ? styles.webBottomRow : null,
+          ]}
         >
-          <Image source={icons.Arrow} style={{ width: 10, height: 16 }}></Image>
-          <Font
-            style={{ fontWeight: "500", color: "#0C9FD5" }}
-            text={step > 1 && step <= 8 ? "back" : "home"}
-          ></Font>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {
-            if (step >= 1 && step < 8) {
-              setPopup(false);
-              if (step == 1 && value.name == "") {
-                Alert.alert(t("enterThisFields"), "", [
-                  { text: t("Fs_Close") },
-                ]);
-                return;
+          <TouchableOpacity
+            onPress={() => {
+              if (step > 1 && step <= 8) {
+                setStep(step - 1);
+              } else {
+                setPopup(true);
+                if (isWebDesktop) {
+                  navigation.navigate("Main");
+                  return;
+                }
+                confirmExit();
               }
-              if (step == 2 && value.age == "") {
-                Alert.alert(t("enterThisFields"), "", [
-                  { text: t("Fs_Close") },
-                ]);
-                return;
-              }
-              if (step == 3 && value.gender == "") {
-                Alert.alert(t("enterThisFields"), "", [
-                  { text: t("Fs_Close") },
-                ]);
-                return;
-              }
-              // if (step == 4 && (value.height_Cm == "" || value.height_Ft =="" || value.height_In)) {
-              //   Alert.alert(t("enterThisFields"), "", [{ text: t("Fs_Close") }]);
-              //   return;
-              // }
-              // if (step == 5 && value.gender == "") {
-              //   Alert.alert(t("enterThisFields"), "", [{ text: t("Fs_Close") }]);
-              //   return;
-              // }
-              // if (step == 6 && value.gender == "") {
-              //   Alert.alert(t("enterThisFields"), "", [{ text: t("Fs_Close") }]);
-              //   return;
-              // }
-              setStep(step + 1);
-            } else {
-              if (value.name == "" || value.age == "" || value.gender == "") {
-                // alert(t("enterRequiredFields"));
-                Alert.alert(t("enterRequiredFields"), "", [
-                  { text: t("Fs_Close") },
-                ]);
-                return;
-              }
-              setStep(1);
-              setSelectedAge("");
+            }}
+            style={[
+              {
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: 4,
+                padding: 5,
+              },
+              isWebDesktop ? styles.webNavBtn : null,
+            ]}
+          >
+            <Image source={icons.Arrow} style={{ width: 10, height: 16 }} />
+            <Font
+              style={{
+                fontWeight: "500",
+                color: "#0C9FD5",
+                ...(isWebDesktop ? styles.webNavText : {}),
+              }}
+              text={step > 1 && step <= 8 ? "back" : "home"}
+            />
+          </TouchableOpacity>
 
-              setValue({
-                name: "",
-                age: "",
-                gender: "",
-                height_Ft: "",
-                height_In: "",
-                height_Cm: "",
-                weight_Kg: "",
-                weight_Lb: "",
-                weight_Lb_points: "",
-                weight_Kg_points: "",
-                waist_Circumference_In: "",
-                waist_Circumference_In_points: "",
-                waist_Circumference_Cm: "",
-                waist_Circumference_Cm_points: "",
-                blood_pressure_sys: "",
-                blood_pressure_dia: "",
-                blood_glucose_mg: "",
-                blood_glucose_mmol: "",
-                blood_glucose_mmol_points: "",
-              });
-              setPopup(true);
-              navigation.navigate("QuestionsScreen", {
-                name: value.name,
-                height:
-                  selectedHeightUnit == "ft in"
-                    ? value.height_Ft + " ft " + value.height_In + " in"
-                    : value.height_Cm + " cm",
-                age: value.age,
-                gender: value.gender,
-                weight:
-                  selectedWeightUnit == "Lb"
-                    ? value.weight_Lb + " lb"
-                    : value.weight_Kg + " kg",
-                bloodGlucose:
-                  selectedGlucoseUnit == "mg/dL"
-                    ? value.blood_glucose_mg
-                    : value.blood_glucose_mmol +
-                      "." +
-                      value.blood_glucose_mmol_points,
-                bloodPressure:
-                  value.blood_pressure_sys + "/" + value.blood_pressure_dia,
-                bloodPressureSys: value.blood_pressure_sys,
-                bloodPressureDia: value.blood_pressure_dia,
-                bloodGlucose_mg: value.blood_glucose_mg
-                  ? value.blood_glucose_mg
-                  : "",
-                bloodGlucose_mmol: value.blood_glucose_mmol,
-                blood_glucose_mmol_points: value.blood_glucose_mmol_points,
-                selectedGlucoseUnit: selectedGlucoseUnit,
-                fasting: switchValue == "fasting" ? true : false,
-                selectedHeightUnit: selectedHeightUnit,
-                selectedWeightUnit: selectedWeightUnit,
-                heightValue:
-                  selectedHeightUnit == "ft in"
-                    ? value.height_Ft + "." + value.height_In
-                    : value.height_Cm,
-                weightValue:
-                  selectedWeightUnit == "Lb"
-                    ? value.weight_Lb
-                    : value.weight_Kg,
-                // weightValue:
-                //   selectedWeightUnit == "Lb"
-                //     ? value.weight_Lb + "." + value.weight_Lb_points
-                //     : value.weight_Kg + "." + value.weight_Kg_points,
-              });
-            }
-          }}
-          style={{
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: 4,
-            padding: 5,
-          }}
-        >
-          <Font
-            style={{ fontWeight: "500", color: "#0C9FD5" }}
-            text={step >= 1 && step < 8 ? "next" : "start"}
-          ></Font>
-          <Image
-            source={icons.Arrow}
-            style={{ width: 10, height: 16, transform: [{ scaleX: -1 }] }}
-          ></Image>
-        </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              if (step >= 1 && step < 8) {
+                setPopup(false);
+                if (step == 1 && value.name == "") {
+                  Alert.alert(t("enterThisFields"), "", [{ text: t("Fs_Close") }]);
+                  return;
+                }
+                if (step == 2 && value.age == "") {
+                  Alert.alert(t("enterThisFields"), "", [{ text: t("Fs_Close") }]);
+                  return;
+                }
+                if (step == 3 && value.gender == "") {
+                  Alert.alert(t("enterThisFields"), "", [{ text: t("Fs_Close") }]);
+                  return;
+                }
+                setStep(step + 1);
+              } else {
+                if (value.name == "" || value.age == "" || value.gender == "") {
+                  Alert.alert(t("enterRequiredFields"), "", [{ text: t("Fs_Close") }]);
+                  return;
+                }
+                setStep(1);
+                setSelectedAge("");
+
+                setValue({
+                  name: "",
+                  age: "",
+                  gender: "",
+                  height_Ft: "",
+                  height_In: "",
+                  height_Cm: "",
+                  weight_Kg: "",
+                  weight_Lb: "",
+                  weight_Lb_points: "",
+                  weight_Kg_points: "",
+                  waist_Circumference_In: "",
+                  waist_Circumference_In_points: "",
+                  waist_Circumference_Cm: "",
+                  waist_Circumference_Cm_points: "",
+                  blood_pressure_sys: "",
+                  blood_pressure_dia: "",
+                  blood_glucose_mg: "",
+                  blood_glucose_mmol: "",
+                  blood_glucose_mmol_points: "",
+                });
+                setPopup(true);
+                navigation.navigate("QuestionsScreen", {
+                  name: value.name,
+                  height:
+                    selectedHeightUnit == "ft in"
+                      ? value.height_Ft + " ft " + value.height_In + " in"
+                      : value.height_Cm + " cm",
+                  age: value.age,
+                  gender: value.gender,
+                  weight:
+                    selectedWeightUnit == "Lb"
+                      ? value.weight_Lb + " lb"
+                      : value.weight_Kg + " kg",
+                  bloodGlucose:
+                    selectedGlucoseUnit == "mg/dL"
+                      ? value.blood_glucose_mg
+                      : value.blood_glucose_mmol + "." + value.blood_glucose_mmol_points,
+                  bloodPressure: value.blood_pressure_sys + "/" + value.blood_pressure_dia,
+                  bloodPressureSys: value.blood_pressure_sys,
+                  bloodPressureDia: value.blood_pressure_dia,
+                  bloodGlucose_mg: value.blood_glucose_mg ? value.blood_glucose_mg : "",
+                  bloodGlucose_mmol: value.blood_glucose_mmol,
+                  blood_glucose_mmol_points: value.blood_glucose_mmol_points,
+                  selectedGlucoseUnit: selectedGlucoseUnit,
+                  fasting: switchValue == "fasting" ? true : false,
+                  selectedHeightUnit: selectedHeightUnit,
+                  selectedWeightUnit: selectedWeightUnit,
+                  heightValue:
+                    selectedHeightUnit == "ft in"
+                      ? value.height_Ft + "." + value.height_In
+                      : value.height_Cm,
+                  weightValue: selectedWeightUnit == "Lb" ? value.weight_Lb : value.weight_Kg,
+                });
+              }
+            }}
+            style={[
+              {
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: 4,
+                padding: 5,
+              },
+              isWebDesktop ? styles.webNavBtn : null,
+            ]}
+          >
+            <Font
+              style={{
+                fontWeight: "500",
+                color: "#0C9FD5",
+                ...(isWebDesktop ? styles.webNavText : {}),
+              }}
+              text={step >= 1 && step < 8 ? "next" : "start"}
+            />
+            <Image source={icons.Arrow} style={{ width: 10, height: 16, transform: [{ scaleX: -1 }] }} />
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -1983,6 +1967,38 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     flexDirection: "column",
     justifyContent: "space-between",
+  },
+  webContainer: {
+    backgroundColor: "#FFFFFF",
+    paddingHorizontal: 24,
+    paddingVertical: 0,
+  },
+  contentWrap: {
+    flex: 1,
+    width: "100%",
+  },
+  webContentWrap: {
+    maxWidth: 560,
+    alignSelf: "center",
+    paddingTop: 22,
+    paddingBottom: 14,
+  },
+  webBottomRow: {
+    marginTop: "auto",
+    paddingBottom: 26,
+    paddingHorizontal: 6,
+  },
+  webNavBtn: {
+    minWidth: 112,
+    height: 38,
+    borderWidth: 1,
+    borderColor: "#0C9FD5",
+    borderRadius: 999,
+    paddingHorizontal: 16,
+    paddingVertical: 0,
+  },
+  webNavText: {
+    fontSize: 15,
   },
   itemContainer: {
     justifyContent: "center",

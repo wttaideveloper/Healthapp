@@ -12,6 +12,7 @@ export const icons = {
   proSymbol: require("../../assets/images/proSymbol.png"),
   freeLimit: require("../../assets/images/freeLimit.png"),
   HomeScreen: require("../../assets/images/homeScreenBg.png"),
+  homeHero: require("../../assets/images/home-hero.png"),
   message: require("../../assets/images/message.png"),
   bulb: require("../../assets/images/bulb.png"),
   close: require("../../assets/images/close.png"),

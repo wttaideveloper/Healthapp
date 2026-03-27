@@ -54,6 +54,7 @@ const PurchaseScreen: React.FC = () => {
     providerStatus,
     refreshSubscription,
     setDebugSubscriptionOverride,
+    debugSubscriptionOverride,
   } = useSubscription();
   const { accessToken, user } = useAuth();
 
@@ -328,6 +329,25 @@ const PurchaseScreen: React.FC = () => {
     }
   };
 
+  const handleManualStatusRefresh = async () => {
+    if (actionLoading) return;
+    setActionLoading(true);
+    try {
+      if (__DEV__ && debugSubscriptionOverride !== null) {
+        await setDebugSubscriptionOverride(null);
+      }
+      await refreshSubscription(true);
+      if (__DEV__ && debugSubscriptionOverride !== null) {
+        Alert.alert("Status refreshed", "Live subscription status reloaded (DEV override cleared).");
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to refresh status";
+      Alert.alert("Refresh failed", message);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   const expiryLabel = formatDate(expiryDate);
 
   if (isLoading) {
@@ -354,7 +374,8 @@ const PurchaseScreen: React.FC = () => {
           : "Not active";
   const canOpenStripeBilling =
     Platform.OS === "web" &&
-    (subscriptionSource === "stripe" || subscriptionSource === "mixed");
+    isSubscribed &&
+    subscriptionSource === "stripe";
   const stripeCancelAtPeriodEnd =
     subscriptionSource === "stripe" &&
     isSubscribed &&
@@ -366,11 +387,13 @@ const PurchaseScreen: React.FC = () => {
       ? `Subscription is active${expiryLabel ? ` until ${expiryLabel}` : ""}.`
       : `Premium access is active${expiryLabel ? ` until ${expiryLabel}` : ""}.`;
 
+  const webContentWidthStyle = Platform.OS === "web" ? styles.webContentWidth : null;
+
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
-      <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 120 }}>
+      <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
         {isSubscribed ? (
-          <View style={styles.proBadgeCard}>
+          <View style={[styles.proBadgeCard, webContentWidthStyle]}>
             <Text style={styles.proTag}>PRO</Text>
             <Font text="NowAProMember" style={styles.proBadgeTitle} />
             <Text style={styles.proBadgeSub}>
@@ -397,19 +420,15 @@ const PurchaseScreen: React.FC = () => {
               </>
             ) : canOpenStripeBilling ? (
               <Button
-                style={{ padding: 10, marginTop: 12 }}
+                style={styles.actionButton}
                 title="Manage Billing"
                 onPress={handleManageSubscription}
                 disabled={actionLoading}
               />
-            ) : (
-              <Text style={styles.sourceSubNote}>
-                Billing portal is available only for Stripe subscriptions.
-              </Text>
-            )}
+            ) : null}
           </View>
         ) : (
-          <View style={styles.licenseCard}>
+          <View style={[styles.licenseCard, webContentWidthStyle]}>
             {webNotice ? (
               <View style={styles.noticeCard}>
                 <Text style={styles.noticeText}>{webNotice}</Text>
@@ -426,7 +445,7 @@ const PurchaseScreen: React.FC = () => {
                 <Text style={styles.errorTitle}>Store configuration required</Text>
                 <Text style={styles.errorBody}>{storeError}</Text>
                 <Button
-                  style={{ padding: 10, marginTop: 10 }}
+                  style={styles.actionButton}
                   title="Retry Store Load"
                   onPress={loadNativePlanOptions}
                   disabled={actionLoading}
@@ -483,7 +502,7 @@ const PurchaseScreen: React.FC = () => {
             />
 
             <Button
-              style={{ padding: 10, marginTop: 12 }}
+              style={styles.actionButton}
               title={actionLoading ? "Activating..." : "Activate License"}
               onPress={handleActivateLicense}
               disabled={actionLoading}
@@ -491,8 +510,8 @@ const PurchaseScreen: React.FC = () => {
 
             <Text style={styles.orText}>or</Text>
             <Button
-              style={{ padding: 10, marginTop: 8 }}
-              title={Platform.OS === "web" ? "Subscribe (Stripe)" : "Subscribe"}
+              style={styles.actionButtonSecondary}
+              title="Subscribe"
               onPress={handleSubscribe}
               disabled={actionLoading}
             />
@@ -513,19 +532,19 @@ const PurchaseScreen: React.FC = () => {
                   <Text style={styles.refreshText}>Manage existing subscription</Text>
                 </TouchableOpacity>
               </>
-            ) : (
+            ) : canOpenStripeBilling ? (
               <TouchableOpacity
                 style={{ marginTop: 10, alignItems: "center" }}
                 onPress={handleManageSubscription}
                 disabled={actionLoading}
               >
-                <Text style={styles.refreshText}>Open Stripe billing portal</Text>
+                <Text style={styles.refreshText}>Open Billing Portal</Text>
               </TouchableOpacity>
-            )}
+            ) : null}
 
             <TouchableOpacity
               style={{ marginTop: 10, alignItems: "center" }}
-              onPress={() => refreshSubscription(true)}
+              onPress={handleManualStatusRefresh}
               disabled={actionLoading}
             >
               <Text style={styles.refreshText}>I already have a license, refresh status</Text>
@@ -546,7 +565,10 @@ const PurchaseScreen: React.FC = () => {
 
         {__DEV__ ? (
           <Button
-            style={{ padding: 10, marginTop: 12 }}
+            style={{
+              ...styles.actionButton,
+              ...(webContentWidthStyle ?? {}),
+            }}
             title={isSubscribed ? "DEV: Disable Subscription" : "DEV: Enable Subscription"}
             onPress={handleDevSubscriptionToggle}
             disabled={actionLoading}
@@ -565,7 +587,20 @@ const PurchaseScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, paddingHorizontal: 20, paddingTop: 10 },
+  scrollContent: { paddingBottom: 120, alignItems: "center" },
   loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
+  webContentWidth: {
+    width: "100%",
+    maxWidth: 900,
+  },
+  actionButton: {
+    padding: 10,
+    marginTop: 12,
+  },
+  actionButtonSecondary: {
+    padding: 10,
+    marginTop: 8,
+  },
   licenseCard: {
     backgroundColor: "#F8FAFB",
     borderRadius: 24,
@@ -690,6 +725,8 @@ const styles = StyleSheet.create({
     paddingTop: 15,
     borderTopWidth: 1,
     borderTopColor: "#E6ECF2",
+    width: "100%",
+    maxWidth: 900,
   },
   disclosureText: {
     color: "#7D8699",

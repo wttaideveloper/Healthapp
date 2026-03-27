@@ -7,6 +7,8 @@ import {
   BackHandler,
   TouchableOpacity,
   Text,
+  Platform,
+  useWindowDimensions,
 } from "react-native";
 import Font from "../components/CustomisedFont";
 import { icons } from "../components/images";
@@ -31,10 +33,12 @@ type HomeScreenProps = {
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [count, setCount] = React.useState<number>(0);
+  const { width } = useWindowDimensions();
   const { t } = useTranslation();
   const { isSubscribed } = useSubscription();
   const { signOut } = useAuth();
   const hasPremium = isSubscribed;
+  const isWebDesktop = Platform.OS === "web" && width >= 900;
 
   useFocusEffect(
     React.useCallback(() => {
@@ -107,6 +111,82 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       },
     ]);
   };
+
+  const onStartAssessment = () => {
+    if (hasPremium) {
+      navigation.navigate("healthAgeTest");
+      return;
+    }
+
+    if (count < FREE_DAILY_TASK_LIMIT) {
+      navigation.navigate("healthAgeTest");
+      return;
+    }
+
+    Alert.alert(
+      `${t("dailyLimit")} : ${count}/${FREE_DAILY_TASK_LIMIT}`,
+      t("JoinPro"),
+      [
+        { text: t("Hs_Cancel"), style: "cancel" },
+        {
+          text: t("purchase"),
+          onPress: () => navigation.navigate("Purchase"),
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
+  if (isWebDesktop) {
+    return (
+      <LinearGradient
+        colors={[
+          "rgba(218,235,246,1)",
+          "rgba(255,255,255,1)",
+          "rgba(255,255,255,1)",
+          "rgba(255,255,255,1)",
+          "rgba(194,233,248,1)",
+        ]}
+        locations={[0, 0.34, 0.56, 0.76, 1]}
+        start={{ x: 0.5, y: 0 }}
+        end={{ x: 0.5, y: 1 }}
+        style={styles.webContainer}
+      >
+        <View style={styles.webHero}>
+          {!hasPremium ? (
+            <View style={styles.webLimitPillOuter}>
+              <View style={styles.webLimitPillInner}>
+                <Image source={icons.freeLimit} style={styles.webLimitLogo} />
+                <Text style={styles.webLimitText}>
+                  Daily limit {count}/{FREE_DAILY_TASK_LIMIT}
+                </Text>
+              </View>
+            </View>
+          ) : (
+            <View />
+          )}
+
+          <Text style={styles.webHeadline}>{t("helpCalculateHealthAge")}</Text>
+
+          <View style={styles.webImageWrap}>
+            <Image source={icons.homeHero} style={styles.webImage} />
+          </View>
+          <View style={styles.webCtaRow}>
+            <TouchableOpacity onPress={onStartAssessment} activeOpacity={0.88} style={styles.webCtaBtn}>
+              <LinearGradient
+                colors={["#18A9E6", "#2B57A6"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.webCtaGradient}
+              >
+                <Text style={styles.webCtaText}>{t("startAssessment")}</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </LinearGradient>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -198,7 +278,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             ></Image> */}
           </View>
         </View>
-        {__DEV__ && (
+        {__DEV__ && Platform.OS !== "web" && (
           <TouchableOpacity style={styles.devResetButton} onPress={handleDevResetAppData}>
             <Text style={styles.devResetText}>Reset App Data (DEV)</Text>
           </TouchableOpacity>
@@ -216,32 +296,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           right: 0,
         }}
         title="startAssessment"
-        onPress={() => {
-          if (hasPremium) {
-            navigation.navigate("healthAgeTest");
-          } else {
-            if (count < FREE_DAILY_TASK_LIMIT) {
-              navigation.navigate("healthAgeTest");
-            } else {
-              console.log(count, "count");
-              
-              Alert.alert(
-                `${t("dailyLimit")} : ${count}/${FREE_DAILY_TASK_LIMIT}`,
-                t("JoinPro"),
-                [
-                  { text: t("Hs_Cancel"), style: "cancel" },
-                  {
-                    text: t("purchase"),
-                    onPress: () => navigation.navigate("Purchase"),
-                  },
-                ],
-                { cancelable: true }
-              );
-              return;
-            }
-          }
-          // navigation.navigate("healthAgeTest")
-        }}
+        onPress={onStartAssessment}
       ></Button>
     </View>
   );
@@ -277,6 +332,84 @@ const styles = StyleSheet.create({
   devResetText: {
     color: "#b91c1c",
     fontSize: 12,
+    fontWeight: "600",
+  },
+  webContainer: {
+    flex: 1,
+    paddingTop: 44,
+    paddingBottom: 46,
+    paddingHorizontal: 24,
+  },
+  webHero: {
+    flex: 1,
+    maxWidth: 1110,
+    width: "100%",
+    alignSelf: "center",
+  },
+  webLimitPillOuter: {
+    alignSelf: "flex-end",
+    borderRadius: 999,
+    padding: 1,
+    backgroundColor: "#F0D6BA",
+    marginBottom: 20,
+  },
+  webLimitPillInner: {
+    borderRadius: 999,
+    backgroundColor: "#F9E4D0",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+  webLimitLogo: {
+    width: 46,
+    height: 18,
+  },
+  webLimitText: {
+    color: "#8E562A",
+    fontSize: 28 / 2,
+    fontWeight: "700",
+  },
+  webHeadline: {
+    color: "#20497F",
+    fontSize: 60,
+    fontWeight: "700",
+    lineHeight: 72,
+    maxWidth: 580,
+    marginBottom: 20,
+  },
+  webImageWrap: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: -4,
+  },
+  webImage: {
+    width: 540,
+    height: 420,
+    resizeMode: "contain",
+  },
+  webCtaRow: {
+    marginTop: 8,
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  webCtaBtn: {
+    width: "100%",
+    maxWidth: 640,
+    borderRadius: 999,
+    overflow: "hidden",
+  },
+  webCtaGradient: {
+    borderRadius: 999,
+    paddingVertical: 18,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  webCtaText: {
+    color: "#FFFFFF",
+    fontSize: 36 / 2,
     fontWeight: "600",
   },
 });
