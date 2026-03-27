@@ -2,17 +2,21 @@ import React, { useState } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
+  Image,
   Platform,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
+  useWindowDimensions,
   View,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { useAuth } from "../context/authContext";
 import { isValidEmail } from "../components/utils/validation";
+import { icons } from "../components/images";
+import { LinearGradient } from "expo-linear-gradient";
 
 type SignInScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, "SignIn">;
@@ -20,9 +24,11 @@ type SignInScreenProps = {
 
 const SignInScreen: React.FC<SignInScreenProps> = ({ navigation }) => {
   const { signIn, isLoading, useMockAuth } = useAuth();
+  const { width } = useWindowDimensions();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const isWebDesktop = Platform.OS === "web" && width >= 980;
 
   const onSignIn = async () => {
     const normalizedEmail = email.trim().toLowerCase();
@@ -53,53 +59,84 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ navigation }) => {
     }
   };
 
+  const cardContent = (
+    <>
+      <Text style={styles.title}>Sign in</Text>
+      <Text style={styles.subtitle}>Continue with your account.</Text>
+
+      <Text style={styles.label}>Email</Text>
+      <TextInput
+        style={styles.input}
+        value={email}
+        onChangeText={setEmail}
+        autoCapitalize="none"
+        keyboardType="email-address"
+        placeholder="you@example.com"
+        placeholderTextColor="#8b909b"
+      />
+
+      <Text style={styles.label}>Password</Text>
+      <TextInput
+        style={styles.input}
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+        placeholder="Your password"
+        placeholderTextColor="#8b909b"
+      />
+
+      {error ? <Text style={styles.error}>{error}</Text> : null}
+      {useMockAuth ? (
+        <Text style={styles.hint}>Mock auth is enabled. Verification code: 123456</Text>
+      ) : null}
+
+      <TouchableOpacity style={styles.primaryButtonTouch} onPress={onSignIn} disabled={isLoading}>
+        <LinearGradient
+          colors={["#16A3DE", "#2D579D"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.primaryButton}
+        >
+          {isLoading ? <ActivityIndicator color="#ffffff" /> : <Text style={styles.primaryText}>Sign in</Text>}
+        </LinearGradient>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.secondaryButton}
+        onPress={() => navigation.navigate("SignUp")}
+        disabled={isLoading}
+      >
+        <Text style={styles.secondaryText}>Create account</Text>
+      </TouchableOpacity>
+    </>
+  );
+
+  if (isWebDesktop) {
+    return (
+      <View style={styles.webShell}>
+        <View style={styles.webHero}>
+          <Image source={icons.menuLogo} style={styles.webLogo} />
+          <Text style={styles.webHeroTitle}>Welcome back</Text>
+          <Text style={styles.webHeroText}>
+            Sign in to continue your Health Age assessments, reports, and premium features.
+          </Text>
+        </View>
+        <KeyboardAvoidingView
+          style={styles.webCardWrap}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+        >
+          <View style={[styles.card, styles.webCard]}>{cardContent}</View>
+        </KeyboardAvoidingView>
+      </View>
+    );
+  }
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <View style={styles.card}>
-        <Text style={styles.title}>Sign in</Text>
-        <Text style={styles.subtitle}>Continue after onboarding with your account.</Text>
-
-        <Text style={styles.label}>Email</Text>
-        <TextInput
-          style={styles.input}
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
-          placeholder="you@example.com"
-          placeholderTextColor="#8b909b"
-        />
-
-        <Text style={styles.label}>Password</Text>
-        <TextInput
-          style={styles.input}
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          placeholder="Your password"
-          placeholderTextColor="#8b909b"
-        />
-
-        {error ? <Text style={styles.error}>{error}</Text> : null}
-        {useMockAuth ? (
-          <Text style={styles.hint}>Mock auth is enabled. Verification code: 123456</Text>
-        ) : null}
-
-        <TouchableOpacity style={styles.primaryButton} onPress={onSignIn} disabled={isLoading}>
-          {isLoading ? <ActivityIndicator color="#ffffff" /> : <Text style={styles.primaryText}>Sign in</Text>}
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.secondaryButton}
-          onPress={() => navigation.navigate("SignUp")}
-          disabled={isLoading}
-        >
-          <Text style={styles.secondaryText}>Create account</Text>
-        </TouchableOpacity>
-      </View>
+      <View style={[styles.card, Platform.OS === "web" ? styles.webCompactCard : null]}>{cardContent}</View>
     </KeyboardAvoidingView>
   );
 };
@@ -107,32 +144,76 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f3f7fb",
+    backgroundColor: "#EEF4FA",
     justifyContent: "center",
     paddingHorizontal: 20,
   },
+  webShell: {
+    flex: 1,
+    backgroundColor: "#EEF4FA",
+    flexDirection: "row",
+    alignItems: "stretch",
+  },
+  webHero: {
+    flex: 1,
+    paddingHorizontal: 56,
+    justifyContent: "center",
+    backgroundColor: "#E2EEF8",
+  },
+  webLogo: {
+    width: 190,
+    height: 56,
+    resizeMode: "contain",
+    marginBottom: 24,
+  },
+  webHeroTitle: {
+    fontSize: 42,
+    fontWeight: "800",
+    color: "#1E3A6D",
+    marginBottom: 10,
+  },
+  webHeroText: {
+    maxWidth: 420,
+    fontSize: 17,
+    lineHeight: 26,
+    color: "#456088",
+  },
+  webCardWrap: {
+    width: 520,
+    justifyContent: "center",
+    paddingHorizontal: 30,
+  },
   card: {
     backgroundColor: "#ffffff",
-    borderRadius: 16,
-    padding: 18,
+    borderRadius: 18,
+    padding: 24,
     shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 3,
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 4,
+  },
+  webCard: {
+    width: "100%",
+  },
+  webCompactCard: {
+    width: "100%",
+    maxWidth: 560,
+    alignSelf: "center",
   },
   title: {
-    fontSize: 26,
+    fontSize: 34,
     fontWeight: "700",
     color: "#0f172a",
   },
   subtitle: {
     marginTop: 6,
-    marginBottom: 16,
+    marginBottom: 20,
     color: "#455269",
+    fontSize: 14,
   },
   label: {
-    marginTop: 10,
+    marginTop: 12,
     marginBottom: 6,
     fontWeight: "600",
     color: "#1f2937",
@@ -140,23 +221,27 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: "#d8deea",
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
     color: "#111827",
-    backgroundColor: "#fbfcfe",
+    backgroundColor: "#F9FBFD",
+  },
+  primaryButtonTouch: {
+    marginTop: 18,
+    borderRadius: 12,
+    overflow: "hidden",
   },
   primaryButton: {
-    marginTop: 16,
-    backgroundColor: "#1663d6",
-    borderRadius: 10,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 12,
+    paddingVertical: 13,
   },
   primaryText: {
     color: "#ffffff",
     fontWeight: "700",
+    fontSize: 15,
   },
   secondaryButton: {
     marginTop: 10,

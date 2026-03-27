@@ -26,6 +26,17 @@ export const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (
   const hasPremium = isSubscribed;
 
   const [showModal, setShowModal] = React.useState(false);
+  const handleLogout = async () => {
+    await signOut();
+    await clearCachedSubscriptionStatus();
+    await AsyncStorage.removeItem(DEBUG_SUB_OVERRIDE_KEY);
+    props.navigation.closeDrawer();
+    const parent = props.navigation.getParent();
+    (parent as any)?.reset?.({
+      index: 0,
+      routes: [{ name: "SignIn" }],
+    });
+  };
 
   const drawerContent = [
     {
@@ -77,6 +88,9 @@ export const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (
           style={{ width: "100%", height: "100%" }}
         ></Image>
         <Image source={icons.drawerLogo} style={styles.overlayImage} />
+        <TouchableOpacity style={styles.headerLogoutBtn} onPress={handleLogout}>
+          <Text style={styles.headerLogoutText}>Logout</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Drawer Options */}
@@ -153,64 +167,21 @@ export const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (
             {/* <View style={styles.separator} /> */}
           </React.Fragment>
         ))}
+
+        <TouchableOpacity style={styles.drawerItem} onPress={handleLogout}>
+          <Image source={icons.changeLanguage} style={{ width: 20, height: 20 }} />
+          <Text style={styles.logoutInlineText}>Logout</Text>
+        </TouchableOpacity>
+        <View style={styles.separator} />
       </View>
 
       {/* You can add more items here */}
 
-      {/* Footer Section */}
+      {/* Footer Section intentionally minimal on mobile drawer to keep primary actions visible. */}
       <View style={styles.drawerFooter}>
-        <TouchableOpacity
-          style={styles.logoutButton}
-          onPress={async () => {
-            // Clear auth + premium caches, then reset to the auth stack.
-            await signOut();
-            await clearCachedSubscriptionStatus();
-            await AsyncStorage.removeItem(DEBUG_SUB_OVERRIDE_KEY);
-
-            // Drawer navigator is nested under RootStack; reset parent so we land on SignIn.
-            props.navigation.closeDrawer();
-            const parent = props.navigation.getParent();
-            (parent as any)?.reset?.({
-              index: 0,
-              routes: [{ name: "SignIn" }],
-            });
-          }}
-        >
-          <Text style={styles.logoutButtonText}>Logout</Text>
-        </TouchableOpacity>
-
-        <View style={{ borderRadius: 10, padding: 4 }}>
-          <View>
-            <Text style={{ color: "white", marginBottom: 6 }}>
-              {user ? `Signed in as ${user.email}` : "Not signed in"}
-            </Text>
-            <Text style={{ color: "white" }}>Contact Information</Text>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              {/* <Image source={icons.phone} style={{ width: 15, height: 14 }} /> */}
-              <Text style={{ color: "white" }}> : 269-471-6159</Text>
-            </View>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              {/* <Image source={icons.mail} style={{ width: 15, height: 14 }} /> */}
-              <Text style={{ color: "white" }}>
-                {" "}
-                : communitychange@andrews.edu
-              </Text>
-            </View>
-          </View>
-        </View>
-        <View
-          style={{
-            width: "100%",
-            alignItems: "center",
-            height: 30,
-            marginVertical: 20,
-          }}
-        >
-          {/* <Image
-            source={require("../assets/icons/footerIcon.png")}
-            style={{ width: 20, height: 30 }}
-          /> */}
-        </View>
+        <Text style={styles.signedInText}>
+          {user ? `Signed in as ${user.email}` : "Not signed in"}
+        </Text>
       </View>
       <UpgradeModal
         visible={showModal}
@@ -249,6 +220,22 @@ const styles = StyleSheet.create({
     height: 40,
     resizeMode: "contain",
   },
+  headerLogoutBtn: {
+    position: "absolute",
+    top: 16,
+    right: 14,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.9)",
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: "rgba(0,0,0,0.12)",
+  },
+  headerLogoutText: {
+    color: "#FFFFFF",
+    fontSize: 12,
+    fontWeight: "700",
+  },
   profilePic: {
     borderRadius: 40,
     marginBottom: 10,
@@ -275,30 +262,15 @@ const styles = StyleSheet.create({
     padding: 10,
     // backgroundColor: "#14517d", // Set a background color for the footer
   },
-  footerItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 10,
-  },
-
-  footerText: {
+  logoutInlineText: {
+    color: "#B42318",
     marginLeft: 10,
-    fontSize: 18,
-    color: "#ff6347", // Red color for the footer text
-  },
-  logoutButton: {
-    borderWidth: 1,
-    borderColor: "#ffffff",
-    borderRadius: 8,
-    paddingVertical: 10,
-    alignItems: "center",
-    marginHorizontal: 4,
-    marginBottom: 12,
-    backgroundColor: "rgba(255,255,255,0.12)",
-  },
-  logoutButtonText: {
-    color: "#ffffff",
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: "600",
+  },
+  signedInText: {
+    color: "#64748B",
+    fontSize: 12,
+    paddingHorizontal: 10,
   },
 });

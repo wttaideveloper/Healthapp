@@ -1,5 +1,6 @@
 import React from "react";
 import { createDrawerNavigator } from "@react-navigation/drawer";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import BottomTabNavigator from "./BottomTabNavigator";
 import ProfileScreen from "../screens/PurchaseScreen";
 import HistoryScreen from "../screens/HistoryScreen";
@@ -26,6 +27,7 @@ import UpgradeModal from "../components/upgradeModal";
 import { useAuth } from "../context/authContext";
 import i18n from "../components/i18n";
 import CheckoutResultScreen from "../screens/CheckoutResultScreen";
+import { clearCachedSubscriptionStatus } from "../components/utils/purchase";
 
 export type DrawerParamList = {
   Main: undefined;
@@ -242,13 +244,14 @@ const HeaderRight = ({ navigation }) => {
 const Stack = createStackNavigator<StackParamList>();
 const Drawer = createDrawerNavigator<DrawerParamList>();
 const WebStack = createStackNavigator<DrawerParamList>();
+const DEBUG_SUB_OVERRIDE_KEY = "debug_subscription_override";
 
 const WebShellHeader: React.FC<{
   navigation: any;
   hasPremium: boolean;
   onRequireUpgrade: () => void;
 }> = ({ navigation, hasPremium, onRequireUpgrade }) => {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const initial = (user?.name?.trim()?.[0] ?? user?.email?.trim()?.[0] ?? "A").toUpperCase();
   const languageCode = (i18n.language ?? "en").split("-")[0].toLowerCase();
   const languageLabel =
@@ -271,6 +274,21 @@ const WebShellHeader: React.FC<{
       return;
     }
     goRoot(routeName, params);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      await clearCachedSubscriptionStatus();
+      await AsyncStorage.removeItem(DEBUG_SUB_OVERRIDE_KEY);
+      const parent = navigation.getParent?.();
+      parent?.reset?.({
+        index: 0,
+        routes: [{ name: "SignIn" }],
+      });
+    } catch (error) {
+      console.error("Web logout failed:", error);
+    }
   };
 
   return (
@@ -347,6 +365,9 @@ const WebShellHeader: React.FC<{
         </View>
 
         <View style={webStyles.right}>
+          <TouchableOpacity style={webStyles.logoutPillBtn} onPress={handleLogout}>
+            <Text style={webStyles.logoutPillText}>Logout</Text>
+          </TouchableOpacity>
           <TouchableOpacity
             style={webStyles.langPill}
             onPress={() => {
@@ -908,6 +929,24 @@ const webStyles = StyleSheet.create({
   linkText: { fontSize: 31 / 2, color: "#121826", fontWeight: "500" },
   caret: { fontSize: 10, color: "#6B7280" },
   right: { flexDirection: "row", alignItems: "center", gap: 12 },
+  logoutPillBtn: {
+    borderWidth: 1,
+    borderColor: "#F3C4C0",
+    backgroundColor: "#FFF5F4",
+    borderRadius: 999,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+  },
+  logoutPillText: {
+    color: "#B42318",
+    fontSize: 13,
+    fontWeight: "700",
+  },
+  logoutLinkText: {
+    color: "#B42318",
+    fontSize: 31 / 2,
+    fontWeight: "600",
+  },
   langPill: {
     flexDirection: "row",
     alignItems: "center",
