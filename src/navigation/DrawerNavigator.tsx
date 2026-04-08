@@ -308,6 +308,14 @@ const WebShellHeader: React.FC<{
 
   const [reportsOpen, setReportsOpen] = React.useState(false);
   const [languageOpen, setLanguageOpen] = React.useState(false);
+  const navState = navigation.getState?.();
+  const currentRouteName =
+    navState?.routes?.[typeof navState?.index === "number" ? navState.index : 0]?.name ?? "Main";
+  const isHomeActive = currentRouteName === "Main";
+  const isPurchaseActive = currentRouteName === "Purchase";
+  const isHistoryActive = currentRouteName === "HistoryScreen";
+  const isAboutActive = currentRouteName === "AboutAppScreen";
+  const isReportsActive = currentRouteName === "PrintScreen" || currentRouteName === "ReportSettings";
   const languageOptions = [
     { code: "en", label: "English" },
     { code: "hi", label: "हिन्दी" },
@@ -373,11 +381,20 @@ const WebShellHeader: React.FC<{
         </TouchableOpacity>
 
         <View style={webStyles.links}>
-          <TouchableOpacity style={webStyles.linkBtn} onPress={() => goRoot("Purchase")}>
-            <Text style={webStyles.linkText}>Purchase</Text>
+          <TouchableOpacity
+            style={[webStyles.linkBtn, isHomeActive ? webStyles.linkBtnActive : null]}
+            onPress={() => goRoot("Main")}
+          >
+            <Text style={[webStyles.linkText, isHomeActive ? webStyles.linkTextActive : null]}>Home</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={webStyles.linkBtn}
+            style={[webStyles.linkBtn, isPurchaseActive ? webStyles.linkBtnActive : null]}
+            onPress={() => goRoot("Purchase")}
+          >
+            <Text style={[webStyles.linkText, isPurchaseActive ? webStyles.linkTextActive : null]}>Purchase</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[webStyles.linkBtn, isHistoryActive ? webStyles.linkBtnActive : null]}
             onPress={() => {
               if (hasPremium) {
                 goRoot("HistoryScreen");
@@ -386,21 +403,24 @@ const WebShellHeader: React.FC<{
               }
             }}
           >
-            <Text style={webStyles.linkText}>History</Text>
+            <Text style={[webStyles.linkText, isHistoryActive ? webStyles.linkTextActive : null]}>History</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={webStyles.linkBtn} onPress={() => goRoot("AboutAppScreen")}>
-            <Text style={webStyles.linkText}>About</Text>
+          <TouchableOpacity
+            style={[webStyles.linkBtn, isAboutActive ? webStyles.linkBtnActive : null]}
+            onPress={() => goRoot("AboutAppScreen")}
+          >
+            <Text style={[webStyles.linkText, isAboutActive ? webStyles.linkTextActive : null]}>About</Text>
           </TouchableOpacity>
 
           <View style={webStyles.dropdownWrap as any}>
             <TouchableOpacity
-              style={webStyles.linkBtn}
+              style={[webStyles.linkBtn, isReportsActive ? webStyles.linkBtnActive : null]}
               onPress={() => {
                 setLanguageOpen(false);
                 setReportsOpen((v) => !v);
               }}
             >
-              <Text style={webStyles.linkText}>Reports</Text>
+              <Text style={[webStyles.linkText, isReportsActive ? webStyles.linkTextActive : null]}>Reports</Text>
               <Text style={webStyles.caret}>▼</Text>
             </TouchableOpacity>
             {reportsOpen ? (
@@ -436,9 +456,6 @@ const WebShellHeader: React.FC<{
             ) : null}
           </View>
 
-          <TouchableOpacity style={webStyles.linkBtn} onPress={() => goRoot("Purchase")}>
-            <Text style={webStyles.linkText}>Activation Key</Text>
-          </TouchableOpacity>
         </View>
 
         <View style={webStyles.right}>
@@ -1022,9 +1039,14 @@ const webStyles = StyleSheet.create({
     alignItems: "center",
     gap: 8,
     paddingVertical: 8,
-    paddingHorizontal: 8,
+    paddingHorizontal: 10,
+    borderRadius: 999,
+  },
+  linkBtnActive: {
+    backgroundColor: "#EAF2FF",
   },
   linkText: { fontSize: 31 / 2, color: "#121826", fontWeight: "500" },
+  linkTextActive: { color: "#0E4FAE", fontWeight: "700" },
   caret: { fontSize: 10, color: "#6B7280" },
   right: { flexDirection: "row", alignItems: "center", gap: 12 },
   logoutPillBtn: {

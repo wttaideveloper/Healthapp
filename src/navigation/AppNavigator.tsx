@@ -11,6 +11,7 @@ import DrawerNavigator from "./DrawerNavigator";
 import SignInScreen from "../screens/SignInScreen";
 import SignUpScreen from "../screens/SignUpScreen";
 import VerifyEmailScreen from "../screens/VerifyEmailScreen";
+import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
 import { useAuth } from "../context/authContext";
 
 export type RootStackParamList = {
@@ -21,6 +22,7 @@ export type RootStackParamList = {
   Intro3: undefined;
   SignIn: undefined;
   SignUp: undefined;
+  ForgotPassword: undefined;
   VerifyEmail: { email?: string } | undefined;
   InitialScreen: undefined;
   ChangeLanguage: undefined;
@@ -111,6 +113,7 @@ const AppNavigator: React.FC = () => {
           <Stack.Screen name="Intro3" component={IntroScreen3} />
           <Stack.Screen name="SignIn" component={SignInScreen} />
           <Stack.Screen name="SignUp" component={SignUpScreen} />
+          <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
           <Stack.Screen name="VerifyEmail" component={VerifyEmailScreen} />
         </>
       ) : null}
@@ -122,6 +125,7 @@ const AppNavigator: React.FC = () => {
           <Stack.Screen name="Intro3" component={IntroScreen3} />
           <Stack.Screen name="SignIn" component={SignInScreen} />
           <Stack.Screen name="SignUp" component={SignUpScreen} />
+          <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
           <Stack.Screen name="VerifyEmail" component={VerifyEmailScreen} />
         </>
       ) : null}
@@ -130,6 +134,7 @@ const AppNavigator: React.FC = () => {
         <>
           <Stack.Screen name="SignIn" component={SignInScreen} />
           <Stack.Screen name="SignUp" component={SignUpScreen} />
+          <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
           <Stack.Screen name="VerifyEmail" component={VerifyEmailScreen} />
         </>
       ) : null}

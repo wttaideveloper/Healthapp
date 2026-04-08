@@ -13,163 +13,165 @@ import {
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
-import { useAuth } from "../context/authContext";
+import { authService } from "../components/utils/authService";
 import { isValidEmail } from "../components/utils/validation";
-import { icons } from "../components/images";
-import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
+import { icons } from "../components/images";
 
-type SignUpScreenProps = {
-  navigation: StackNavigationProp<RootStackParamList, "SignUp">;
+type ForgotPasswordScreenProps = {
+  navigation: StackNavigationProp<RootStackParamList, "ForgotPassword">;
 };
 
-type SignUpFieldErrors = {
-  name?: string;
-  email?: string;
-  password?: string;
-};
-
-const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
-  const { signUp, isLoading } = useAuth();
+const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation }) => {
   const { width } = useWindowDimensions();
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [fieldErrors, setFieldErrors] = useState<SignUpFieldErrors>({});
-  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [otp, setOtp] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [otpRequested, setOtpRequested] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const isWebDesktop = Platform.OS === "web" && width >= 980;
 
-  const clearFieldError = (field: keyof SignUpFieldErrors) => {
-    setFieldErrors((prev) => {
-      if (!prev[field]) return prev;
-      return { ...prev, [field]: undefined };
-    });
-  };
+  const normalizedEmail = email.trim().toLowerCase();
 
-  const onSignUp = async () => {
-    const normalizedName = name.trim();
-    const normalizedEmail = email.trim().toLowerCase();
-    const nextErrors: SignUpFieldErrors = {};
-
-    if (!normalizedName) {
-      nextErrors.name = "Name is required";
-    }
-
+  const onRequestOtp = async () => {
     if (!normalizedEmail) {
-      nextErrors.email = "Email is required";
-    } else if (!isValidEmail(normalizedEmail)) {
-      nextErrors.email = "Please enter a valid email address";
+      setError("Email is required");
+      return;
     }
 
-    if (!password) {
-      nextErrors.password = "Password is required";
-    } else if (password.length < 6) {
-      nextErrors.password = "Password must be at least 6 characters";
-    }
-
-    if (nextErrors.name || nextErrors.email || nextErrors.password) {
-      setFieldErrors(nextErrors);
-      setSubmitError(null);
+    if (!isValidEmail(normalizedEmail)) {
+      setError("Please enter a valid email address");
       return;
     }
 
     try {
-      setFieldErrors({});
-      setSubmitError(null);
-      const result = await signUp({
-        name: normalizedName,
-        email: normalizedEmail,
-        password,
-      });
-
-      if (result.status === "needs_verification") {
-        navigation.replace("VerifyEmail", { email: result.email });
-      }
+      setIsLoading(true);
+      setError(null);
+      setNotice(null);
+      await authService.forgotPassword({ email: normalizedEmail });
+      setOtpRequested(true);
+      setNotice("If this email is registered, a 6-digit OTP has been sent. It is valid for 10 minutes.");
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : "Unable to sign up");
+      setError(err instanceof Error ? err.message : "Unable to send OTP");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const onResetPassword = async () => {
+    if (!normalizedEmail) {
+      setError("Email is required");
+      return;
+    }
+    if (!/^\d{6}$/.test(otp.trim())) {
+      setError("OTP must be a 6-digit code");
+      return;
+    }
+    if (newPassword.trim().length < 8) {
+      setError("New password must be at least 8 characters");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      setError(null);
+      setNotice(null);
+      await authService.resetPassword({
+        email: normalizedEmail,
+        otp: otp.trim(),
+        newPassword: newPassword.trim(),
+      });
+      setNotice("Password reset successful. Please sign in with your new password.");
+      setTimeout(() => {
+        navigation.replace("SignIn");
+      }, 450);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to reset password");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const cardContent = (
     <>
-      <Text style={styles.title}>Create account</Text>
-      <Text style={styles.subtitle}>Set up your account to continue using the app.</Text>
-
-      <Text style={styles.label}>Name</Text>
-      <TextInput
-        style={[styles.input, fieldErrors.name ? styles.inputError : null]}
-        value={name}
-        onChangeText={(value) => {
-          setName(value);
-          clearFieldError("name");
-          if (submitError) setSubmitError(null);
-        }}
-        placeholder="Your name"
-        placeholderTextColor="#8b909b"
-      />
-      {fieldErrors.name ? <Text style={styles.error}>{fieldErrors.name}</Text> : null}
+      <Text style={styles.title}>Forgot password</Text>
+      <Text style={styles.subtitle}>Request an OTP and reset your password securely.</Text>
 
       <Text style={styles.label}>Email</Text>
       <TextInput
-        style={[styles.input, fieldErrors.email ? styles.inputError : null]}
+        style={styles.input}
         value={email}
         onChangeText={(value) => {
           setEmail(value);
-          clearFieldError("email");
-          if (submitError) setSubmitError(null);
+          if (error) setError(null);
         }}
         autoCapitalize="none"
         keyboardType="email-address"
         placeholder="you@example.com"
         placeholderTextColor="#8b909b"
       />
-      {fieldErrors.email ? <Text style={styles.error}>{fieldErrors.email}</Text> : null}
 
-      <Text style={styles.label}>Password</Text>
-      <View style={[styles.passwordRow, fieldErrors.password ? styles.inputError : null]}>
-        <TextInput
-          style={styles.passwordInput}
-          value={password}
-          onChangeText={(value) => {
-            setPassword(value);
-            clearFieldError("password");
-            if (submitError) setSubmitError(null);
-          }}
-          secureTextEntry={!showPassword}
-          placeholder="At least 6 characters"
-          placeholderTextColor="#8b909b"
-        />
-        <TouchableOpacity
-          onPress={() => setShowPassword((prev) => !prev)}
-          style={styles.passwordToggle}
-          disabled={isLoading}
-        >
-          <Ionicons
-            name={showPassword ? "eye-off-outline" : "eye-outline"}
-            size={18}
-            color="#1663d6"
-          />
+      {!otpRequested ? (
+        <TouchableOpacity style={styles.primaryButton} onPress={onRequestOtp} disabled={isLoading}>
+          {isLoading ? <ActivityIndicator color="#ffffff" /> : <Text style={styles.primaryText}>Send OTP</Text>}
         </TouchableOpacity>
-      </View>
-      {fieldErrors.password ? <Text style={styles.error}>{fieldErrors.password}</Text> : null}
+      ) : (
+        <>
+          <Text style={styles.label}>OTP</Text>
+          <TextInput
+            style={styles.input}
+            value={otp}
+            onChangeText={(value) => {
+              setOtp(value.replace(/[^0-9]/g, ""));
+              if (error) setError(null);
+            }}
+            keyboardType="number-pad"
+            placeholder="6-digit OTP"
+            placeholderTextColor="#8b909b"
+            maxLength={6}
+          />
 
-      {submitError ? <Text style={styles.error}>{submitError}</Text> : null}
+          <Text style={styles.label}>New password</Text>
+          <View style={styles.passwordRow}>
+            <TextInput
+              style={styles.passwordInput}
+              value={newPassword}
+              onChangeText={(value) => {
+                setNewPassword(value);
+                if (error) setError(null);
+              }}
+              secureTextEntry={!showPassword}
+              placeholder="At least 8 characters"
+              placeholderTextColor="#8b909b"
+            />
+            <TouchableOpacity
+              onPress={() => setShowPassword((prev) => !prev)}
+              style={styles.passwordToggle}
+              disabled={isLoading}
+            >
+              <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={18} color="#1663d6" />
+            </TouchableOpacity>
+          </View>
 
-      <TouchableOpacity style={styles.primaryButtonTouch} onPress={onSignUp} disabled={isLoading}>
-        <LinearGradient
-          colors={["#16A3DE", "#2D579D"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.primaryButton}
-        >
-          {isLoading ? (
-            <ActivityIndicator color="#ffffff" />
-          ) : (
-            <Text style={styles.primaryText}>Sign up and verify</Text>
-          )}
-        </LinearGradient>
-      </TouchableOpacity>
+          <TouchableOpacity style={styles.primaryButton} onPress={onResetPassword} disabled={isLoading}>
+            {isLoading ? (
+              <ActivityIndicator color="#ffffff" />
+            ) : (
+              <Text style={styles.primaryText}>Reset password</Text>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.secondaryButton} onPress={onRequestOtp} disabled={isLoading}>
+            <Text style={styles.secondaryText}>Resend OTP</Text>
+          </TouchableOpacity>
+        </>
+      )}
+
+      {notice ? <Text style={styles.notice}>{notice}</Text> : null}
+      {error ? <Text style={styles.error}>{error}</Text> : null}
 
       <TouchableOpacity
         style={styles.secondaryButton}
@@ -187,9 +189,9 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
         <View style={styles.webFrame}>
           <View style={styles.webHero}>
             <Image source={icons.menuLogo} style={styles.webLogo} />
-            <Text style={styles.webHeroTitle}>Join Health Age</Text>
+            <Text style={styles.webHeroTitle}>Reset your password</Text>
             <Text style={styles.webHeroText}>
-              Create your account to save assessments, sync license status, and unlock pro features.
+              Enter your email to receive an OTP, then set a new secure password.
             </Text>
             <Image source={icons.homeHero} style={styles.webHeroImage} />
           </View>
@@ -319,9 +321,6 @@ const styles = StyleSheet.create({
     color: "#111827",
     backgroundColor: "#F9FBFD",
   },
-  inputError: {
-    borderColor: "#DC2626",
-  },
   passwordRow: {
     borderWidth: 1,
     borderColor: "#d8deea",
@@ -344,35 +343,37 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     minWidth: 28,
   },
-  primaryButtonTouch: {
-    marginTop: 18,
-    borderRadius: 12,
-    overflow: "hidden",
-  },
   primaryButton: {
-    borderRadius: 12,
+    marginTop: 16,
+    backgroundColor: "#1663d6",
+    borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 13,
+    paddingVertical: 12,
   },
   primaryText: {
     color: "#ffffff",
     fontWeight: "700",
-    fontSize: 15,
   },
   secondaryButton: {
     marginTop: 10,
     alignItems: "center",
-    paddingVertical: 10,
+    paddingVertical: 8,
   },
   secondaryText: {
     color: "#1663d6",
     fontWeight: "600",
   },
+  notice: {
+    marginTop: 10,
+    color: "#155eef",
+    fontSize: 13,
+  },
   error: {
     marginTop: 10,
     color: "#c62828",
+    fontSize: 13,
   },
 });
 
-export default SignUpScreen;
+export default ForgotPasswordScreen;

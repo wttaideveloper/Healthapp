@@ -36,6 +36,16 @@ export type VerifyEmailInput = {
   code: string;
 };
 
+export type ForgotPasswordInput = {
+  email: string;
+};
+
+export type ResetPasswordInput = {
+  email: string;
+  otp: string;
+  newPassword: string;
+};
+
 export type SignInResult =
   | { status: "authenticated"; user: AuthUser; session: AuthSession }
   | { status: "needs_verification"; email: string };
@@ -48,6 +58,7 @@ const SHOULD_FORCE_MOCK = process.env.EXPO_PUBLIC_USE_MOCK_AUTH === "true";
 const USE_MOCK_AUTH = SHOULD_FORCE_MOCK || (!getApiRoot() && __DEV__);
 
 const MOCK_USERS_KEY = "mock_auth_users";
+const MOCK_RESET_OTP_KEY = "mock_auth_reset_otp";
 
 type StoredMockUser = {
   id: string;
@@ -57,6 +68,12 @@ type StoredMockUser = {
   emailVerified: boolean;
 };
 
+type StoredMockResetOtp = {
+  email: string;
+  otp: string;
+  expiresAt: number;
+};
+
 const randomId = () => `${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
 
 const normalizeEmail = (email: string) => email.trim().toLowerCase();
@@ -64,6 +81,26 @@ const normalizeEmail = (email: string) => email.trim().toLowerCase();
 const isValidEmail = (email: string): boolean => {
   // Pragmatic check; backend still enforces normalization + validation.
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+};
+
+const normalizeAuthErrorMessage = (error: unknown): string => {
+  const raw = error instanceof Error ? error.message : String(error ?? "");
+  const normalized = raw.trim();
+  const lower = normalized.toLowerCase();
+
+  if (
+    lower.includes("invalid email address") ||
+    lower.includes("body/email") ||
+    lower.includes("email must be")
+  ) {
+    return "Please enter a valid email address.";
+  }
+
+  if (lower.includes("password") && lower.includes("required")) {
+    return "Password is required.";
+  }
+
+  return normalized || "Unable to sign in";
 };
 
 const getMockUsers = async (): Promise<StoredMockUser[]> => {
@@ -82,6 +119,21 @@ const getMockUsers = async (): Promise<StoredMockUser[]> => {
 
 const setMockUsers = async (users: StoredMockUser[]): Promise<void> => {
   await AsyncStorage.setItem(MOCK_USERS_KEY, JSON.stringify(users));
+};
+
+const getMockResetOtps = async (): Promise<StoredMockResetOtp[]> => {
+  const raw = await AsyncStorage.getItem(MOCK_RESET_OTP_KEY);
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw) as StoredMockResetOtp[];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
+const setMockResetOtps = async (entries: StoredMockResetOtp[]): Promise<void> => {
+  await AsyncStorage.setItem(MOCK_RESET_OTP_KEY, JSON.stringify(entries));
 };
 
 const toAuthUser = (user: StoredMockUser): AuthUser => ({
@@ -231,6 +283,68 @@ const mockVerifyEmail = async ({ email, code }: VerifyEmailInput): Promise<void>
   await setMockUsers(users);
 };
 
+const mockForgotPassword = async ({ email }: ForgotPasswordInput): Promise<void> => {
+  const normalized = normalizeEmail(email);
+  if (!isValidEmail(normalized)) {
+    throw new Error("Please enter a valid email address.");
+  }
+
+  const users = await getMockUsers();
+  const exists = users.some((u) => normalizeEmail(u.email) === normalized);
+  if (!exists) {
+    // Keep the response generic even in mock mode.
+    return;
+  }
+
+  const otp = String(Math.floor(100000 + Math.random() * 900000));
+  const expiresAt = Date.now() + 10 * 60 * 1000;
+  const entries = (await getMockResetOtps()).filter((entry) => entry.email !== normalized);
+  entries.push({ email: normalized, otp, expiresAt });
+  await setMockResetOtps(entries);
+
+  if (__DEV__) {
+    console.log(`Mock forgot-password OTP for ${normalized}: ${otp}`);
+  }
+};
+
+const mockResetPassword = async ({ email, otp, newPassword }: ResetPasswordInput): Promise<void> => {
+  const normalized = normalizeEmail(email);
+  const normalizedOtp = otp.trim();
+  const trimmedPassword = newPassword.trim();
+
+  if (!isValidEmail(normalized)) {
+    throw new Error("Please enter a valid email address.");
+  }
+  if (!/^\d{6}$/.test(normalizedOtp)) {
+    throw new Error("OTP must be a 6-digit code.");
+  }
+  if (trimmedPassword.length < 8) {
+    throw new Error("New password must be at least 8 characters.");
+  }
+
+  const entries = await getMockResetOtps();
+  const record = entries.find((entry) => entry.email === normalized);
+  if (!record || record.expiresAt < Date.now()) {
+    throw new Error("OTP expired or invalid. Please request a new code.");
+  }
+  if (record.otp !== normalizedOtp) {
+    throw new Error("Invalid OTP. Please try again.");
+  }
+
+  const users = await getMockUsers();
+  const index = users.findIndex((u) => normalizeEmail(u.email) === normalized);
+  if (index === -1) {
+    throw new Error("Account not found.");
+  }
+
+  users[index] = {
+    ...users[index],
+    password: trimmedPassword,
+  };
+  await setMockUsers(users);
+  await setMockResetOtps(entries.filter((entry) => entry.email !== normalized));
+};
+
 const mockMe = async (token: string): Promise<AuthUser> => {
   if (!token.startsWith("mock_token_")) {
     throw new Error("Invalid session");
@@ -263,24 +377,28 @@ export const authService = {
       throw new Error("Password is required.");
     }
 
-    const payload = await apiRequest<unknown>("/auth/login", {
-      method: "POST",
-      body: JSON.stringify({ email, password: input.password }),
-    });
+    try {
+      const payload = await apiRequest<unknown>("/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email, password: input.password }),
+      });
 
-    const source = payload as Record<string, unknown>;
-    const user = buildUserFromBackend(source?.user);
-    const session = buildSessionFromBackend(source);
+      const source = payload as Record<string, unknown>;
+      const user = buildUserFromBackend(source?.user);
+      const session = buildSessionFromBackend(source);
 
-    if (!user || !session) {
-      throw new Error("Invalid sign-in response from server");
+      if (!user || !session) {
+        throw new Error("Invalid sign-in response from server");
+      }
+
+      return {
+        status: "authenticated",
+        user,
+        session,
+      };
+    } catch (error) {
+      throw new Error(normalizeAuthErrorMessage(error));
     }
-
-    return {
-      status: "authenticated",
-      user,
-      session,
-    };
   },
 
   async signUp(input: SignUpInput): Promise<SignUpResult> {
@@ -332,6 +450,49 @@ export const authService = {
       return;
     }
     throw new Error("Email verification is not supported by the backend yet.");
+  },
+
+  async forgotPassword(input: ForgotPasswordInput): Promise<void> {
+    if (USE_MOCK_AUTH) {
+      await mockForgotPassword(input);
+      return;
+    }
+
+    const email = normalizeEmail(input.email);
+    if (!isValidEmail(email)) {
+      throw new Error("Please enter a valid email address.");
+    }
+
+    await apiRequest<unknown>("/auth/forgot-password", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    });
+  },
+
+  async resetPassword(input: ResetPasswordInput): Promise<void> {
+    if (USE_MOCK_AUTH) {
+      await mockResetPassword(input);
+      return;
+    }
+
+    const email = normalizeEmail(input.email);
+    const otp = input.otp.trim();
+    const newPassword = input.newPassword.trim();
+
+    if (!isValidEmail(email)) {
+      throw new Error("Please enter a valid email address.");
+    }
+    if (!/^\d{6}$/.test(otp)) {
+      throw new Error("OTP must be a 6-digit code.");
+    }
+    if (newPassword.length < 8) {
+      throw new Error("New password must be at least 8 characters.");
+    }
+
+    await apiRequest<unknown>("/auth/reset-password", {
+      method: "POST",
+      body: JSON.stringify({ email, otp, newPassword }),
+    });
   },
 
   async me(accessToken: string): Promise<AuthUser> {

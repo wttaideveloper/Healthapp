@@ -155,6 +155,7 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
   const [selectedAnswers, setSelectedAnswers] = React.useState<
     { questionId: number; text: string; points: number }[]
   >([]);
+  const [questionError, setQuestionError] = React.useState<string | null>(null);
   console.log(
     route.params.heightValue,
     route.params.weightValue,
@@ -182,6 +183,9 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
     selectedOption: string,
     points: number
   ) => {
+    if (questionError) {
+      setQuestionError(null);
+    }
     setSelectedAnswers((prev) => {
       const filteredAnswers = prev.filter((answer) => answer.questionId !== Id);
       return [
@@ -200,11 +204,22 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
     );
 
     if (!isAnswered) {
-      Alert.alert(t("enterThisFields"), "", [{ text: t("Fs_Close") }]);
+      const message = "Please select an option to continue.";
+      setQuestionError(message);
+      if (Platform.OS !== "web") {
+        Alert.alert("Validation", message, [{ text: t("Fs_Close") }]);
+      }
       return;
     }
     if (currentIndex + 1 == 12) {
-      if (selectedAnswers.length !== 12) return;
+      if (selectedAnswers.length !== 12) {
+        const message = "Please complete all questions before proceeding.";
+        setQuestionError(message);
+        if (Platform.OS !== "web") {
+          Alert.alert("Validation", message, [{ text: t("Fs_Close") }]);
+        }
+        return;
+      }
     }
     if (currentIndex < questionsData.length - 1) {
       const nextQuestion = questionsData[currentIndex + 1];
@@ -279,6 +294,7 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
       });
       setSelectedAnswers([]);
       setCurrentIndex(0);
+      setQuestionError(null);
       //   console.log(totalScore, "total Score");
     }
   };
@@ -321,6 +337,9 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
   }, [currentIndex, navigation, route.params]);
 
   const handleBack = () => {
+    if (questionError) {
+      setQuestionError(null);
+    }
     if (currentIndex == 0) {
       // Return to the previous assessment form flow without losing inputs.
       navigation.navigate("healthAgeTest", {
@@ -385,6 +404,7 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
           }
           style={styles.subQuestion}
         ></Font>
+        {questionError ? <Font text={questionError} style={styles.errorText} /> : null}
       </View>
 
       <FlatList
@@ -519,5 +539,11 @@ const styles = StyleSheet.create({
   },
   webNavText: {
     fontSize: 15,
+  },
+  errorText: {
+    marginTop: 8,
+    color: "#B42318",
+    fontSize: 13,
+    fontWeight: "600",
   },
 });

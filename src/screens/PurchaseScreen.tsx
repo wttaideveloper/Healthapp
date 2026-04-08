@@ -35,6 +35,8 @@ const TERMS_OF_USE_URL = "https://www.apple.com/legal/internet-services/itunes/d
 const PRIVACY_POLICY_URL = "https://www.apple.com/legal/privacy/";
 const FALLBACK_PLAN_PRICE = "$49/year";
 const FALLBACK_PLAN_DESCRIPTION = "Annual Pro subscription";
+const LICENSE_KEY_FORMAT = "ORG-******-******-******-******";
+const LICENSE_KEY_REGEX = /^ORG-[A-Z0-9]{6}-[A-Z0-9]{6}-[A-Z0-9]{6}-[A-Z0-9]{6}$/;
 
 const formatDate = (value: Date | null): string | null => {
   if (!value) return null;
@@ -65,6 +67,7 @@ const PurchaseScreen: React.FC = () => {
   const [selectedPackageIdentifier, setSelectedPackageIdentifier] = useState<string | null>(null);
   const [storeError, setStoreError] = useState<string | null>(null);
   const [webNotice, setWebNotice] = useState<string | null>(null);
+  const [licenseError, setLicenseError] = useState<string | null>(null);
 
   const isInitialMount = React.useRef(true);
   const refreshInFlight = React.useRef(false);
@@ -212,20 +215,48 @@ const PurchaseScreen: React.FC = () => {
       return;
     }
 
-    if (!licenseKey.trim()) {
-      Alert.alert("Missing key", "Please enter your license key.");
+    const normalizedKey = licenseKey.trim().toUpperCase().replace(/[^A-Z0-9-]/g, "");
+    setLicenseKey(normalizedKey);
+
+    if (!normalizedKey) {
+      const message = "Please enter your license key.";
+      setLicenseError(message);
+      Alert.alert("Missing key", message);
+      return;
+    }
+
+    if (!LICENSE_KEY_REGEX.test(normalizedKey)) {
+      const message = `Invalid license key format. Use ${LICENSE_KEY_FORMAT}`;
+      setLicenseError(message);
+      Alert.alert("Invalid format", message);
       return;
     }
 
     setActionLoading(true);
     try {
       await setDebugSubscriptionOverride(null);
-      await activateLicenseKey(accessToken, licenseKey);
+      setLicenseError(null);
+      const status = await activateLicenseKey(accessToken, normalizedKey);
       await refreshSubscription(true);
+      if (!status.isValid) {
+        const statusText =
+          status.providerStatus && status.providerStatus.trim()
+            ? ` (status: ${status.providerStatus})`
+            : "";
+        const message = `License key was submitted but is not active${statusText}.`;
+        setLicenseError(message);
+        Alert.alert("Activation pending", message);
+        return;
+      }
       Alert.alert("License activated", "Pro features are now enabled.");
       setLicenseKey("");
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unable to activate license";
+      const rawMessage = error instanceof Error ? error.message : "Unable to activate license";
+      const message =
+        /max.*activation|activation.*limit|device.*limit/i.test(rawMessage)
+          ? "This license key has reached its maximum activation limit. Please contact your admin."
+          : rawMessage;
+      setLicenseError(message);
       Alert.alert("Activation failed", message);
     } finally {
       setActionLoading(false);
@@ -493,13 +524,24 @@ const PurchaseScreen: React.FC = () => {
             ) : null}
 
             <TextInput
-              style={styles.licenseInput}
+              style={[styles.licenseInput, licenseError ? styles.licenseInputError : null]}
               value={licenseKey}
-              onChangeText={setLicenseKey}
-              placeholder="Enter license key"
+              onChangeText={(value) => {
+                const normalized = value.toUpperCase().replace(/[^A-Z0-9-]/g, "");
+                setLicenseKey(normalized);
+                if (licenseError) {
+                  setLicenseError(null);
+                }
+              }}
+              placeholder={`Enter license key (${LICENSE_KEY_FORMAT})`}
               placeholderTextColor="#8b909b"
               autoCapitalize="characters"
+              autoCorrect={false}
+              autoComplete="off"
+              maxLength={31}
             />
+            {licenseError ? <Text style={styles.licenseErrorText}>{licenseError}</Text> : null}
+            <Text style={styles.licenseHintText}>Format: {LICENSE_KEY_FORMAT}</Text>
 
             <Button
               style={styles.actionButton}
@@ -706,6 +748,22 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     color: "#111827",
     backgroundColor: "#fbfcfe",
+  },
+  licenseInputError: {
+    borderColor: "#DC2626",
+  },
+  licenseErrorText: {
+    alignSelf: "flex-start",
+    marginTop: 6,
+    color: "#B42318",
+    fontSize: 13,
+    fontWeight: "500",
+  },
+  licenseHintText: {
+    alignSelf: "flex-start",
+    marginTop: 4,
+    color: "#64748B",
+    fontSize: 12,
   },
   refreshText: {
     color: "#1663d6",

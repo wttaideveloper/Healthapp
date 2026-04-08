@@ -25,6 +25,7 @@ const REVENUECAT_PRODUCT_IDS = (process.env.EXPO_PUBLIC_REVENUECAT_PRODUCT_IDS ?
   .split(",")
   .map((value) => value.trim())
   .filter(Boolean);
+const LICENSE_KEY_REGEX = /^ORG-[A-Z0-9]{6}-[A-Z0-9]{6}-[A-Z0-9]{6}-[A-Z0-9]{6}$/;
 
 type RevenueCatRuntimeConfig = {
   iosApiKey: string;
@@ -445,9 +446,12 @@ export const activateLicenseKey = async (
     throw new Error("Missing API base URL or access token");
   }
 
-  const normalizedKey = licenseKey.trim();
+  const normalizedKey = licenseKey.trim().toUpperCase();
   if (!normalizedKey) {
     throw new Error("License key is required");
+  }
+  if (!LICENSE_KEY_REGEX.test(normalizedKey)) {
+    throw new Error("Invalid license key format. Expected ORG-XXXXXX-XXXXXX-XXXXXX-XXXXXX");
   }
 
   const deviceId = await getOrCreateDeviceId();

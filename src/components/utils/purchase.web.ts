@@ -9,6 +9,7 @@ const STRIPE_CHECKOUT_PATH =
   process.env.EXPO_PUBLIC_STRIPE_CHECKOUT_PATH ?? "/stripe/checkout";
 const STRIPE_PORTAL_PATH =
   process.env.EXPO_PUBLIC_STRIPE_PORTAL_PATH ?? "/stripe/portal";
+const LICENSE_KEY_REGEX = /^ORG-[A-Z0-9]{6}-[A-Z0-9]{6}-[A-Z0-9]{6}-[A-Z0-9]{6}$/;
 
 export type SubscriptionStatus = {
   isValid: boolean;
@@ -143,9 +144,12 @@ export const activateLicenseKey = async (
     throw new Error("Missing API base URL or access token");
   }
 
-  const normalizedKey = licenseKey.trim();
+  const normalizedKey = licenseKey.trim().toUpperCase();
   if (!normalizedKey) {
     throw new Error("License key is required");
+  }
+  if (!LICENSE_KEY_REGEX.test(normalizedKey)) {
+    throw new Error("Invalid license key format. Expected ORG-XXXXXX-XXXXXX-XXXXXX-XXXXXX");
   }
 
   const deviceIdKey = "device_id";

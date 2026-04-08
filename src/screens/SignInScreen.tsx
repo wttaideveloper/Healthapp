@@ -17,9 +17,15 @@ import { useAuth } from "../context/authContext";
 import { isValidEmail } from "../components/utils/validation";
 import { icons } from "../components/images";
 import { LinearGradient } from "expo-linear-gradient";
+import { Ionicons } from "@expo/vector-icons";
 
 type SignInScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, "SignIn">;
+};
+
+type SignInFieldErrors = {
+  email?: string;
+  password?: string;
 };
 
 const SignInScreen: React.FC<SignInScreenProps> = ({ navigation }) => {
@@ -27,24 +33,41 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ navigation }) => {
   const { width } = useWindowDimensions();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<SignInFieldErrors>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
   const isWebDesktop = Platform.OS === "web" && width >= 980;
+
+  const clearFieldError = (field: keyof SignInFieldErrors) => {
+    setFieldErrors((prev) => {
+      if (!prev[field]) return prev;
+      return { ...prev, [field]: undefined };
+    });
+  };
 
   const onSignIn = async () => {
     const normalizedEmail = email.trim().toLowerCase();
+    const nextErrors: SignInFieldErrors = {};
 
-    if (!normalizedEmail || !password) {
-      setError("Email and password are required");
-      return;
+    if (!normalizedEmail) {
+      nextErrors.email = "Email is required";
+    } else if (!isValidEmail(normalizedEmail)) {
+      nextErrors.email = "Please enter a valid email address";
     }
 
-    if (!isValidEmail(normalizedEmail)) {
-      setError("Please enter a valid email address");
+    if (!password) {
+      nextErrors.password = "Password is required";
+    }
+
+    if (nextErrors.email || nextErrors.password) {
+      setFieldErrors(nextErrors);
+      setSubmitError(null);
       return;
     }
 
     try {
-      setError(null);
+      setFieldErrors({});
+      setSubmitError(null);
       const result = await signIn({
         email: normalizedEmail,
         password,
@@ -55,7 +78,7 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ navigation }) => {
         return;
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unable to sign in");
+      setSubmitError(err instanceof Error ? err.message : "Unable to sign in");
     }
   };
 
@@ -66,26 +89,56 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ navigation }) => {
 
       <Text style={styles.label}>Email</Text>
       <TextInput
-        style={styles.input}
+        style={[styles.input, fieldErrors.email ? styles.inputError : null]}
         value={email}
-        onChangeText={setEmail}
+        onChangeText={(value) => {
+          setEmail(value);
+          clearFieldError("email");
+          if (submitError) setSubmitError(null);
+        }}
         autoCapitalize="none"
         keyboardType="email-address"
         placeholder="you@example.com"
         placeholderTextColor="#8b909b"
       />
+      {fieldErrors.email ? <Text style={styles.error}>{fieldErrors.email}</Text> : null}
 
       <Text style={styles.label}>Password</Text>
-      <TextInput
-        style={styles.input}
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        placeholder="Your password"
-        placeholderTextColor="#8b909b"
-      />
+      <View style={[styles.passwordRow, fieldErrors.password ? styles.inputError : null]}>
+        <TextInput
+          style={styles.passwordInput}
+          value={password}
+          onChangeText={(value) => {
+            setPassword(value);
+            clearFieldError("password");
+            if (submitError) setSubmitError(null);
+          }}
+          secureTextEntry={!showPassword}
+          placeholder="Your password"
+          placeholderTextColor="#8b909b"
+        />
+        <TouchableOpacity
+          onPress={() => setShowPassword((prev) => !prev)}
+          style={styles.passwordToggle}
+          disabled={isLoading}
+        >
+          <Ionicons
+            name={showPassword ? "eye-off-outline" : "eye-outline"}
+            size={18}
+            color="#1663d6"
+          />
+        </TouchableOpacity>
+      </View>
+      {fieldErrors.password ? <Text style={styles.error}>{fieldErrors.password}</Text> : null}
+      <TouchableOpacity
+        style={styles.forgotButton}
+        onPress={() => navigation.navigate("ForgotPassword")}
+        disabled={isLoading}
+      >
+        <Text style={styles.forgotButtonText}>Forgot password?</Text>
+      </TouchableOpacity>
 
-      {error ? <Text style={styles.error}>{error}</Text> : null}
+      {submitError ? <Text style={styles.error}>{submitError}</Text> : null}
       {useMockAuth ? (
         <Text style={styles.hint}>Mock auth is enabled. Verification code: 123456</Text>
       ) : null}
@@ -114,19 +167,22 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ navigation }) => {
   if (isWebDesktop) {
     return (
       <View style={styles.webShell}>
-        <View style={styles.webHero}>
-          <Image source={icons.menuLogo} style={styles.webLogo} />
-          <Text style={styles.webHeroTitle}>Welcome back</Text>
-          <Text style={styles.webHeroText}>
-            Sign in to continue your Health Age assessments, reports, and premium features.
-          </Text>
+        <View style={styles.webFrame}>
+          <View style={styles.webHero}>
+            <Image source={icons.menuLogo} style={styles.webLogo} />
+            <Text style={styles.webHeroTitle}>Welcome back</Text>
+            <Text style={styles.webHeroText}>
+              Sign in to continue your Health Age assessments, reports, and premium features.
+            </Text>
+            <Image source={icons.homeHero} style={styles.webHeroImage} />
+          </View>
+          <KeyboardAvoidingView
+            style={styles.webCardWrap}
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
+          >
+            <View style={[styles.card, styles.webCard]}>{cardContent}</View>
+          </KeyboardAvoidingView>
         </View>
-        <KeyboardAvoidingView
-          style={styles.webCardWrap}
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-        >
-          <View style={[styles.card, styles.webCard]}>{cardContent}</View>
-        </KeyboardAvoidingView>
       </View>
     );
   }
@@ -151,12 +207,24 @@ const styles = StyleSheet.create({
   webShell: {
     flex: 1,
     backgroundColor: "#EEF4FA",
+    padding: 24,
+  },
+  webFrame: {
+    flex: 1,
+    width: "100%",
+    maxWidth: 1280,
+    alignSelf: "center",
+    backgroundColor: "#F7FBFF",
+    borderRadius: 24,
+    overflow: "hidden",
     flexDirection: "row",
-    alignItems: "stretch",
+    borderWidth: 1,
+    borderColor: "#DDE8F6",
   },
   webHero: {
     flex: 1,
     paddingHorizontal: 56,
+    paddingVertical: 44,
     justifyContent: "center",
     backgroundColor: "#E2EEF8",
   },
@@ -173,13 +241,20 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   webHeroText: {
-    maxWidth: 420,
+    maxWidth: 430,
     fontSize: 17,
     lineHeight: 26,
     color: "#456088",
   },
+  webHeroImage: {
+    width: "100%",
+    height: 300,
+    maxWidth: 480,
+    resizeMode: "contain",
+    marginTop: 18,
+  },
   webCardWrap: {
-    width: 520,
+    width: 560,
     justifyContent: "center",
     paddingHorizontal: 30,
   },
@@ -226,6 +301,40 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     color: "#111827",
     backgroundColor: "#F9FBFD",
+  },
+  inputError: {
+    borderColor: "#DC2626",
+  },
+  passwordRow: {
+    borderWidth: 1,
+    borderColor: "#d8deea",
+    borderRadius: 12,
+    backgroundColor: "#F9FBFD",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 14,
+  },
+  passwordInput: {
+    flex: 1,
+    color: "#111827",
+    paddingVertical: 12,
+  },
+  passwordToggle: {
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+    marginLeft: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    minWidth: 28,
+  },
+  forgotButton: {
+    marginTop: 8,
+    alignSelf: "flex-end",
+  },
+  forgotButtonText: {
+    color: "#1663d6",
+    fontWeight: "600",
+    fontSize: 13,
   },
   primaryButtonTouch: {
     marginTop: 18,

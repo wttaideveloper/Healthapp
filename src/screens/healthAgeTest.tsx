@@ -30,6 +30,8 @@ import { Dimensions } from "react-native";
 type HealthAgeTestProps = DrawerScreenProps<DrawerParamList, "healthAgeTest">;
 
 const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
+  const MIN_AGE = 16;
+  const MAX_AGE = 80;
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const isWebDesktop = Platform.OS === "web" && width >= 900;
@@ -212,6 +214,87 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
       ? "whatIsYourBloodPressure"
       : "whatIsYourBloodGlucose";
 
+  const validateAgeValue = (rawAge: string): string | null => {
+    const trimmed = rawAge.trim();
+    if (!trimmed) return "Age is required.";
+    if (!/^\d{1,2}$/.test(trimmed)) return `Age must be between ${MIN_AGE} and ${MAX_AGE}.`;
+    const numericAge = Number(trimmed);
+    if (Number.isNaN(numericAge) || numericAge < MIN_AGE || numericAge > MAX_AGE) {
+      return `Age must be between ${MIN_AGE} and ${MAX_AGE}.`;
+    }
+    return null;
+  };
+
+  const validateStep = (targetStep: number): string | null => {
+    if (targetStep === 1) {
+      if (!value.name.trim()) return "Name is required.";
+      return null;
+    }
+
+    if (targetStep === 2) {
+      return validateAgeValue(value.age);
+    }
+
+    if (targetStep === 3) {
+      if (!value.gender.trim()) return "Gender is required.";
+      return null;
+    }
+
+    if (targetStep === 4) {
+      if (selectedHeightUnit === "cm") {
+        if (!value.height_Cm.trim()) return "Height is required.";
+      } else {
+        if (!value.height_Ft.trim() || !value.height_In.trim()) {
+          return "Height (ft/in) is required.";
+        }
+      }
+      return null;
+    }
+
+    if (targetStep === 5) {
+      if (selectedWeightUnit === "Lb") {
+        if (!value.weight_Lb.trim()) return "Weight is required.";
+      } else {
+        if (!value.weight_Kg.trim()) return "Weight is required.";
+      }
+      return null;
+    }
+
+    if (targetStep === 6) {
+      if (selectedWaistUnit === "In") {
+        if (!value.waist_Circumference_In.trim()) return "Waist circumference is required.";
+      } else {
+        if (!value.waist_Circumference_Cm.trim()) return "Waist circumference is required.";
+      }
+      return null;
+    }
+
+    if (targetStep === 7) {
+      if (!value.blood_pressure_sys.trim() || !value.blood_pressure_dia.trim()) {
+        return "Blood pressure values are required.";
+      }
+      return null;
+    }
+
+    if (targetStep === 8) {
+      if (selectedGlucoseUnit === "mg/dL") {
+        if (!value.blood_glucose_mg.trim()) return "Blood glucose is required.";
+      } else {
+        if (!value.blood_glucose_mmol.trim() || !value.blood_glucose_mmol_points.trim()) {
+          return "Blood glucose is required.";
+        }
+      }
+      return null;
+    }
+
+    return null;
+  };
+
+  const showValidationError = (message: string) => {
+    setStepError(message);
+    Alert.alert("Validation", message, [{ text: t("Fs_Close") }]);
+  };
+
   const renderItem = () => {
     if (step == 1) {
       return (
@@ -225,7 +308,6 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
               if (stepError) setStepError(null);
             }}
           ></CustomInput>
-          <View style={{ height: 300 }}></View>
         </>
       );
     } else if (step == 2) {
@@ -237,8 +319,9 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
             value={selectedAge}
             type={"numeric"}
             onChangeText={(val) => {
-              setValue((prev) => ({ ...prev, age: val }));
-              setSelectedAge(val);
+              const normalized = val.replace(/[^0-9]/g, "").slice(0, 2);
+              setValue((prev) => ({ ...prev, age: normalized }));
+              setSelectedAge(normalized);
               if (stepError) setStepError(null);
             }}
           ></CustomInput>
@@ -1913,28 +1996,20 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
             onPress={() => {
               if (step >= 1 && step < 8) {
                 setPopup(false);
-                if (step == 1 && value.name.trim() == "") {
-                  setStepError("Name is required.");
-                  Alert.alert(t("enterThisFields"), "", [{ text: t("Fs_Close") }]);
-                  return;
-                }
-                if (step == 2 && value.age == "") {
-                  setStepError("Age is required.");
-                  Alert.alert(t("enterThisFields"), "", [{ text: t("Fs_Close") }]);
-                  return;
-                }
-                if (step == 3 && value.gender == "") {
-                  setStepError("Gender is required.");
-                  Alert.alert(t("enterThisFields"), "", [{ text: t("Fs_Close") }]);
+                const currentStepError = validateStep(step);
+                if (currentStepError) {
+                  showValidationError(currentStepError);
                   return;
                 }
                 setStepError(null);
                 setStep((prev) => Math.min(prev + 1, 8));
               } else {
-                if (value.name == "" || value.age == "" || value.gender == "") {
-                  setStepError("Please complete required fields.");
-                  Alert.alert(t("enterRequiredFields"), "", [{ text: t("Fs_Close") }]);
-                  return;
+                for (let stepIndex = 1; stepIndex <= 8; stepIndex += 1) {
+                  const requiredStepError = validateStep(stepIndex);
+                  if (requiredStepError) {
+                    showValidationError(requiredStepError);
+                    return;
+                  }
                 }
                 setStepError(null);
                 setStep(1);

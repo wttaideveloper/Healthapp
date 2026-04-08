@@ -44,6 +44,20 @@ const App: React.FC = () => {
     []
   );
 
+  const documentTitle = React.useMemo(
+    () => ({
+      enabled: true,
+      formatter: (_options: any, route: any) => {
+        const routeName = typeof route?.name === "string" ? route.name.trim() : "";
+        if (!routeName || routeName.toLowerCase() === "undefined") {
+          return "Health Age";
+        }
+        return `Health Age | ${routeName}`;
+      },
+    }),
+    []
+  );
+
   useEffect(() => {
     InitializeDb();
   }, []);
@@ -73,6 +87,15 @@ const App: React.FC = () => {
       return;
     }
 
+    const normalizeTitle = () => {
+      const current = (document.title ?? "").trim().toLowerCase();
+      if (!current || current === "undefined" || current === "null") {
+        document.title = "Health Age";
+      }
+    };
+    normalizeTitle();
+    const timer = setInterval(normalizeTitle, 800);
+
     const onError = (event: ErrorEvent) => {
       const message =
         event.error instanceof Error
@@ -93,6 +116,7 @@ const App: React.FC = () => {
     window.addEventListener("unhandledrejection", onUnhandledRejection);
 
     return () => {
+      clearInterval(timer);
       window.removeEventListener("error", onError);
       window.removeEventListener("unhandledrejection", onUnhandledRejection);
     };
@@ -138,7 +162,11 @@ const App: React.FC = () => {
           <ErrorBoundary>
             <AuthProvider>
               <SubscriptionProvider>
-                <NavigationContainer linking={linking} onReady={() => setIsNavReady(true)}>
+                <NavigationContainer
+                  linking={linking}
+                  documentTitle={documentTitle}
+                  onReady={() => setIsNavReady(true)}
+                >
                   <AppNavigator />
                 </NavigationContainer>
               </SubscriptionProvider>
