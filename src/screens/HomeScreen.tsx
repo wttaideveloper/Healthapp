@@ -182,7 +182,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           </View>
 
           <View style={styles.webImageWrap}>
-            <Image source={icons.homeHero} style={styles.webImage} />
+            <Image source={require("../../assets/images/bg-hero.png")} style={styles.webImage} />
           </View>
         </View>
       </LinearGradient>
@@ -267,10 +267,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
               alignItems: "center",
             }}
           >
-            <Image
-              source={icons.HomeScreen}
+            {/* <Image
+              source={icons.heroBg}
               style={{ width: 354, height: 354 }}
-            ></Image>
+            ></Image> */}
           </View>
           <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
             {/* <Image
@@ -378,7 +378,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     lineHeight: 72,
     maxWidth: 580,
-    marginBottom: 20,
+    marginBottom: 18,
   },
   webImageWrap: {
     alignItems: "center",
@@ -386,7 +386,7 @@ const styles = StyleSheet.create({
     marginTop: -4,
   },
   webImage: {
-    width: 540,
+    width: 560,
     height: 420,
     resizeMode: "contain",
   },

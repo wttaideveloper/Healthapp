@@ -99,7 +99,17 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
   const [selectedWaistUnit, setSelectedWaistUnit] = React.useState("In");
   const [selectedGlucoseUnit, setSelectedGlucoseUnit] = React.useState("mg/dL");
   const [switchValue, setSwitchValue] = React.useState("fasting");
+  const [pickerRefreshKey, setPickerRefreshKey] = React.useState(0);
   const restoredFromQuestionsRef = React.useRef(false);
+
+  const refreshPickersFromInput = () => {
+    setPickerRefreshKey((prev) => prev + 1);
+  };
+  const refreshPickerIfValid = (nextValue: string, options: string[]) => {
+    if (options.includes(nextValue)) {
+      refreshPickersFromInput();
+    }
+  };
 
   React.useEffect(() => {
     const resumePayload = route.params;
@@ -201,18 +211,18 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
     step == 1
       ? "whatIsYourName"
       : step == 2
-      ? "whatIsYourAge"
-      : step == 3
-      ? "whatIsYourGender"
-      : step == 4
-      ? "whatIsYourHeight"
-      : step == 5
-      ? "whatIsYourWeight"
-      : step == 6
-      ? "whatIsYourWaistCircumference"
-      : step == 7
-      ? "whatIsYourBloodPressure"
-      : "whatIsYourBloodGlucose";
+        ? "whatIsYourAge"
+        : step == 3
+          ? "whatIsYourGender"
+          : step == 4
+            ? "whatIsYourHeight"
+            : step == 5
+              ? "whatIsYourWeight"
+              : step == 6
+                ? "whatIsYourWaistCircumference"
+                : step == 7
+                  ? "whatIsYourBloodPressure"
+                  : "whatIsYourBloodGlucose";
 
   const validateAgeValue = (rawAge: string): string | null => {
     const trimmed = rawAge.trim();
@@ -316,22 +326,26 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
           <CustomInput
             title="whatIsYourAge"
             placeHolder={t("age")}
-            value={selectedAge}
+            value={value.age}
             type={"numeric"}
             onChangeText={(val) => {
               const normalized = val.replace(/[^0-9]/g, "").slice(0, 2);
               setValue((prev) => ({ ...prev, age: normalized }));
               setSelectedAge(normalized);
+              if (ageOptions.includes(normalized)) {
+                refreshPickersFromInput();
+              }
               if (stepError) setStepError(null);
             }}
           ></CustomInput>
           <WheelPickerExpo
+            key={`age-picker-${pickerRefreshKey}`}
             width={"100%"} // Use device width
             height={300}
             initialSelectedIndex={
-              selectedAge && ageOptions.includes(selectedAge)
-                ? ageOptions.indexOf(selectedAge)
-                : ageOptions.indexOf("33")
+              value.age && ageOptions.includes(value.age)
+                ? ageOptions.indexOf(value.age)
+                : ageOptions.indexOf("25")
             }
             items={ageOptions.map((age) => ({ label: age, value: age }))}
             onChange={({ item }) => {
@@ -344,7 +358,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
                 <View
                   style={{
                     backgroundColor:
-                      props.label == selectedAge ? "#f4f6f9" : "#ffffff",
+                      props.label == value.age ? "#f4f6f9" : "#ffffff",
                     width: "100%",
                     borderRadius: 99999,
                   }}
@@ -488,9 +502,10 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
                       keyboardType="numeric"
                       placeholder={"cm"}
                       placeholderTextColor={"#b2b2b2"}
-                      onChangeText={(val) =>
-                        setValue((prev) => ({ ...prev, height_Cm: val }))
-                      } // Now correctly typed
+                      onChangeText={(val) => {
+                        setValue((prev) => ({ ...prev, height_Cm: val }));
+                        refreshPickerIfValid(val, heightOptionsInCm);
+                      }}
                       style={[{ padding: 10 }]}
                     />
                   </View>
@@ -520,6 +535,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
                         onChangeText={(val) => {
                           if (/^\d?$/.test(val)) {
                             setValue((prev) => ({ ...prev, height_Ft: val }));
+                            refreshPickerIfValid(val, heightOptions);
                           }
                         }}
                         style={[{ padding: 10 }]}
@@ -542,6 +558,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
                         onChangeText={(val) => {
                           if (/^\d{0,2}$/.test(val)) {
                             setValue((prev) => ({ ...prev, height_In: val }));
+                            refreshPickerIfValid(val, heightOptionsInInches);
                           }
                         }}
                         style={[{ padding: 10 }]}
@@ -564,7 +581,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
               <>
                 <WheelPickerExpo
                   // Key must not depend on value, otherwise the picker remounts on every change (web resets to 0).
-                  key={`heightCm-picker-${selectedHeightUnit}`}
+                  key={`heightCm-picker-${selectedHeightUnit}-${pickerRefreshKey}`}
                   width={fullPickerWidth}
                   height={300}
                   initialSelectedIndex={(() => {
@@ -611,7 +628,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
               <>
                 <WheelPickerExpo
                   // Key must not depend on value, otherwise the picker remounts on every change (web resets to 0).
-                  key={`heightFt-picker-${selectedHeightUnit}`}
+                  key={`heightFt-picker-${selectedHeightUnit}-${pickerRefreshKey}`}
                   // width={Dimensions.get("window").width} // Use device width
                   // height={300}
                   // initialSelectedIndex={
@@ -662,7 +679,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
                 />
                 <WheelPickerExpo
                   // Key must not depend on value, otherwise the picker remounts on every change (web resets to 0).
-                  key={`heightIn-picker-${selectedHeightUnit}`}
+                  key={`heightIn-picker-${selectedHeightUnit}-${pickerRefreshKey}`}
                   width={"50%"}
                   height={300}
                   // initialSelectedIndex={6} // Default to age 18 (index 17)
@@ -785,9 +802,10 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
                         placeholder={"lb"}
                         keyboardType="numeric"
                         placeholderTextColor={"#b2b2b2"}
-                        onChangeText={(val) =>
-                          setValue((prev) => ({ ...prev, weight_Lb: val }))
-                        } // Now correctly typed
+                        onChangeText={(val) => {
+                          setValue((prev) => ({ ...prev, weight_Lb: val }));
+                          refreshPickerIfValid(val, weightOptionsInLb);
+                        }}
                         style={[{ padding: 10 }]}
                       />
                     </View>
@@ -838,6 +856,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
                         // maxLength={1}
                         onChangeText={(val) => {
                           setValue((prev) => ({ ...prev, weight_Kg: val }));
+                          refreshPickerIfValid(val, weightOptionsInKg);
                         }}
                         style={[{ padding: 10 }]}
                       />
@@ -891,7 +910,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
                 weightOptionsInKg.indexOf("54")
               )} */}
               <WheelPickerExpo
-                key={`weight-picker-${selectedWeightUnit}`}
+                key={`weight-picker-${selectedWeightUnit}-${pickerRefreshKey}`}
                 width={fullPickerWidth}
                 height={300}
                 // initialSelectedIndex={
@@ -907,19 +926,19 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
                       : weightOptionsInLb.indexOf("120")
                     : value.weight_Kg &&
                       weightOptionsInKg.includes(value.weight_Kg)
-                    ? weightOptionsInKg.indexOf(value.weight_Kg)
-                    : weightOptionsInKg.indexOf("54")
+                      ? weightOptionsInKg.indexOf(value.weight_Kg)
+                      : weightOptionsInKg.indexOf("54")
                 }
                 items={
                   selectedWeightUnit == "Lb"
                     ? weightOptionsInLb.map((age) => ({
-                        label: age,
-                        value: age,
-                      }))
+                      label: age,
+                      value: age,
+                    }))
                     : weightOptionsInKg.map((age) => ({
-                        label: age,
-                        value: age,
-                      }))
+                      label: age,
+                      value: age,
+                    }))
                 }
                 onChange={({ item }) =>
                   selectedWeightUnit == "Lb"
@@ -932,9 +951,9 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
                       style={{
                         backgroundColor:
                           props.label ==
-                          (selectedWeightUnit == "Lb"
-                            ? value.weight_Lb
-                            : value.weight_Kg)
+                            (selectedWeightUnit == "Lb"
+                              ? value.weight_Lb
+                              : value.weight_Kg)
                             ? "#f4f6f9"
                             : "#ffffff",
                         width: "100%",
@@ -1069,12 +1088,13 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
                         placeholder={"In"}
                         placeholderTextColor={"#b2b2b2"}
                         keyboardType="numeric"
-                        onChangeText={(val) =>
+                        onChangeText={(val) => {
                           setValue((prev) => ({
                             ...prev,
                             waist_Circumference_In: val,
-                          }))
-                        } // Now correctly typed
+                          }));
+                          refreshPickerIfValid(val, waistOptionsIn);
+                        }}
                         style={[{ padding: 10 }]}
                       />
                     </View>
@@ -1107,6 +1127,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
                             ...prev,
                             waist_Circumference_Cm: val,
                           }));
+                          refreshPickerIfValid(val, waistOptionsCm);
                         }}
                         style={[{ padding: 10 }]}
                       />
@@ -1163,7 +1184,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
           >
             <>
               <WheelPickerExpo
-                key={`waist-picker-${selectedWaistUnit}`}
+                key={`waist-picker-${selectedWaistUnit}-${pickerRefreshKey}`}
                 width={fullPickerWidth}
                 height={300}
                 initialSelectedIndex={
@@ -1174,8 +1195,8 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
                       : waistOptionsIn.indexOf("32")
                     : value.waist_Circumference_Cm &&
                       waistOptionsCm.includes(value.waist_Circumference_Cm)
-                    ? waistOptionsCm.indexOf(value.waist_Circumference_Cm)
-                    : waistOptionsCm.indexOf("81") // 32 inches ≈ 81 cm
+                      ? waistOptionsCm.indexOf(value.waist_Circumference_Cm)
+                      : waistOptionsCm.indexOf("81") // 32 inches ≈ 81 cm
                 }
                 items={
                   selectedWaistUnit == "In"
@@ -1185,13 +1206,13 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
                 onChange={({ item }) =>
                   selectedWaistUnit == "In"
                     ? setValue((prev) => ({
-                        ...prev,
-                        waist_Circumference_In: item.label,
-                      }))
+                      ...prev,
+                      waist_Circumference_In: item.label,
+                    }))
                     : setValue((prev) => ({
-                        ...prev,
-                        waist_Circumference_Cm: item.label,
-                      }))
+                      ...prev,
+                      waist_Circumference_Cm: item.label,
+                    }))
                 }
                 renderItem={(props) => {
                   return (
@@ -1199,9 +1220,9 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
                       style={{
                         backgroundColor:
                           props.label ==
-                          (selectedWaistUnit == "In"
-                            ? value.waist_Circumference_In
-                            : value.waist_Circumference_Cm)
+                            (selectedWaistUnit == "In"
+                              ? value.waist_Circumference_In
+                              : value.waist_Circumference_Cm)
                             ? "#f4f6f9"
                             : "#ffffff",
                         width: "100%",
@@ -1281,12 +1302,13 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
                       placeholder={"Sys"}
                       keyboardType="numeric"
                       placeholderTextColor={"#b2b2b2"}
-                      onChangeText={(val) =>
+                      onChangeText={(val) => {
                         setValue((prev) => ({
                           ...prev,
                           blood_pressure_sys: val,
-                        }))
-                      } // Now correctly typed
+                        }));
+                        refreshPickerIfValid(val, bloodPressureOptionsSystolic);
+                      }}
                       style={[{ padding: 10 }]}
                     />
                   </View>
@@ -1303,12 +1325,13 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
                       placeholder={"Dia"}
                       keyboardType="numeric"
                       placeholderTextColor={"#b2b2b2"}
-                      onChangeText={(val) =>
+                      onChangeText={(val) => {
                         setValue((prev) => ({
                           ...prev,
                           blood_pressure_dia: val,
-                        }))
-                      } // Now correctly typed
+                        }));
+                        refreshPickerIfValid(val, bloodPressureOptionsDiastolic);
+                      }}
                       style={[{ padding: 10 }]}
                     />
                   </View>
@@ -1340,9 +1363,15 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
               )} */}
               {/* {console.log(bloodPressureOptionsDiastolic,bloodPressureOptionsDiastolic.indexOf("80"))} */}
               <WheelPickerExpo
+                key={`bp-sys-picker-${pickerRefreshKey}`}
                 width={"50%"}
                 height={300}
-                initialSelectedIndex={50} // Default to age 18 (index 17)
+                initialSelectedIndex={
+                  value.blood_pressure_sys &&
+                    bloodPressureOptionsSystolic.includes(value.blood_pressure_sys)
+                    ? bloodPressureOptionsSystolic.indexOf(value.blood_pressure_sys)
+                    : bloodPressureOptionsSystolic.indexOf("120")
+                }
                 items={bloodPressureOptionsSystolic.map((age) => ({
                   label: age,
                   value: age,
@@ -1386,10 +1415,14 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
                 }}
               ></Font>
               <WheelPickerExpo
+                key={`bp-dia-picker-${pickerRefreshKey}`}
                 width={"50%"}
                 height={300}
                 initialSelectedIndex={bloodPressureOptionsDiastolic.indexOf(
-                  "80"
+                  value.blood_pressure_dia &&
+                    bloodPressureOptionsDiastolic.includes(value.blood_pressure_dia)
+                    ? value.blood_pressure_dia
+                    : "80"
                 )}
                 items={bloodPressureOptionsDiastolic.map((age) => ({
                   label: age,
@@ -1512,12 +1545,13 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
                         placeholder={"mg/dL"}
                         keyboardType="numeric"
                         placeholderTextColor={"#b2b2b2"}
-                        onChangeText={(val) =>
+                        onChangeText={(val) => {
                           setValue((prev) => ({
                             ...prev,
                             blood_glucose_mg: val,
-                          }))
-                        } // Now correctly typed
+                          }));
+                          refreshPickerIfValid(val, bloodGlucoseMgOptions);
+                        }}
                         style={[{ padding: 10 }]}
                       />
                     </View>
@@ -1550,6 +1584,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
                             ...prev,
                             blood_glucose_mmol: val,
                           }));
+                          refreshPickerIfValid(val, bloodGlucoseMmolOptions);
                         }}
                         style={[{ padding: 10 }]}
                       />
@@ -1574,6 +1609,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
                             ...prev,
                             blood_glucose_mmol_points: val,
                           }));
+                          refreshPickerIfValid(val, bloodGlucoseMmolPointsOptions);
                         }}
                         style={[{ padding: 10 }]}
                       />
@@ -1610,7 +1646,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
           >
             <>
               <WheelPickerExpo
-                key={`glucose-picker-${selectedGlucoseUnit}`}
+                key={`glucose-picker-${selectedGlucoseUnit}-${pickerRefreshKey}`}
                 width={selectedGlucoseUnit == "mg/dL" ? "100%" : "50%"}
                 height={300}
                 initialSelectedIndex={
@@ -1638,9 +1674,9 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
                       style={{
                         backgroundColor:
                           props.label ==
-                          (selectedGlucoseUnit == "mg/dL"
-                            ? value.blood_glucose_mg
-                            : value.blood_glucose_mmol)
+                            (selectedGlucoseUnit == "mg/dL"
+                              ? value.blood_glucose_mg
+                              : value.blood_glucose_mmol)
                             ? "#f4f6f9"
                             : "#ffffff",
                         width: "100%",
@@ -1670,10 +1706,15 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
                     }}
                   ></Font>
                   <WheelPickerExpo
-                    key={`glucosemmolPoints-picker-${selectedGlucoseUnit}`}
+                    key={`glucosemmolPoints-picker-${selectedGlucoseUnit}-${pickerRefreshKey}`}
                     width={"50%"}
                     height={300}
-                    initialSelectedIndex={4} // Default to age 18 (index 17)
+                    initialSelectedIndex={
+                      value.blood_glucose_mmol_points &&
+                        bloodGlucoseMmolPointsOptions.includes(value.blood_glucose_mmol_points)
+                        ? bloodGlucoseMmolPointsOptions.indexOf(value.blood_glucose_mmol_points)
+                        : 4
+                    }
                     items={bloodGlucoseMmolPointsOptions.map((age) => ({
                       label: age,
                       value: age,
@@ -1851,8 +1892,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
     } else {
       return (
         `${t("maintainGlucoseLevel")} (${formattedValue}). ` +
-        `${t("normalRangeGlucose")} ${normalRange} ${t("for")} ${
-          isFasting ? `${t("fasting")}` : `${t("postMeal")}`
+        `${t("normalRangeGlucose")} ${normalRange} ${t("for")} ${isFasting ? `${t("fasting")}` : `${t("postMeal")}`
         } ${t("test")}.`
       );
     }
@@ -1898,22 +1938,22 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
               isWebDesktop ? { justifyContent: "flex-start" } : null,
             ]}
           >
-              <View
-                style={[
-                  {
-                    flexDirection: "row",
-                    alignItems: "flex-start",
-                    gap: 10,
-                    backgroundColor: "#DFE9F0",
-                    borderRadius: 16,
-                    paddingVertical: 14,
-                    paddingHorizontal: 14,
-                    width: 329,
-                  },
-                  isWebDesktop ? { width: "100%", borderRadius: 18 } : null,
-                ]}
-              >
-                <Image source={icons.bulb} style={{ width: 16, height: 16 }} />
+            <View
+              style={[
+                {
+                  flexDirection: "row",
+                  alignItems: "flex-start",
+                  gap: 10,
+                  backgroundColor: "#DFE9F0",
+                  borderRadius: 16,
+                  paddingVertical: 14,
+                  paddingHorizontal: 14,
+                  width: 329,
+                },
+                isWebDesktop ? { width: "100%", borderRadius: 18 } : null,
+              ]}
+            >
+              <Image source={icons.bulb} style={{ width: 16, height: 16 }} />
               <View style={{ flex: 1, paddingRight: 18 }}>
                 <Font text="getStarted" style={{ fontSize: 13, fontWeight: 400 }} />
               </View>

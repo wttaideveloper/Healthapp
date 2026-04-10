@@ -5,6 +5,8 @@ import {
   Image,
   TouchableOpacity,
   Text,
+  Platform,
+  useWindowDimensions,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
@@ -21,6 +23,23 @@ type IntroScreen1Props = {
 
 const IntroScreen1: React.FC<IntroScreen1Props> = ({ navigation }) => {
   const [step, setStep] = React.useState(1);
+  const { width } = useWindowDimensions();
+  const isWebDesktop = Platform.OS === "web" && width >= 980;
+  const isWeb = Platform.OS === "web";
+
+  const handleBackPress = () => {
+    if (step > 1 && step <= 3) {
+      setStep((prev) => prev - 1);
+      return;
+    }
+
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+      return;
+    }
+
+    navigation.replace("SignIn");
+  };
 
     // React.useEffect(() => {
     //   InitializeDb();
@@ -49,22 +68,11 @@ const IntroScreen1: React.FC<IntroScreen1Props> = ({ navigation }) => {
   // };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, isWeb && styles.webContainer]}>
+      <View style={[styles.pageShell, isWeb && styles.webShell]}>
       <TouchableOpacity
-        onPress={() => {
-          if (step > 1 && step <= 3) {
-            setStep(step - 1);
-          } else {
-            navigation.goBack();
-          }
-        }}
-        style={{
-          paddingTop: 20,
-          flexDirection: "row",
-          justifyContent: "flex-start",
-          alignItems: "center",
-          gap: 6,
-        }}
+        onPress={handleBackPress}
+        style={[styles.backRow, isWeb && styles.backRowWeb]}
       >
         <Image source={icons.Arrow} style={{ width: 10, height: 16 }}></Image>
         <Font
@@ -73,14 +81,9 @@ const IntroScreen1: React.FC<IntroScreen1Props> = ({ navigation }) => {
         ></Font>
       </TouchableOpacity>
       <View
-         style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-        }}
+         style={[styles.mainBody, isWebDesktop && styles.mainBodyDesktop]}
       >
-        <View style={{  justifyContent: "center", alignItems: "center" }}>
+        <View style={[styles.visualWrap, isWebDesktop && styles.visualWrapDesktop]}>
           <View style={styles.circleContainer}>
             {/* Outer Circle (Largest) */}
             <View style={[styles.circle, styles.largeCircle]} />
@@ -100,11 +103,8 @@ const IntroScreen1: React.FC<IntroScreen1Props> = ({ navigation }) => {
             {/* Image on Top */}
             <Image source={icons.introScreen} style={styles.image} />
           </View>
-          {/* <View style={{ width: "100%", marginTop: 40 }}> */}
-          {/* </View> */}
         </View>
-        <View style={{  flexDirection: "column",
-          justifyContent: "center", gap: 4 }}>
+        <View style={[styles.copyWrap, isWebDesktop && styles.copyWrapDesktop]}>
           <Font
             text={
               step == 1 ? "introduction" : step == 2 ? "howItWorks" : "benefits"
@@ -134,16 +134,7 @@ const IntroScreen1: React.FC<IntroScreen1Props> = ({ navigation }) => {
             }
             style={{ color: "black", fontWeight: "regular", fontSize: 15 }}
           />
-        </View>
-        <View style={{marginTop:20, justifyContent: "center", alignItems: "center" }}>
-          <View
-            style={{
-              width: "100%",
-              flexDirection: "row",
-              gap: 5,
-              justifyContent: "flex-start",
-            }}
-          >
+          <View style={styles.indicatorsWrap}>
             {/* <Animated.View
               style={[styles.stepContainer, { transform: [{ translateX }] }]}
               > */}
@@ -166,15 +157,7 @@ const IntroScreen1: React.FC<IntroScreen1Props> = ({ navigation }) => {
       </View>
       <Button
         type="intro"
-        style={{
-          padding: 10,
-          marginTop: 40,
-          marginBottom: 40,
-          // position: "absolute",
-          // bottom: 20,
-          // left: 0,
-          // right: 0,
-        }}
+        style={{...styles.nextButton, ...(isWeb && styles.nextButtonWeb)}}
         title={step == 3 ? "GetStarted" : "next"}
         onPress={() => {
           if (step >= 1 && step < 3) {
@@ -191,7 +174,7 @@ const IntroScreen1: React.FC<IntroScreen1Props> = ({ navigation }) => {
       ></Button>
       {step === 3 ? (
         <TouchableOpacity
-          style={{ alignItems: "center", marginTop: -24, marginBottom: 20 }}
+          style={styles.signInLink}
           onPress={() => navigation.replace("SignIn")}
         >
           <Text style={{ color: "#0C9FD5", fontWeight: "500", fontSize: 13 }}>
@@ -199,6 +182,7 @@ const IntroScreen1: React.FC<IntroScreen1Props> = ({ navigation }) => {
           </Text>
         </TouchableOpacity>
       ) : null}
+      </View>
     </View>
   );
 };
@@ -206,10 +190,90 @@ const IntroScreen1: React.FC<IntroScreen1Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-flexDirection: "column",
+    flexDirection: "column",
     justifyContent: "center",
     backgroundColor: "#ffffff",
     paddingHorizontal: 20,
+  },
+  webContainer: {
+    alignItems: "center",
+    paddingHorizontal: 24,
+  },
+  pageShell: {
+    flex: 1,
+    width: "100%",
+  },
+  webShell: {
+    width: "100%",
+    maxWidth: 1180,
+    alignSelf: "center",
+  },
+  backRow: {
+    paddingTop: 20,
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    gap: 6,
+  },
+  backRowWeb: {
+    paddingTop: 28,
+    paddingBottom: 8,
+  },
+  mainBody: {
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+  },
+  mainBodyDesktop: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 36,
+    justifyContent: "space-between",
+  },
+  visualWrap: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  visualWrapDesktop: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  copyWrap: {
+    flexDirection: "column",
+    justifyContent: "center",
+    gap: 4,
+  },
+  copyWrapDesktop: {
+    flex: 1,
+    maxWidth: 520,
+    justifyContent: "center",
+    alignSelf: "center",
+  },
+  indicatorsWrap: {
+    marginTop: 20,
+    width: "100%",
+    flexDirection: "row",
+    gap: 5,
+    justifyContent: "flex-start",
+  },
+  nextButton: {
+    padding: 10,
+    marginTop: 26,
+    marginBottom: 26,
+  },
+  nextButtonWeb: {
+    width: "100%",
+    maxWidth: 420,
+    alignSelf: "flex-start",
+    marginTop: 18,
+    marginBottom: 18,
+  },
+  signInLink: {
+    alignItems: "center",
+    marginTop: -8,
+    marginBottom: 20,
   },
   text: {
     fontSize: 24,

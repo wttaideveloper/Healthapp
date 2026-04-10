@@ -174,7 +174,7 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ navigation }) => {
             <Text style={styles.webHeroText}>
               Sign in to continue your Health Age assessments, reports, and premium features.
             </Text>
-            <Image source={icons.homeHero} style={styles.webHeroImage} />
+            <Image source={icons.login} style={styles.webHeroImage} />
           </View>
           <KeyboardAvoidingView
             style={styles.webCardWrap}

@@ -193,7 +193,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
             <Text style={styles.webHeroText}>
               Enter your email to receive an OTP, then set a new secure password.
             </Text>
-            <Image source={icons.homeHero} style={styles.webHeroImage} />
+            <Image source={icons.forgotPassword} style={styles.webHeroImage} />
           </View>
           <KeyboardAvoidingView
             style={styles.webCardWrap}

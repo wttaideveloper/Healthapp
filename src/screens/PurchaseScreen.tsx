@@ -543,20 +543,43 @@ const PurchaseScreen: React.FC = () => {
             {licenseError ? <Text style={styles.licenseErrorText}>{licenseError}</Text> : null}
             <Text style={styles.licenseHintText}>Format: {LICENSE_KEY_FORMAT}</Text>
 
-            <Button
-              style={styles.actionButton}
-              title={actionLoading ? "Activating..." : "Activate License"}
-              onPress={handleActivateLicense}
-              disabled={actionLoading}
-            />
+            {Platform.OS === "web" ? (
+              <View style={styles.webActionRow}>
+                <View style={styles.webActionItem}>
+                  <Button
+                    style={styles.webActionButton}
+                    title={actionLoading ? "Activating..." : "Activate License"}
+                    onPress={handleActivateLicense}
+                    disabled={actionLoading}
+                  />
+                </View>
+                <View style={styles.webActionItem}>
+                  <Button
+                    style={styles.webActionButton}
+                    title="Subscribe"
+                    onPress={handleSubscribe}
+                    disabled={actionLoading}
+                  />
+                </View>
+              </View>
+            ) : (
+              <>
+                <Button
+                  style={styles.actionButton}
+                  title={actionLoading ? "Activating..." : "Activate License"}
+                  onPress={handleActivateLicense}
+                  disabled={actionLoading}
+                />
 
-            <Text style={styles.orText}>or</Text>
-            <Button
-              style={styles.actionButtonSecondary}
-              title="Subscribe"
-              onPress={handleSubscribe}
-              disabled={actionLoading}
-            />
+                <Text style={styles.orText}>or</Text>
+                <Button
+                  style={styles.actionButtonSecondary}
+                  title="Subscribe"
+                  onPress={handleSubscribe}
+                  disabled={actionLoading}
+                />
+              </>
+            )}
 
             {Platform.OS !== "web" ? (
               <>
@@ -642,6 +665,22 @@ const styles = StyleSheet.create({
   actionButtonSecondary: {
     padding: 10,
     marginTop: 8,
+  },
+  webActionRow: {
+    marginTop: 12,
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 10,
+  },
+  webActionItem: {
+    width: 220,
+    maxWidth: "48%",
+  },
+  webActionButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
   },
   licenseCard: {
     backgroundColor: "#F8FAFB",

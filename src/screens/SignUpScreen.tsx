@@ -191,7 +191,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
             <Text style={styles.webHeroText}>
               Create your account to save assessments, sync license status, and unlock pro features.
             </Text>
-            <Image source={icons.homeHero} style={styles.webHeroImage} />
+            <Image source={icons.signup} style={styles.webHeroImage} />
           </View>
           <KeyboardAvoidingView
             style={styles.webCardWrap}
