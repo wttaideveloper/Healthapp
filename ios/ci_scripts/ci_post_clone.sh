@@ -21,6 +21,13 @@ fi
 # Install JavaScript dependencies.
 npm ci
 
+# Temporary React Native Catalyst/x86_64 compile fix for Xcode Cloud:
+# RCTInstance passes id to a BOOL parameter, which fails in archive builds.
+RN_RCT_INSTANCE_FILE="node_modules/react-native/ReactCommon/react/runtime/platform/ios/ReactCommon/RCTInstance.mm"
+if [ -f "$RN_RCT_INSTANCE_FILE" ]; then
+  perl -0777 -i -pe 's/isFatal:errorData\[@\"isFatal\"\]/isFatal:\[\(\(NSNumber \*\)errorData\[@\"isFatal\"\]\) boolValue\]/g' "$RN_RCT_INSTANCE_FILE"
+fi
+
 # Install CocoaPods dependencies required by the workspace/scheme.
 cd ios
 pod install --repo-update
