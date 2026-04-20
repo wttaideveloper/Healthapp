@@ -17,7 +17,12 @@
     "ios": {
       "bundleIdentifier": "com.wtt.healthAge",
       "usesAppleSignIn": true,
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSPhotoLibraryUsageDescription": "Health Age needs photo library access so you can choose images to attach in your profile and reports.",
+        "NSPhotoLibraryAddUsageDescription": "Health Age needs permission to save generated health reports and exported files to your photo library when you choose to save them."
+      }
     },
     "android": {
       "versionCode": 10,

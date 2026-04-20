@@ -37,6 +37,7 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ navigation }) => {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const isWebDesktop = Platform.OS === "web" && width >= 980;
+  const isNativeMobile = Platform.OS !== "web";
 
   const clearFieldError = (field: keyof SignInFieldErrors) => {
     setFieldErrors((prev) => {
@@ -84,8 +85,8 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ navigation }) => {
 
   const cardContent = (
     <>
-      <Text style={styles.title}>Sign in</Text>
-      <Text style={styles.subtitle}>Continue with your account.</Text>
+      <Text style={[styles.title, isNativeMobile ? styles.mobileTitle : null]}>Sign in</Text>
+      <Text style={[styles.subtitle, isNativeMobile ? styles.mobileSubtitle : null]}>Continue with your account.</Text>
 
       <Text style={styles.label}>Email</Text>
       <TextInput
@@ -189,10 +190,17 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, isNativeMobile ? styles.mobileContainer : null]}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <View style={[styles.card, Platform.OS === "web" ? styles.webCompactCard : null]}>{cardContent}</View>
+      <View
+        style={[
+          styles.card,
+          Platform.OS === "web" ? styles.webCompactCard : styles.mobileCard,
+        ]}
+      >
+        {cardContent}
+      </View>
     </KeyboardAvoidingView>
   );
 };
@@ -200,9 +208,14 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#EEF4FA",
+    backgroundColor: "#FFFFFF",
     justifyContent: "center",
     paddingHorizontal: 20,
+    alignItems: "center",
+  },
+  mobileContainer: {
+    justifyContent: "center",
+    paddingHorizontal: 24,
   },
   webShell: {
     flex: 1,
@@ -276,16 +289,41 @@ const styles = StyleSheet.create({
     maxWidth: 560,
     alignSelf: "center",
   },
+  mobileCard: {
+    width: "100%",
+    maxWidth: 420,
+    alignSelf: "center",
+    backgroundColor: "transparent",
+    borderRadius: 0,
+    borderWidth: 0,
+    borderColor: "transparent",
+    padding: 0,
+    shadowColor: "transparent",
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    shadowOffset: { width: 0, height: 0 },
+    elevation: 0,
+  },
   title: {
     fontSize: 34,
     fontWeight: "700",
     color: "#0f172a",
+  },
+  mobileTitle: {
+    fontSize: 50,
+    lineHeight: 54,
+    marginBottom: 6,
   },
   subtitle: {
     marginTop: 6,
     marginBottom: 20,
     color: "#455269",
     fontSize: 14,
+  },
+  mobileSubtitle: {
+    marginTop: 0,
+    marginBottom: 20,
+    fontSize: 15,
   },
   label: {
     marginTop: 12,

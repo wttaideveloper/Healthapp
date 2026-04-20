@@ -41,16 +41,16 @@ const IntroScreen1: React.FC<IntroScreen1Props> = ({ navigation }) => {
     navigation.replace("SignIn");
   };
 
-    // React.useEffect(() => {
-    //   InitializeDb();
-    // }, []);
-  
-    // const InitializeDb = async () => {
-    //   await initDatabase().catch(console.error);
-    // };
+  // React.useEffect(() => {
+  //   InitializeDb();
+  // }, []);
+
+  // const InitializeDb = async () => {
+  //   await initDatabase().catch(console.error);
+  // };
 
 
-    
+
   // const translateX = React.useRef(new Animated.Value(0)).current;
 
   // const handleNext = () => {
@@ -70,118 +70,119 @@ const IntroScreen1: React.FC<IntroScreen1Props> = ({ navigation }) => {
   return (
     <View style={[styles.container, isWeb && styles.webContainer]}>
       <View style={[styles.pageShell, isWeb && styles.webShell]}>
-      <TouchableOpacity
-        onPress={handleBackPress}
-        style={[styles.backRow, isWeb && styles.backRowWeb]}
-      >
-        <Image source={icons.Arrow} style={{ width: 10, height: 16 }}></Image>
-        <Font
-          text="back"
-          style={{ color: "#0C9FD5", fontWeight: "medium" }}
-        ></Font>
-      </TouchableOpacity>
-      <View
-         style={[styles.mainBody, isWebDesktop && styles.mainBodyDesktop]}
-      >
-        <View style={[styles.visualWrap, isWebDesktop && styles.visualWrapDesktop]}>
-          <View style={styles.circleContainer}>
-            {/* Outer Circle (Largest) */}
-            <View style={[styles.circle, styles.largeCircle]} />
-
-            {/* Middle Circle (Dashed) */}
-            <View
-              style={[
-                styles.circle,
-                styles.mediumCircle,
-                { borderStyle: "dashed" },
-              ]}
-            />
-
-            {/* Inner Circle (Smallest) */}
-            <View style={[styles.circle, styles.smallCircle]} />
-
-            {/* Image on Top */}
-            <Image source={icons.introScreen} style={styles.image} />
-          </View>
-        </View>
-        <View style={[styles.copyWrap, isWebDesktop && styles.copyWrapDesktop]}>
-          <Font
-            text={
-              step == 1 ? "introduction" : step == 2 ? "howItWorks" : "benefits"
-            }
-            style={{ color: "#0C9FD5", fontWeight: "semibold", fontSize: 14 }}
-          ></Font>
-          <Font
-            text={
-              step == 1
-                ? "discoverHealthAge"
-                : step == 2
-                ? "simpleScienceBacked"
-                : "getPersonalizedTips"
-            }
-            style={{ color: "black", fontWeight: "semibold", fontSize: 24 }}
-          />
-          <Font
-            // text={
-            //   "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
-            // }
-            text={
-              step == 1
-                ? "lifestyleAffectsHealth"
-                : step == 2
-                ? "answerQuestions"
-                : "improveLifestyle"
-            }
-            style={{ color: "black", fontWeight: "regular", fontSize: 15 }}
-          />
-          <View style={styles.indicatorsWrap}>
-            {/* <Animated.View
-              style={[styles.stepContainer, { transform: [{ translateX }] }]}
-              > */}
-            {/* Step Indicators */}
-            {[1, 2, 3].map((item) => (
-              <View
-                key={item}
-                style={{
-                  backgroundColor: step === item ? "#2C2E33" : "#D2DAEE",
-                  padding: 2,
-                  paddingHorizontal: step === item ? 10 : 5,
-                  borderRadius: 99999,
-                  // margin: 5,
-                }}
-              />
-            ))}
-            {/* </Animated.View> */}
-          </View>
-        </View>
-      </View>
-      <Button
-        type="intro"
-        style={{...styles.nextButton, ...(isWeb && styles.nextButtonWeb)}}
-        title={step == 3 ? "GetStarted" : "next"}
-        onPress={() => {
-          if (step >= 1 && step < 3) {
-            setStep(step + 1);
-            // handleNext();
-          } else {
-            AsyncStorage.setItem(ONBOARDING_COMPLETED_KEY, "true")
-              .catch((error) => console.error("Failed to persist onboarding:", error))
-              .finally(() => {
-                navigation.replace("SignIn");
-              });
-          }
-        }}
-      ></Button>
-      {step === 3 ? (
         <TouchableOpacity
-          style={styles.signInLink}
-          onPress={() => navigation.replace("SignIn")}
+          onPress={handleBackPress}
+          style={[styles.backRow, isWeb && styles.backRowWeb]}
         >
-          <Text style={{ color: "#0C9FD5", fontWeight: "500", fontSize: 13 }}>
-            Already have an account? Sign in
-          </Text>
+          <Image source={icons.Arrow} style={{ width: 10, height: 16 }}></Image>
+          <Font
+            text="back"
+            style={{ color: "#0C9FD5", fontWeight: "medium" }}
+          ></Font>
         </TouchableOpacity>
-      ) : null}
+        <View
+          style={[styles.mainBody, isWebDesktop && styles.mainBodyDesktop]}
+        >
+          <View style={[styles.visualWrap, isWebDesktop && styles.visualWrapDesktop]}>
+            <View style={styles.circleContainer}>
+              {/* Outer Circle (Largest) */}
+              <View style={[styles.circle, styles.largeCircle]} />
+
+              {/* Middle Circle (Dashed) */}
+              <View
+                style={[
+                  styles.circle,
+                  styles.mediumCircle,
+                  { borderStyle: "dashed" },
+                ]}
+              />
+
+              {/* Inner Circle (Smallest) */}
+              <View style={[styles.circle, styles.smallCircle]} />
+
+              {/* Image on Top */}
+              <Image source={icons.introScreen} style={styles.image} />
+            </View>
+          </View>
+          <View style={[styles.copyWrap, isWebDesktop && styles.copyWrapDesktop]}>
+            <Font
+              text={
+                step == 1 ? "introduction" : step == 2 ? "howItWorks" : "benefits"
+              }
+              style={{ color: "#0C9FD5", fontWeight: "semibold", fontSize: 14 }}
+            ></Font>
+            <Font
+              text={
+                step == 1
+                  ? "discoverHealthAge"
+                  : step == 2
+                    ? "simpleScienceBacked"
+                    : "getPersonalizedTips"
+              }
+              style={{ color: "black", fontWeight: "semibold", fontSize: 24 }}
+            />
+            <Font
+              // text={
+              //   "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
+              // }
+              text={
+                step == 1
+                  ? "lifestyleAffectsHealth"
+                  : step == 2
+                    ? "answerQuestions"
+                    : "improveLifestyle"
+              }
+              style={{ color: "black", fontWeight: "regular", fontSize: 15 }}
+            />
+            <View style={styles.indicatorsWrap}>
+              {/* <Animated.View
+              sty
+              le={[styles.stepContainer, { transform: [{ translateX }] }]}
+              > */}
+              {/* Step Indicators */}
+              {[1, 2, 3].map((item) => (
+                <View
+                  key={item}
+                  style={{
+                    backgroundColor: step === item ? "#2C2E33" : "#D2DAEE",
+                    padding: 2,
+                    paddingHorizontal: step === item ? 10 : 5,
+                    borderRadius: 99999,
+                    // margin: 5,
+                  }}
+                />
+              ))}
+              {/* </Animated.View> */}
+            </View>
+          </View>
+        </View>
+        <Button
+          type="intro"
+          style={{ ...styles.nextButton, ...(isWeb && styles.nextButtonWeb) }}
+          title={step == 3 ? "GetStarted" : "next"}
+          onPress={() => {
+            if (step >= 1 && step < 3) {
+              setStep(step + 1);
+              // handleNext();
+            } else {
+              AsyncStorage.setItem(ONBOARDING_COMPLETED_KEY, "true")
+                .catch((error) => console.error("Failed to persist onboarding:", error))
+                .finally(() => {
+                  navigation.replace("SignIn");
+                });
+            }
+          }}
+        ></Button>
+        {step === 3 ? (
+          <TouchableOpacity
+            style={styles.signInLink}
+            onPress={() => navigation.replace("SignIn")}
+          >
+            <Text style={{ color: "#0C9FD5", fontWeight: "500", fontSize: 13 }}>
+              Already have an account? Sign in
+            </Text>
+          </TouchableOpacity>
+        ) : null}
       </View>
     </View>
   );

@@ -11,6 +11,7 @@ import {
   ScrollView,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import Button from "../components/Button";
 import Font from "../components/CustomisedFont";
@@ -48,6 +49,7 @@ const formatDate = (value: Date | null): string | null => {
 };
 
 const PurchaseScreen: React.FC = () => {
+  const insets = useSafeAreaInsets();
   const {
     isSubscribed,
     autoRenewing,
@@ -380,6 +382,17 @@ const PurchaseScreen: React.FC = () => {
   };
 
   const expiryLabel = formatDate(expiryDate);
+  const scrollContentStyle = React.useMemo(
+    () => [
+      styles.scrollContent,
+      Platform.OS !== "web"
+        ? {
+          paddingBottom: 36 + insets.bottom,
+        }
+        : null,
+    ],
+    [insets.bottom]
+  );
 
   if (isLoading) {
     return (
@@ -392,17 +405,17 @@ const PurchaseScreen: React.FC = () => {
   const planPrice = selectedPlan?.priceString || FALLBACK_PLAN_PRICE;
   const planTitle = selectedPlan?.title || selectedPlan?.description || FALLBACK_PLAN_DESCRIPTION;
   const planPeriod = selectedPlan?.billingPeriod ? `Billing period: ${selectedPlan.billingPeriod}` : "";
-  const showPlanOptions = Platform.OS !== "web" && (availablePlans.length > 1 || __DEV__);
+  const showPlanOptions = Platform.OS !== "web" && __DEV__;
   const sourceLabel =
     subscriptionSource === "iap"
       ? "In-app purchase (RevenueCat)"
       : subscriptionSource === "stripe"
         ? "Stripe subscription"
-      : subscriptionSource === "enterprise"
-        ? "Enterprise license key"
-        : subscriptionSource === "mixed"
-          ? "RevenueCat + backend license sync"
-          : "Not active";
+        : subscriptionSource === "enterprise"
+          ? "Enterprise license key"
+          : subscriptionSource === "mixed"
+            ? "RevenueCat + backend license sync"
+            : "Not active";
   const canOpenStripeBilling =
     Platform.OS === "web" &&
     isSubscribed &&
@@ -419,12 +432,18 @@ const PurchaseScreen: React.FC = () => {
       : `Premium access is active${expiryLabel ? ` until ${expiryLabel}` : ""}.`;
 
   const webContentWidthStyle = Platform.OS === "web" ? styles.webContentWidth : null;
-
+  const isNativeMobile = Platform.OS !== "web";
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
-      <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
+      <ScrollView style={styles.container} contentContainerStyle={scrollContentStyle}>
         {isSubscribed ? (
-          <View style={[styles.proBadgeCard, webContentWidthStyle]}>
+          <View
+            style={[
+              styles.proBadgeCard,
+              webContentWidthStyle,
+              isNativeMobile ? styles.proBadgeCardMobile : null,
+            ]}
+          >
             <Text style={styles.proTag}>PRO</Text>
             <Font text="NowAProMember" style={styles.proBadgeTitle} />
             <Text style={styles.proBadgeSub}>
@@ -437,12 +456,14 @@ const PurchaseScreen: React.FC = () => {
             {Platform.OS !== "web" ? (
               <>
                 <Button
+                  type="intro"
                   style={{ padding: 10, marginTop: 12 }}
                   title="Restore Purchases"
                   onPress={handleRestore}
                   disabled={actionLoading}
                 />
                 <Button
+                  type="intro"
                   style={{ padding: 10, marginTop: 12 }}
                   title="Manage Subscription"
                   onPress={handleManageSubscription}
@@ -459,7 +480,13 @@ const PurchaseScreen: React.FC = () => {
             ) : null}
           </View>
         ) : (
-          <View style={[styles.licenseCard, webContentWidthStyle]}>
+          <View
+            style={[
+              styles.licenseCard,
+              webContentWidthStyle,
+              isNativeMobile ? styles.licenseCardMobile : null,
+            ]}
+          >
             {webNotice ? (
               <View style={styles.noticeCard}>
                 <Text style={styles.noticeText}>{webNotice}</Text>
@@ -491,7 +518,7 @@ const PurchaseScreen: React.FC = () => {
               {planPeriod ? <Text style={styles.planMeta}>{planPeriod}</Text> : null}
             </View>
 
-            {showPlanOptions ? (
+            {/* {showPlanOptions ? (
               <View style={styles.optionsWrap}>
                 {availablePlans.map((plan) => {
                   const active = plan.identifier === selectedPlan?.identifier;
@@ -521,7 +548,7 @@ const PurchaseScreen: React.FC = () => {
                   );
                 })}
               </View>
-            ) : null}
+            ) : null} */}
 
             <TextInput
               style={[styles.licenseInput, licenseError ? styles.licenseInputError : null]}
@@ -541,8 +568,6 @@ const PurchaseScreen: React.FC = () => {
               maxLength={31}
             />
             {licenseError ? <Text style={styles.licenseErrorText}>{licenseError}</Text> : null}
-            <Text style={styles.licenseHintText}>Format: {LICENSE_KEY_FORMAT}</Text>
-
             {Platform.OS === "web" ? (
               <View style={styles.webActionRow}>
                 <View style={styles.webActionItem}>
@@ -565,6 +590,7 @@ const PurchaseScreen: React.FC = () => {
             ) : (
               <>
                 <Button
+                  type="intro"
                   style={styles.actionButton}
                   title={actionLoading ? "Activating..." : "Activate License"}
                   onPress={handleActivateLicense}
@@ -573,6 +599,7 @@ const PurchaseScreen: React.FC = () => {
 
                 <Text style={styles.orText}>or</Text>
                 <Button
+                  type="intro"
                   style={styles.actionButtonSecondary}
                   title="Subscribe"
                   onPress={handleSubscribe}
@@ -584,7 +611,8 @@ const PurchaseScreen: React.FC = () => {
             {Platform.OS !== "web" ? (
               <>
                 <Button
-                  style={{ padding: 10, marginTop: 8 }}
+                  type="intro"
+                  style={{ marginTop: 20 }}
                   title="Restore Purchases"
                   onPress={handleRestore}
                   disabled={actionLoading}
@@ -659,12 +687,10 @@ const styles = StyleSheet.create({
     maxWidth: 900,
   },
   actionButton: {
-    padding: 10,
-    marginTop: 12,
+    marginTop: 10,
   },
   actionButtonSecondary: {
-    padding: 10,
-    marginTop: 8,
+    marginTop: 6,
   },
   webActionRow: {
     marginTop: 12,
@@ -689,6 +715,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#EAECF1",
     marginTop: 8,
+  },
+  licenseCardMobile: {
+    backgroundColor: "transparent",
+    borderWidth: 0,
+    borderColor: "transparent",
+    borderRadius: 0,
+    paddingHorizontal: 0,
+    paddingVertical: 10,
+    marginTop: 0,
   },
   licenseTitle: { color: "#274273", fontWeight: "700", fontSize: 20 },
   licenseSubtitle: { color: "#274273", fontSize: 14, marginTop: 8, marginBottom: 12 },
@@ -811,7 +846,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   orText: {
-    marginTop: 14,
+    marginTop: 10,
     textAlign: "center",
     color: "#7D8699",
     fontSize: 12,
@@ -838,6 +873,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: 1,
     borderColor: "#C9E3FF",
+  },
+  proBadgeCardMobile: {
+    backgroundColor: "transparent",
+    borderWidth: 0,
+    borderColor: "transparent",
+    borderRadius: 0,
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+    marginTop: 8,
+    alignItems: "flex-start",
   },
   proTag: {
     backgroundColor: "#0C64D8",

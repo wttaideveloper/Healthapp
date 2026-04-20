@@ -17,6 +17,7 @@ import { authService } from "../components/utils/authService";
 import { isValidEmail } from "../components/utils/validation";
 import { Ionicons } from "@expo/vector-icons";
 import { icons } from "../components/images";
+import { LinearGradient } from "expo-linear-gradient";
 
 type ForgotPasswordScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, "ForgotPassword">;
@@ -33,6 +34,14 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const isWebDesktop = Platform.OS === "web" && width >= 980;
+  const isNativeMobile = Platform.OS !== "web";
+
+  const backToSignIn = () => {
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "SignIn" }],
+    });
+  };
 
   const normalizedEmail = email.trim().toLowerCase();
 
@@ -86,7 +95,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
       });
       setNotice("Password reset successful. Please sign in with your new password.");
       setTimeout(() => {
-        navigation.replace("SignIn");
+        backToSignIn();
       }, 450);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to reset password");
@@ -97,8 +106,10 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
 
   const cardContent = (
     <>
-      <Text style={styles.title}>Forgot password</Text>
-      <Text style={styles.subtitle}>Request an OTP and reset your password securely.</Text>
+      <Text style={[styles.title, isNativeMobile ? styles.mobileTitle : null]}>Forgot password</Text>
+      <Text style={[styles.subtitle, isNativeMobile ? styles.mobileSubtitle : null]}>
+        Request an OTP and reset your password securely.
+      </Text>
 
       <Text style={styles.label}>Email</Text>
       <TextInput
@@ -115,8 +126,15 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
       />
 
       {!otpRequested ? (
-        <TouchableOpacity style={styles.primaryButton} onPress={onRequestOtp} disabled={isLoading}>
-          {isLoading ? <ActivityIndicator color="#ffffff" /> : <Text style={styles.primaryText}>Send OTP</Text>}
+        <TouchableOpacity style={styles.primaryButtonTouch} onPress={onRequestOtp} disabled={isLoading}>
+          <LinearGradient
+            colors={["#16A3DE", "#2D579D"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.primaryButton}
+          >
+            {isLoading ? <ActivityIndicator color="#ffffff" /> : <Text style={styles.primaryText}>Send OTP</Text>}
+          </LinearGradient>
         </TouchableOpacity>
       ) : (
         <>
@@ -156,12 +174,19 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity style={styles.primaryButton} onPress={onResetPassword} disabled={isLoading}>
-            {isLoading ? (
-              <ActivityIndicator color="#ffffff" />
-            ) : (
-              <Text style={styles.primaryText}>Reset password</Text>
-            )}
+          <TouchableOpacity style={styles.primaryButtonTouch} onPress={onResetPassword} disabled={isLoading}>
+            <LinearGradient
+              colors={["#16A3DE", "#2D579D"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.primaryButton}
+            >
+              {isLoading ? (
+                <ActivityIndicator color="#ffffff" />
+              ) : (
+                <Text style={styles.primaryText}>Reset password</Text>
+              )}
+            </LinearGradient>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.secondaryButton} onPress={onRequestOtp} disabled={isLoading}>
@@ -175,7 +200,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
 
       <TouchableOpacity
         style={styles.secondaryButton}
-        onPress={() => navigation.replace("SignIn")}
+        onPress={backToSignIn}
         disabled={isLoading}
       >
         <Text style={styles.secondaryText}>Back to sign in</Text>
@@ -208,10 +233,26 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, isNativeMobile ? styles.mobileContainer : null]}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <View style={[styles.card, Platform.OS === "web" ? styles.webCompactCard : null]}>{cardContent}</View>
+      {isNativeMobile ? (
+        <View style={styles.mobileTopBackRow}>
+          <View style={styles.mobileTopBackInner}>
+            <TouchableOpacity style={styles.mobileBackButton} onPress={backToSignIn}>
+              <Ionicons name="arrow-back" size={18} color="#475569" />
+            </TouchableOpacity>
+          </View>
+        </View>
+      ) : null}
+      <View
+        style={[
+          styles.card,
+          Platform.OS === "web" ? styles.webCompactCard : styles.mobileCard,
+        ]}
+      >
+        {cardContent}
+      </View>
     </KeyboardAvoidingView>
   );
 };
@@ -219,9 +260,36 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#EEF4FA",
+    backgroundColor: "#FFFFFF",
     justifyContent: "center",
     paddingHorizontal: 20,
+    alignItems: "center",
+  },
+  mobileContainer: {
+    justifyContent: "center",
+    paddingHorizontal: 24,
+  },
+  mobileTopBackRow: {
+    position: "absolute",
+    top: 56,
+    left: 0,
+    right: 0,
+    zIndex: 2,
+    alignItems: "center",
+  },
+  mobileTopBackInner: {
+    width: "100%",
+    maxWidth: 420,
+    paddingHorizontal: 24,
+  },
+  mobileBackButton: {
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#D2D7E2",
+    alignItems: "center",
+    justifyContent: "center",
   },
   webShell: {
     flex: 1,
@@ -295,10 +363,35 @@ const styles = StyleSheet.create({
     maxWidth: 560,
     alignSelf: "center",
   },
+  mobileCard: {
+    width: "100%",
+    maxWidth: 420,
+    alignSelf: "center",
+    backgroundColor: "transparent",
+    borderRadius: 0,
+    borderWidth: 0,
+    borderColor: "transparent",
+    padding: 0,
+    shadowColor: "transparent",
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    shadowOffset: { width: 0, height: 0 },
+    elevation: 0,
+  },
   title: {
     fontSize: 34,
     fontWeight: "700",
     color: "#0f172a",
+  },
+  mobileTitle: {
+    fontSize: 50,
+    lineHeight: 54,
+    marginBottom: 6,
+  },
+  mobileSubtitle: {
+    marginTop: 0,
+    marginBottom: 20,
+    fontSize: 15,
   },
   subtitle: {
     marginTop: 6,
@@ -343,17 +436,21 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     minWidth: 28,
   },
-  primaryButton: {
+  primaryButtonTouch: {
     marginTop: 16,
-    backgroundColor: "#1663d6",
-    borderRadius: 10,
+    borderRadius: 12,
+    overflow: "hidden",
+  },
+  primaryButton: {
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 12,
+    paddingVertical: 13,
   },
   primaryText: {
     color: "#ffffff",
     fontWeight: "700",
+    fontSize: 15,
   },
   secondaryButton: {
     marginTop: 10,

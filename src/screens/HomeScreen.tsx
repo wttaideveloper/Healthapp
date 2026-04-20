@@ -267,10 +267,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
               alignItems: "center",
             }}
           >
-            {/* <Image
-              source={icons.heroBg}
-              style={{ width: 354, height: 354 }}
-            ></Image> */}
+            <Image source={require("../../assets/images/bg-hero.png")} style={styles.mobileHeroImage} />
           </View>
           <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
             {/* <Image
@@ -413,6 +410,12 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 36 / 2,
     fontWeight: "600",
+  },
+  mobileHeroImage: {
+    width: 320,
+    height: 270,
+    resizeMode: "contain",
+    marginTop: 8,
   },
 });
 
