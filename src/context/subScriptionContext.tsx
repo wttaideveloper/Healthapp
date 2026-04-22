@@ -3,7 +3,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
     clearCachedSubscriptionStatus,
     initIAP,
-    syncRevenueCatStatusToBackend,
     syncRevenueCatUser,
     verifySubscriptionStatusRevenueCat,
     verifySubscriptionStatusBackend,
@@ -42,6 +41,7 @@ interface ProviderProps {
 
 export const SubscriptionProvider: React.FC<ProviderProps> = ({ children }) => {
     const { accessToken, user, isHydrated: isAuthHydrated } = useAuth();
+    const lastUserIdRef = React.useRef<string | null>(null);
     const [isSubscribed, setIsSubscribed] = useState(false);
     const [autoRenewing, setAutoRenewing] = useState(false);
     const [expiryDate, setExpiryDate] = useState<Date | null>(null);
@@ -70,13 +70,6 @@ export const SubscriptionProvider: React.FC<ProviderProps> = ({ children }) => {
                 await initIAP();
                 await syncRevenueCatUser(user?.id ?? null);
                 revenueCat = await verifySubscriptionStatusRevenueCat();
-                if (forceLive && accessToken) {
-                    const didSync = await syncRevenueCatStatusToBackend(accessToken, user?.id ?? null);
-                    if (didSync) {
-                        backendResult = await verifySubscriptionStatusBackend(accessToken);
-                        result = backendResult ?? result;
-                    }
-                }
             } catch (error) {
                 console.warn("RevenueCat refresh failed:", error);
                 revenueCat = null;
@@ -110,23 +103,35 @@ export const SubscriptionProvider: React.FC<ProviderProps> = ({ children }) => {
             return;
         }
 
-        const mergedIsValid = Boolean(result.isValid) || Boolean(revenueCat?.isValid);
-        const mergedAutoRenewing = Boolean(result.autoRenewing) || Boolean(revenueCat?.autoRenewing);
+        const hasAuthenticatedUser = Boolean(accessToken && user?.id);
+        // IMPORTANT:
+        // For authenticated app users, subscription access must be tied to backend ownership.
+        // This prevents Apple-ID-based entitlements from being auto-shared across different app accounts.
+        const allowDirectRevenueCatEntitlement = !hasAuthenticatedUser;
+
+        const mergedIsValid =
+            Boolean(result.isValid) ||
+            (allowDirectRevenueCatEntitlement && Boolean(revenueCat?.isValid));
+        const mergedAutoRenewing =
+            Boolean(result.autoRenewing) ||
+            (allowDirectRevenueCatEntitlement && Boolean(revenueCat?.autoRenewing));
         const mergedExpiry =
-            result.expiryDate && revenueCat?.expiryDate
+            result.expiryDate && allowDirectRevenueCatEntitlement && revenueCat?.expiryDate
                 ? result.expiryDate > revenueCat.expiryDate
                     ? result.expiryDate
                     : revenueCat.expiryDate
-                : result.expiryDate ?? revenueCat?.expiryDate ?? null;
+                : result.expiryDate ??
+                  (allowDirectRevenueCatEntitlement ? revenueCat?.expiryDate : null) ??
+                  null;
 
         const source: "none" | "iap" | "enterprise" | "stripe" | "mixed" =
             !mergedIsValid
                 ? "none"
-                : revenueCat?.isValid && result.isValid
+                : allowDirectRevenueCatEntitlement && revenueCat?.isValid && result.isValid
                     ? "mixed"
                     : result.provider === "stripe"
                         ? "stripe"
-                        : revenueCat?.isValid
+                        : allowDirectRevenueCatEntitlement && revenueCat?.isValid
                             ? "iap"
                         : "enterprise";
 
@@ -176,13 +181,24 @@ export const SubscriptionProvider: React.FC<ProviderProps> = ({ children }) => {
         }
 
         const refreshOnAuthChange = async () => {
+            const currentUserId = user?.id ?? null;
+            if (lastUserIdRef.current !== currentUserId) {
+                // Reset cached/backed values when switching accounts to avoid cross-user stale premium UI.
+                await clearCachedSubscriptionStatus();
+                setIsSubscribed(false);
+                setAutoRenewing(false);
+                setExpiryDate(null);
+                setSubscriptionSource("none");
+                setProviderStatus(null);
+                lastUserIdRef.current = currentUserId;
+            }
             await refreshSubscription(true);
         };
 
         refreshOnAuthChange().catch((error) => {
             console.error("Failed to refresh subscription state:", error);
         });
-    }, [accessToken, isAuthHydrated, refreshSubscription]);
+    }, [accessToken, isAuthHydrated, refreshSubscription, user?.id]);
 
     const contextValue = useMemo(
         () => ({

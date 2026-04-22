@@ -1,5 +1,5 @@
 export const icons = {
-  heroBg: require("../../assets/images/bg-hero.jpg"),
+  heroBg: require("../../assets/images/bg-hero-photo.jpg"),
   introScreen: require("../../assets/images/introScreen.png"),
   Arrow: require("../../assets/images/arrowLeft.png"),
   menu: require("../../assets/images/menu.png"),

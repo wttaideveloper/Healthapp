@@ -24,7 +24,7 @@ type IntroScreen1Props = {
 const IntroScreen1: React.FC<IntroScreen1Props> = ({ navigation }) => {
   const [step, setStep] = React.useState(1);
   const { width } = useWindowDimensions();
-  const isWebDesktop = Platform.OS === "web" && width >= 980;
+  const isWebDesktop = width >= 760;
   const isWeb = Platform.OS === "web";
 
   const handleBackPress = () => {

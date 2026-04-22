@@ -36,7 +36,7 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ navigation }) => {
   const [fieldErrors, setFieldErrors] = useState<SignInFieldErrors>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  const isWebDesktop = Platform.OS === "web" && width >= 980;
+  const isWebDesktop = width >= 760;
   const isNativeMobile = Platform.OS !== "web";
 
   const clearFieldError = (field: keyof SignInFieldErrors) => {

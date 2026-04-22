@@ -29,6 +29,7 @@ import {
   startStripeCheckout,
   startStripePortal,
   syncRevenueCatStatusToBackend,
+  verifySubscriptionStatusRevenueCat,
   type RevenueCatPackageSummary,
 } from "../components/utils/purchase";
 
@@ -299,6 +300,14 @@ const PurchaseScreen: React.FC = () => {
       }
 
       await initIAP();
+      const existingStoreStatus = await verifySubscriptionStatusRevenueCat();
+      if (existingStoreStatus?.isValid) {
+        Alert.alert(
+          "Already subscribed on this Apple ID",
+          "This Apple ID already has an active subscription. Use Restore Purchases to link it to this account."
+        );
+        return;
+      }
       const packages = await getSubscriptions();
       await purchaseSubscription(packages, selectedPackageIdentifier);
       await syncRevenueCatStatusToBackend(accessToken, user?.id ?? null);

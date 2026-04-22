@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  useWindowDimensions,
   View,
 } from "react-native";
 import React from 'react';
@@ -109,7 +110,9 @@ const InterestScreen: React.FC<InterestScreenProps> = ({
   navigation,
   route,
 }) => {
-    const { t } = useTranslation();
+  const { t } = useTranslation();
+  const { width } = useWindowDimensions();
+  const isWebDesktop = width >= 760;
   const { isSubscribed } = useSubscription();
   const { user } = useAuth();
   const [otherText, setOtherText] = React.useState("");
@@ -354,7 +357,8 @@ confirmExit();
 
   console.log(interestList, "interestList");
   return (
-    <View style={styles.container}>
+    <View style={styles.screen}>
+      <View style={[styles.container, isWebDesktop ? styles.desktopContainer : null]}>
       <View style={{ marginVertical: 20 }}>
         <Font
           text="Is_Interests"
@@ -526,6 +530,7 @@ confirmExit();
           ></Image>
         </TouchableOpacity>
       </View>
+      </View>
     </View>
   );
 };
@@ -533,6 +538,10 @@ confirmExit();
 export default InterestScreen;
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+  },
   container: {
     flex: 1,
     // justifyContent: "center",
@@ -542,6 +551,12 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     flexDirection: "column",
     justifyContent: "space-between",
+  },
+  desktopContainer: {
+    width: "100%",
+    maxWidth: 1120,
+    alignSelf: "center",
+    justifyContent: "flex-start",
   },
   scrollViewContainer: { paddingBottom: 30 },
   question: { fontSize: 20 },

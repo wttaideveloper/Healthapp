@@ -38,7 +38,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const { isSubscribed } = useSubscription();
   const { signOut } = useAuth();
   const hasPremium = isSubscribed;
-  const isWebDesktop = Platform.OS === "web" && width >= 900;
+  const isWebDesktop = width >= 760;
 
   useFocusEffect(
     React.useCallback(() => {

@@ -150,7 +150,7 @@ const questionsData = [
 const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
-  const isWebDesktop = Platform.OS === "web" && width >= 900;
+  const isWebDesktop = width >= 760;
   const [currentIndex, setCurrentIndex] = React.useState(0);
   const [selectedAnswers, setSelectedAnswers] = React.useState<
     { questionId: number; text: string; points: number }[]
@@ -371,7 +371,8 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
   console.log(currentIndex, "current index");
 
   return (
-    <View style={styles.container}>
+    <View style={styles.screen}>
+      <View style={[styles.container, isWebDesktop ? styles.desktopContainer : null]}>
       <View style={{ marginVertical: 20 }}>
         <Font
           text="newAssessment"
@@ -410,8 +411,8 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
       <FlatList
         data={questionsData[currentIndex].options}
         keyExtractor={(item) => item.text}
-        style={Platform.OS === "web" ? { flex: 1, width: "100%", minHeight: 0 } : undefined}
-        contentContainerStyle={Platform.OS === "web" ? { paddingBottom: 10 } : undefined}
+        style={isWebDesktop ? { flex: 1, width: "100%", minHeight: 0 } : undefined}
+        contentContainerStyle={isWebDesktop ? { paddingBottom: 10 } : undefined}
         renderItem={({ item }) => (
           <>
             {console.log(item, "item")}
@@ -439,16 +440,19 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
         )}
       />
       <View
-        style={[{
-          width: "100%",
-          position: "static",
-          //   bottom: 30,
-          //   left:20,
-          flexDirection: "row",
-          justifyContent: "space-between",
-          marginTop: Platform.OS === "web" ? "auto" : 0,
-          paddingBottom: Platform.OS === "web" ? 24 : 0,
-        }, isWebDesktop ? styles.webBottomRow : null]}
+        style={[
+          {
+            width: "100%",
+            position: "static",
+            //   bottom: 30,
+            //   left:20,
+            flexDirection: "row",
+            justifyContent: "space-between",
+            marginTop: isWebDesktop ? "auto" : 0,
+            paddingBottom: isWebDesktop ? 24 : 0,
+          },
+          isWebDesktop ? styles.webBottomRow : null,
+        ]}
       >
         <TouchableOpacity
           onPress={() => {
@@ -490,6 +494,7 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
           ></Image>
         </TouchableOpacity>
       </View>
+      </View>
     </View>
   );
 };
@@ -497,6 +502,10 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
 export default QuestionsScreen;
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+  },
   container: {
     flex: 1,
     // justifyContent: "center",
@@ -506,6 +515,12 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     flexDirection: "column",
     justifyContent: Platform.OS === "web" ? "flex-start" : "space-between",
+  },
+  desktopContainer: {
+    width: "100%",
+    maxWidth: 1120,
+    alignSelf: "center",
+    justifyContent: "flex-start",
   },
   question: { fontSize: 20 },
   subQuestion: { fontSize: 12, fontWeight: 400 },

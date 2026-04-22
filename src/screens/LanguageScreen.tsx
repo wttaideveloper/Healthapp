@@ -45,7 +45,7 @@ const LanguageScreen: React.FC<LanguageScreenProps> = ({ navigation }) => {
   const { width } = useWindowDimensions();
   const screenWidth = Dimensions.get("window").width;
   const itemWidth = screenWidth / 4; // Adjust column width
-  const isWebDesktop = Platform.OS === "web" && width >= 900;
+  const isWebDesktop = width >= 760;
 
   const setLanguageToStore = async (lang: string) => {
     try {

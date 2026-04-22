@@ -33,7 +33,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
-  const isWebDesktop = Platform.OS === "web" && width >= 980;
+  const isWebDesktop = width >= 760;
   const isNativeMobile = Platform.OS !== "web";
 
   const backToSignIn = () => {

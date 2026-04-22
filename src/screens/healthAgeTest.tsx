@@ -34,7 +34,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
   const MAX_AGE = 80;
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
-  const isWebDesktop = Platform.OS === "web" && width >= 900;
+  const isWebDesktop = width >= 760;
   const fullPickerWidth = isWebDesktop ? 560 : Dimensions.get("window").width;
   const confirmExit = () => {
     Alert.alert(
@@ -1992,7 +1992,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
               position: "static",
               flexDirection: "row",
               justifyContent: "space-between",
-              paddingBottom: Platform.OS === "web" ? 24 : 0,
+              paddingBottom: isWebDesktop ? 24 : 0,
             },
             isWebDesktop ? styles.webBottomRow : null,
           ]}
