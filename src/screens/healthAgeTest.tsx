@@ -2,6 +2,7 @@ import {
   Alert,
   BackHandler,
   Image,
+  KeyboardAvoidingView,
   Platform,
   StyleSheet,
   Text,
@@ -1900,7 +1901,12 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
   console.log(value.height_In, "value.height_In");
 
   return (
-    <View style={[styles.container, isWebDesktop ? styles.webContainer : null]}>
+    <KeyboardAvoidingView
+      style={styles.keyboardWrap}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 24 : 0}
+    >
+      <View style={[styles.container, isWebDesktop ? styles.webContainer : null]}>
       <View style={[styles.contentWrap, isWebDesktop ? styles.webContentWrap : null]}>
         <View
           style={[
@@ -1986,16 +1992,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
         </View>
 
         <View
-          style={[
-            {
-              width: "100%",
-              position: "static",
-              flexDirection: "row",
-              justifyContent: "space-between",
-              paddingBottom: isWebDesktop ? 24 : 0,
-            },
-            isWebDesktop ? styles.webBottomRow : null,
-          ]}
+          style={[styles.navRow, isWebDesktop ? styles.webBottomRow : null]}
         >
           <TouchableOpacity
             onPress={() => {
@@ -2011,22 +2008,15 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
               }
             }}
             style={[
-              {
-                flexDirection: "row",
-                justifyContent: "center",
-                alignItems: "center",
-                gap: 4,
-                padding: 5,
-              },
+              styles.navBtn,
               isWebDesktop ? styles.webNavBtn : null,
             ]}
           >
             <Image source={icons.Arrow} style={{ width: 10, height: 16 }} />
             <Font
               style={{
-                fontWeight: "500",
                 color: "#0C9FD5",
-                ...(isWebDesktop ? styles.webNavText : {}),
+                ...(isWebDesktop ? styles.webNavText : styles.navText),
               }}
               text={step > 1 && step <= 8 ? "back" : "home"}
             />
@@ -2112,21 +2102,14 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
               }
             }}
             style={[
-              {
-                flexDirection: "row",
-                justifyContent: "center",
-                alignItems: "center",
-                gap: 4,
-                padding: 5,
-              },
+              styles.navBtn,
               isWebDesktop ? styles.webNavBtn : null,
             ]}
           >
             <Font
               style={{
-                fontWeight: "500",
                 color: "#0C9FD5",
-                ...(isWebDesktop ? styles.webNavText : {}),
+                ...(isWebDesktop ? styles.webNavText : styles.navText),
               }}
               text={step >= 1 && step < 8 ? "next" : "start"}
             />
@@ -2135,6 +2118,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
         </View>
       </View>
     </View>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -2151,6 +2135,10 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "space-between",
   },
+  keyboardWrap: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+  },
   webContainer: {
     backgroundColor: "#FFFFFF",
     paddingHorizontal: 24,
@@ -2166,8 +2154,31 @@ const styles = StyleSheet.create({
     paddingTop: 22,
     paddingBottom: 14,
   },
-  webBottomRow: {
+  navRow: {
+    width: "100%",
+    position: "static",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingBottom: 8,
     marginTop: "auto",
+  },
+  navBtn: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 16,
+    height: 40,
+    borderWidth: 1,
+    borderColor: "#0C9FD5",
+    borderRadius: 999,
+    minWidth: 112,
+  },
+  navText: {
+    fontWeight: "500",
+    fontSize: 15,
+  },
+  webBottomRow: {
     paddingBottom: 26,
     paddingHorizontal: 6,
   },

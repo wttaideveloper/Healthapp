@@ -39,7 +39,7 @@ type StartupState = {
 };
 
 const AppNavigator: React.FC = () => {
-  const { isAuthenticated, isHydrated } = useAuth();
+  const { isHydrated } = useAuth();
   const [startupState, setStartupState] = React.useState<StartupState>({
     loaded: false,
     hasLanguage: false,
@@ -70,7 +70,7 @@ const AppNavigator: React.FC = () => {
     };
 
     resolveInitialRoute();
-  }, [isAuthenticated]);
+  }, []);
 
   if (!startupState.loaded || !isHydrated) {
     return (
@@ -85,18 +85,14 @@ const AppNavigator: React.FC = () => {
     ? "language"
     : !startupState.onboardingCompleted
       ? "onboarding"
-      : !isAuthenticated
-        ? "auth"
-        : "app";
+      : "app";
 
   const initialRouteName: keyof RootStackParamList =
     phase === "language"
       ? "Language"
       : phase === "onboarding"
         ? "Intro1"
-        : phase === "auth"
-          ? "SignIn"
-          : "InitialScreen";
+        : "InitialScreen";
 
   return (
     <Stack.Navigator
@@ -105,46 +101,16 @@ const AppNavigator: React.FC = () => {
       initialRouteName={initialRouteName}
       screenOptions={{ headerShown: false }}
     >
-      {phase === "language" ? (
-        <>
-          <Stack.Screen name="Language" component={LanguageScreen} />
-          <Stack.Screen name="Intro1" component={IntroScreen1} />
-          <Stack.Screen name="Intro2" component={IntroScreen2} />
-          <Stack.Screen name="Intro3" component={IntroScreen3} />
-          <Stack.Screen name="SignIn" component={SignInScreen} />
-          <Stack.Screen name="SignUp" component={SignUpScreen} />
-          <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
-          <Stack.Screen name="VerifyEmail" component={VerifyEmailScreen} />
-        </>
-      ) : null}
-
-      {phase === "onboarding" ? (
-        <>
-          <Stack.Screen name="Intro1" component={IntroScreen1} />
-          <Stack.Screen name="Intro2" component={IntroScreen2} />
-          <Stack.Screen name="Intro3" component={IntroScreen3} />
-          <Stack.Screen name="SignIn" component={SignInScreen} />
-          <Stack.Screen name="SignUp" component={SignUpScreen} />
-          <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
-          <Stack.Screen name="VerifyEmail" component={VerifyEmailScreen} />
-        </>
-      ) : null}
-
-      {phase === "auth" ? (
-        <>
-          <Stack.Screen name="SignIn" component={SignInScreen} />
-          <Stack.Screen name="SignUp" component={SignUpScreen} />
-          <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
-          <Stack.Screen name="VerifyEmail" component={VerifyEmailScreen} />
-        </>
-      ) : null}
-
-      {phase === "app" ? (
-        <>
-          <Stack.Screen name="InitialScreen" component={DrawerNavigator} />
-          <Stack.Screen name="ChangeLanguage" component={ChangeLanguage} />
-        </>
-      ) : null}
+      <Stack.Screen name="Language" component={LanguageScreen} />
+      <Stack.Screen name="Intro1" component={IntroScreen1} />
+      <Stack.Screen name="Intro2" component={IntroScreen2} />
+      <Stack.Screen name="Intro3" component={IntroScreen3} />
+      <Stack.Screen name="SignIn" component={SignInScreen} />
+      <Stack.Screen name="SignUp" component={SignUpScreen} />
+      <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+      <Stack.Screen name="VerifyEmail" component={VerifyEmailScreen} />
+      <Stack.Screen name="InitialScreen" component={DrawerNavigator} />
+      <Stack.Screen name="ChangeLanguage" component={ChangeLanguage} />
     </Stack.Navigator>
   );
 };

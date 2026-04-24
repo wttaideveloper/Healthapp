@@ -10,7 +10,7 @@ import {
   TextInput,
   ScrollView,
 } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import Button from "../components/Button";
@@ -50,6 +50,7 @@ const formatDate = (value: Date | null): string | null => {
 };
 
 const PurchaseScreen: React.FC = () => {
+  const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
   const {
     isSubscribed,
@@ -71,6 +72,16 @@ const PurchaseScreen: React.FC = () => {
   const [storeError, setStoreError] = useState<string | null>(null);
   const [webNotice, setWebNotice] = useState<string | null>(null);
   const [licenseError, setLicenseError] = useState<string | null>(null);
+
+  const promptSignIn = React.useCallback((message: string) => {
+    Alert.alert("Sign in required", message, [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Sign in",
+        onPress: () => navigation.navigate("SignIn"),
+      },
+    ]);
+  }, [navigation]);
 
   const isInitialMount = React.useRef(true);
   const refreshInFlight = React.useRef(false);
@@ -214,7 +225,7 @@ const PurchaseScreen: React.FC = () => {
 
   const handleActivateLicense = async () => {
     if (!accessToken) {
-      Alert.alert("Sign in required", "Please sign in before activating a license key.");
+      promptSignIn("Please sign in before activating a license key.");
       return;
     }
 
@@ -282,7 +293,7 @@ const PurchaseScreen: React.FC = () => {
   const handleSubscribe = async () => {
     if (actionLoading) return;
     if (!accessToken) {
-      Alert.alert("Sign in required", "Please sign in before starting a subscription.");
+      promptSignIn("Please sign in before starting a subscription.");
       return;
     }
 
@@ -323,14 +334,16 @@ const PurchaseScreen: React.FC = () => {
 
   const handleRestore = async () => {
     if (actionLoading) return;
+    if (!accessToken) {
+      promptSignIn("Please sign in before restoring purchases.");
+      return;
+    }
 
     setActionLoading(true);
     try {
       await setDebugSubscriptionOverride(null);
       const restored = await restorePurchases();
-      if (accessToken) {
-        await syncRevenueCatStatusToBackend(accessToken, user?.id ?? null);
-      }
+      await syncRevenueCatStatusToBackend(accessToken, user?.id ?? null);
       await refreshSubscription(true);
 
       if (restored?.isValid) {
@@ -351,12 +364,12 @@ const PurchaseScreen: React.FC = () => {
   };
 
   const handleManageSubscription = async () => {
+    if (!accessToken) {
+      promptSignIn("Please sign in before opening billing or subscription settings.");
+      return;
+    }
     try {
       if (Platform.OS === "web") {
-        if (!accessToken) {
-          Alert.alert("Sign in required", "Please sign in before opening billing settings.");
-          return;
-        }
         await startStripePortal(accessToken);
         return;
       }
@@ -458,10 +471,10 @@ const PurchaseScreen: React.FC = () => {
             <Text style={styles.proBadgeSub}>
               {statusMessage}
             </Text>
-            <Text style={styles.sourceNote}>Access source: {sourceLabel}</Text>
-            {providerStatus ? (
-              <Text style={styles.sourceSubNote}>Provider status: {providerStatus}</Text>
-            ) : null}
+            <Text style={styles.sourceMetaLine} numberOfLines={1} ellipsizeMode="tail">
+              Access source: {sourceLabel}
+              {providerStatus ? `   |   Provider status: ${providerStatus}` : ""}
+            </Text>
             {Platform.OS !== "web" ? (
               <>
                 <Button
@@ -906,18 +919,13 @@ const styles = StyleSheet.create({
   },
   proBadgeTitle: { color: "#274273", fontWeight: "700", fontSize: 20 },
   proBadgeSub: { color: "#0B9FD4", fontWeight: "600", fontSize: 14, marginTop: 5, textAlign: "center" },
-  sourceNote: {
+  sourceMetaLine: {
     marginTop: 10,
     color: "#315E99",
     fontWeight: "600",
     fontSize: 12,
-    textAlign: "center",
-  },
-  sourceSubNote: {
-    marginTop: 4,
-    color: "#4B6D99",
-    fontSize: 11,
-    textAlign: "center",
+    textAlign: "left",
+    width: "100%",
   },
   optionDebug: {
     marginTop: 4,

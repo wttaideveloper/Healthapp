@@ -6,7 +6,6 @@
     "orientation": "portrait",
     "icon": "./assets/healthAge_Icon.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
     "assetBundlePatterns": [
       "**/*"
     ],

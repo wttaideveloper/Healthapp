@@ -4,13 +4,37 @@
   },
   "build": {
     "development": {
+      "distribution": "internal",
+      "ios": {
+        "scheme": "HealthAge",
+        "buildConfiguration": "Release",
+        "simulator": false
+      }
+    },
+    "devclient": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "ios": {
+        "scheme": "HealthAge",
+        "buildConfiguration": "Debug",
+        "simulator": false
+      }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "ios": {
+        "scheme": "HealthAge",
+        "buildConfiguration": "Release",
+        "simulator": false
+      }
     },
-    "production": {}
+    "production": {
+      "ios": {
+        "scheme": "HealthAge",
+        "buildConfiguration": "Release",
+        "simulator": false
+      }
+    }
   },
   "submit": {
     "production": {}

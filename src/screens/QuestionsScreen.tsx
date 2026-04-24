@@ -440,35 +440,17 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
         )}
       />
       <View
-        style={[
-          {
-            width: "100%",
-            position: "static",
-            //   bottom: 30,
-            //   left:20,
-            flexDirection: "row",
-            justifyContent: "space-between",
-            marginTop: isWebDesktop ? "auto" : 0,
-            paddingBottom: isWebDesktop ? 24 : 0,
-          },
-          isWebDesktop ? styles.webBottomRow : null,
-        ]}
+        style={[styles.navRow, isWebDesktop ? styles.webBottomRow : null]}
       >
         <TouchableOpacity
           onPress={() => {
             handleBack();
           }}
-          style={[{
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: 4,
-            padding: 5,
-          }, isWebDesktop ? styles.webNavBtn : null]}
+          style={[styles.navBtn, isWebDesktop ? styles.webNavBtn : null]}
         >
           <Image source={icons.Arrow} style={{ width: 10, height: 16 }}></Image>
           <Font
-            style={{ fontWeight: "500", color: "#0C9FD5", ...(isWebDesktop ? styles.webNavText : {}) }}
+            style={{ color: "#0C9FD5", ...(isWebDesktop ? styles.webNavText : styles.navText) }}
             text="back"
           ></Font>
         </TouchableOpacity>
@@ -476,16 +458,10 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
           onPress={() => {
             handleNext();
           }}
-          style={[{
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: 4,
-            padding: 5,
-          }, isWebDesktop ? styles.webNavBtn : null]}
+          style={[styles.navBtn, isWebDesktop ? styles.webNavBtn : null]}
         >
           <Font
-            style={{ fontWeight: "500", color: "#0C9FD5", ...(isWebDesktop ? styles.webNavText : {}) }}
+            style={{ color: "#0C9FD5", ...(isWebDesktop ? styles.webNavText : styles.navText) }}
             text={"next"}
           ></Font>
           <Image
@@ -540,17 +516,36 @@ const styles = StyleSheet.create({
   nextButtonText: { color: "white", textAlign: "center", fontSize: 18 },
   result: { fontSize: 24, textAlign: "center" },
   webBottomRow: {
+    marginTop: "auto",
     paddingBottom: 26,
     paddingHorizontal: 6,
   },
-  webNavBtn: {
+  navRow: {
+    width: "100%",
+    position: "static",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 8,
+    paddingBottom: 8,
+  },
+  navBtn: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 4,
     minWidth: 112,
-    height: 38,
+    height: 40,
     borderWidth: 1,
     borderColor: "#0C9FD5",
     borderRadius: 999,
     paddingHorizontal: 16,
-    paddingVertical: 0,
+  },
+  webNavBtn: {
+    height: 40,
+  },
+  navText: {
+    fontWeight: "500",
+    fontSize: 15,
   },
   webNavText: {
     fontSize: 15,

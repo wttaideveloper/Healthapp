@@ -3,6 +3,8 @@ import {
   BackHandler,
   FlatList,
   Image,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -357,7 +359,11 @@ confirmExit();
 
   console.log(interestList, "interestList");
   return (
-    <View style={styles.screen}>
+    <KeyboardAvoidingView
+      style={styles.screen}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 24 : 0}
+    >
       <View style={[styles.container, isWebDesktop ? styles.desktopContainer : null]}>
       <View style={{ marginVertical: 20 }}>
         <Font
@@ -365,7 +371,11 @@ confirmExit();
           style={{ fontWeight: 700, fontSize: 20, color: "#262F40" }}
         ></Font>
       </View>
-      <ScrollView contentContainerStyle={styles.scrollViewContainer}>
+      <ScrollView
+        contentContainerStyle={styles.scrollViewContainer}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode={Platform.OS === "ios" ? "interactive" : "on-drag"}
+      >
         {step == 1 ? (
           <>
             <Font
@@ -481,30 +491,17 @@ confirmExit();
       )}
 
       <View
-        style={{
-          width: "100%",
-          position: "static",
-          //   bottom: 30,
-          //   left:20,
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }}
+        style={styles.navRow}
       >
         <TouchableOpacity
           onPress={() => {
             handleBack();
           }}
-          style={{
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: 4,
-            padding:5
-          }}
+          style={styles.navBtn}
         >
           <Image source={icons.Arrow} style={{ width: 10, height: 16  }}></Image>
           <Font
-            style={{ fontWeight: "500", color: "#0C9FD5" }}
+            style={styles.navText}
             text="back"
           ></Font>
         </TouchableOpacity>
@@ -512,16 +509,10 @@ confirmExit();
           onPress={() => {
             handleNext();
           }}
-          style={{
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: 4,
-            padding:5
-          }}
+          style={styles.navBtn}
         >
           <Font
-            style={{ fontWeight: "500", color: "#0C9FD5" }}
+            style={styles.navText}
             text={step == 2 ? "Is_ShowReport" : "next"}
           ></Font>
           <Image
@@ -531,7 +522,7 @@ confirmExit();
         </TouchableOpacity>
       </View>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -559,6 +550,30 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
   },
   scrollViewContainer: { paddingBottom: 30 },
+  navRow: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 8,
+    paddingBottom: 8,
+  },
+  navBtn: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 4,
+    minWidth: 112,
+    height: 40,
+    borderWidth: 1,
+    borderColor: "#0C9FD5",
+    borderRadius: 999,
+    paddingHorizontal: 16,
+  },
+  navText: {
+    fontWeight: "500",
+    color: "#0C9FD5",
+    fontSize: 15,
+  },
   question: { fontSize: 20 },
   subQuestion: { fontSize: 12, fontWeight: 400 },
   option: {

@@ -1,6 +1,8 @@
 import {
   Image,
+  KeyboardAvoidingView,
   Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -21,10 +23,12 @@ import { DrawerScreenProps } from "@react-navigation/drawer";
 import CustomInput from "../components/CustomInput";
 import CheckBox from "../components/checkbox";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type FilterScreenProps = DrawerScreenProps<DrawerParamList, "FilterScreen">;
 
 const FilterScreen: React.FC<FilterScreenProps> = ({ navigation, route }) => {
+  const insets = useSafeAreaInsets();
   const [filterOption, setFilterOptions] = React.useState({
     name: "",
     fromDate: "",
@@ -38,7 +42,16 @@ const FilterScreen: React.FC<FilterScreenProps> = ({ navigation, route }) => {
   const [showToPicker, setShowToPicker] = React.useState(false);
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      style={[styles.container, { paddingTop: Math.max(insets.top, 12) }]}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 24 : 0}
+    >
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode={Platform.OS === "ios" ? "interactive" : "on-drag"}
+      >
       <View
         style={{
           marginVertical: 20,
@@ -285,7 +298,8 @@ const FilterScreen: React.FC<FilterScreenProps> = ({ navigation, route }) => {
       </TouchableOpacity>
       {/* </View> */}
       <Button title="Show results" style={{ padding: 10 }} />
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -299,6 +313,9 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     paddingHorizontal: 20,
     paddingVertical: 10,
+  },
+  scrollContainer: {
+    paddingBottom: 24,
   },
   label: { fontSize: 16, fontWeight: "bold", marginVertical: 10 },
 });

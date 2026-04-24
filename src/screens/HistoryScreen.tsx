@@ -5,6 +5,8 @@ import {
   StyleSheet,
   TextInput,
   Image,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   TouchableOpacity,
   Alert,
@@ -51,72 +53,12 @@ const HistoryScreen: React.FC<NavigationProps> = () => {
   const [isModalVisible, setModalVisible] = React.useState(false);
   const [isUpgradeModalVisible, setIsUpgradeModalVisible] =
     React.useState(false);
-  const [isGroupListModalVisible, setIsGroupListModalVisible] =
-    React.useState(false);
-  const [selectedGroupDetails, setSelectedGroupDetails] = React.useState({
-    id: "",
-    name: "",
-  });
   const [isGroupModalVisible, setIsGroupModalVisible] = React.useState(false);
-  const [isExportPressed, setIsExportPressed] = React.useState(false);
   const [isNewGroupPressed, setIsNewGroupPressed] = React.useState(false);
   const [newGroupName, setNewGroupName] = React.useState("");
   const [searchGroupName, setSearchGroupName] = React.useState("");
   const [isExistingGroupPressed, setIsExistingGroupPressed] =
     React.useState(false);
-  const [isDeletePressed, setIsDeletePressed] = React.useState(false);
-  const [selectedReportId, setSelectedReportId] = React.useState("");
-  const [selectedReportData, setSelectedReportData] = React.useState<{
-    age: string;
-    answers: { questionId: number; text: string; points: number }[];
-    reportData: {
-      name: string;
-      height: string;
-      age: string;
-      gender: string;
-      weight: string;
-      bloodGlucose: string;
-      bloodPressure: string;
-      fasting: boolean;
-      bloodPressureSys: string;
-      bloodPressureDia: string;
-      bloodGlucose_mg: string;
-      bloodGlucose_mmol: string;
-      blood_glucose_mmol_points: string;
-      selectedGlucoseUnit: string;
-      healthAge?: any;
-      potentialAge?: any;
-      selectedWeightUnit: any;
-      selectedHeightUnit: any;
-      weightValue: any;
-      heightValue: any;
-    };
-  }>({
-    age: "",
-    answers: [],
-    reportData: {
-      name: "",
-      height: "",
-      age: "",
-      gender: "",
-      weight: "",
-      bloodGlucose: "",
-      bloodPressure: "",
-      fasting: false,
-      bloodPressureSys: "",
-      bloodPressureDia: "",
-      bloodGlucose_mg: "",
-      bloodGlucose_mmol: "",
-      blood_glucose_mmol_points: "",
-      selectedGlucoseUnit: "",
-      healthAge: null,
-      potentialAge: null,
-      selectedWeightUnit: "",
-      selectedHeightUnit: "",
-      weightValue: "",
-      heightValue: "",
-    },
-  });
 
   // const [arrayDummy, setArrayDummy] = React.useState(dummyArray);
   const [isDeleted, setIsDeleted] = React.useState(false);
@@ -179,23 +121,12 @@ const HistoryScreen: React.FC<NavigationProps> = () => {
   };
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
-    setIsExportPressed(false);
-  };
-  const toggleModalGroupList = () => {
-    setIsGroupListModalVisible(!isGroupListModalVisible);
-    setSelectedGroupDetails({ id: "", name: "" });
   };
   const toggleGroupModal = () => {
     setIsGroupModalVisible(!isGroupModalVisible);
     setIsNewGroupPressed(false);
     setIsExistingGroupPressed(false);
     // setIsExportPressed(false);
-  };
-  const deleteItemById = (id: any) => {
-    deleteReports([id]);
-    const updatedArray = reports.filter((item) => item.id !== id);
-    setReports(updatedArray);
-    setIsDeleted(true);
   };
   const deleteItemByArrayOfId = (ArrayId: any) => {
     deleteReports(ArrayId);
@@ -311,7 +242,7 @@ const HistoryScreen: React.FC<NavigationProps> = () => {
     setIsSelectAll(false);
     setSelectedReportIds([]);
     setSelectedGroupIdsToDelete([]);
-    Alert.alert(t("addedToGroup"), "", [
+    Alert.alert("Group created successfully", "", [
       {
         text: t("Fs_Close"),
         onPress: () => null,
@@ -356,13 +287,41 @@ const HistoryScreen: React.FC<NavigationProps> = () => {
   };
   const { t } = useTranslation();
 
+  const navigateToReport = React.useCallback(
+    (reportDetails: any, answersArray: any[], reportId: string) => {
+      navigation.navigate("ReportScreen", {
+        age: reportDetails?.age,
+        answers: answersArray,
+        reportId,
+        reportData: {
+          name: reportDetails?.name,
+          height: reportDetails?.height,
+          age: reportDetails?.age,
+          gender: reportDetails?.gender,
+          weight: reportDetails?.weight,
+          bloodGlucose: reportDetails?.bloodGlucose,
+          bloodPressure: reportDetails?.bloodPressure,
+          fasting: reportDetails?.fasting,
+          bloodPressureSys: reportDetails?.bloodPressureSys,
+          bloodPressureDia: reportDetails?.bloodPressureDia,
+          bloodGlucose_mg: reportDetails?.bloodGlucose_mg,
+          bloodGlucose_mmol: reportDetails?.bloodGlucose_mmol,
+          blood_glucose_mmol_points: reportDetails?.blood_glucose_mmol_points,
+          selectedGlucoseUnit: reportDetails?.selectedGlucoseUnit,
+          healthAge: reportDetails?.healthAge,
+          potentialAge: reportDetails?.potentialAge,
+          selectedWeightUnit: reportDetails?.selectedWeightUnit,
+          selectedHeightUnit: reportDetails?.selectedHeightUnit,
+          weightValue: reportDetails?.weightValue,
+          heightValue: reportDetails?.heightValue,
+        },
+      });
+    },
+    [navigation]
+  );
+
   React.useEffect(() => {
     const backAction = () => {
-      if (isGroupListModalVisible) {
-        setIsGroupListModalVisible(false);
-        return true; // Prevent default behavior
-      }
-
       setIsGroupModalVisible(false);
       navigation.goBack();
       return true; // Prevent default behavior
@@ -374,7 +333,7 @@ const HistoryScreen: React.FC<NavigationProps> = () => {
     );
 
     return () => backHandler.remove(); // Cleanup
-  }, [isGroupListModalVisible]);
+  }, [navigation]);
 
   return (
     <View style={styles.container}>
@@ -678,9 +637,13 @@ const HistoryScreen: React.FC<NavigationProps> = () => {
 
                   return (
                     <TouchableOpacity
-                      onPress={() =>
-                        isSelectAll ? handleCheckboxToggle(val.id) : null
-                      }
+                      onPress={() => {
+                        if (isSelectAll) {
+                          handleCheckboxToggle(val.id);
+                          return;
+                        }
+                        navigateToReport(reportDetails, answersArray, val.id);
+                      }}
                       key={index}
                       style={{
                         borderWidth: 1,
@@ -813,41 +776,7 @@ const HistoryScreen: React.FC<NavigationProps> = () => {
                         </View>
                         <TouchableOpacity
                           onPress={() => {
-                            setSelectedReportId(val.id);
-                            setSelectedReportData({
-                              age: reportDetails?.age,
-                              answers: answersArray,
-                              reportData: {
-                                name: reportDetails?.name,
-                                height: reportDetails?.height,
-                                age: reportDetails?.age,
-                                gender: reportDetails?.gender,
-                                weight: reportDetails?.weight,
-                                bloodGlucose: reportDetails?.bloodGlucose,
-                                bloodPressure: reportDetails?.bloodPressure,
-                                fasting: reportDetails?.fasting,
-                                bloodPressureSys:
-                                  reportDetails?.bloodPressureSys,
-                                bloodPressureDia:
-                                  reportDetails?.bloodPressureDia,
-                                bloodGlucose_mg: reportDetails?.bloodGlucose_mg,
-                                bloodGlucose_mmol:
-                                  reportDetails?.bloodGlucose_mmol,
-                                blood_glucose_mmol_points:
-                                  reportDetails?.blood_glucose_mmol_points,
-                                selectedGlucoseUnit:
-                                  reportDetails?.selectedGlucoseUnit,
-                                healthAge: reportDetails?.healthAge,
-                                potentialAge: reportDetails?.potentialAge,
-                                selectedWeightUnit:
-                                  reportDetails?.selectedWeightUnit,
-                                selectedHeightUnit:
-                                  reportDetails?.selectedHeightUnit,
-                                weightValue: reportDetails?.weightValue,
-                                heightValue: reportDetails?.heightValue,
-                              },
-                            });
-                            toggleModal();
+                            navigateToReport(reportDetails, answersArray, val.id);
                           }}
                           style={{
                             flexDirection: "row",
@@ -922,9 +851,16 @@ const HistoryScreen: React.FC<NavigationProps> = () => {
           ) : groupsArray.length ? (
             groupsArray.map((val, index) => (
               <TouchableOpacity
-                onPress={() =>
-                  isSelectAll ? handleCheckboxToggleForGroups(val.id) : null
-                }
+                onPress={() => {
+                  if (isSelectAll) {
+                    handleCheckboxToggleForGroups(val.id);
+                    return;
+                  }
+                  navigation.navigate("GroupDetailsScreen", {
+                    groupName: val.name,
+                    groupId: val.id,
+                  });
+                }}
                 key={index}
                 style={{
                   borderWidth: 1,
@@ -1005,8 +941,10 @@ const HistoryScreen: React.FC<NavigationProps> = () => {
                   </View>
                   <TouchableOpacity
                     onPress={() => {
-                      setIsGroupListModalVisible(true);
-                      setSelectedGroupDetails({ id: val.id, name: val.name });
+                      navigation.navigate("GroupDetailsScreen", {
+                        groupName: val.name,
+                        groupId: val.id,
+                      });
                     }}
                     // onPress={() => handleExport(val.id, val.name)}
                     // onPress={() =>
@@ -1096,7 +1034,7 @@ const HistoryScreen: React.FC<NavigationProps> = () => {
       >
         <View style={styles.modalContent}>
           <Font
-            text={isExportPressed ? "Hs_Export" : "Hs_Options"}
+            text="Hs_Confirmation"
             style={{ color: "#274273", fontSize: 18, fontWeight: 700 }}
           ></Font>
           <View
@@ -1107,213 +1045,57 @@ const HistoryScreen: React.FC<NavigationProps> = () => {
               marginVertical: 10,
             }}
           ></View>
-          {isExportPressed ? (
-            <>
-              <TouchableOpacity
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  gap: 14,
-                  backgroundColor: "#f9fafc",
-                  marginVertical: 5,
-                  paddingVertical: 16,
-                  paddingHorizontal: 12,
-                  borderRadius: 999999,
-                  width: "100%",
-                  alignItems: "center",
-                }}
-              >
-                <Image
-                  source={icons.csv}
-                  style={{ width: 18, height: 18 }}
-                ></Image>
-                <Font
-                  text="Hs_ExportAsCSV"
-                  style={{ color: "#274273", fontWeight: 500, fontSize: 16 }}
-                ></Font>
-              </TouchableOpacity>
-              {/* <TouchableOpacity
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  gap: 14,
-                  backgroundColor: "#f9fafc",
-                  marginVertical: 5,
-                  paddingVertical: 16,
-                  paddingHorizontal: 12,
-                  borderRadius: 999999,
-                  width: "100%",
-                  alignItems: "center",
-                }}
-              >
-                <Image
-                  source={icons.pdf}
-                  style={{ width: 18, height: 18 }}
-                ></Image>
-                <Font
-                  text="Export as PDF"
-                  style={{ color: "#274273", fontWeight: 500, fontSize: 16 }}
-                ></Font>
-              </TouchableOpacity> */}
-            </>
-          ) : isDeletePressed ? (
-            <>
-              <View
-                style={{
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Image
-                  source={icons.deleteModal}
-                  style={{ width: 180, height: 120 }}
-                ></Image>
-                <Font
-                  text="Hs_Confirmation"
-                  style={{
-                    textAlign: "center",
-                    color: "#262F40",
-                    fontSize: 18,
-                    fontWeight: 500,
-                  }}
-                ></Font>
-              </View>
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  gap: 10,
-                  marginVertical: 20,
-                }}
-              >
-                <Button
-                  type="cancel"
-                  title="Hs_Cancel"
-                  style={{ padding: 10 }}
-                  onPress={() => {
-                    setIsDeletePressed(false);
-                    toggleModal();
-                  }}
-                ></Button>
-                <Button
-                  type="delete"
-                  title="Hs_Delete"
-                  style={{ padding: 10 }}
-                  onPress={() => {
-                    if (isSelectAll) {
-                      if (tab == "Group") {
-                        deleteGroupByArrayOfId();
-                        setIsDeletePressed(false);
-                        toggleModal();
-                      } else {
-                        deleteItemByArrayOfId(selectedReportIds);
-                        setIsDeletePressed(false);
-                        toggleModal();
-                      }
-                    } else {
-                      deleteItemById(selectedReportId);
-                      setIsDeletePressed(false);
-                      toggleModal();
-                    }
-                  }}
-                ></Button>
-              </View>
-            </>
-          ) : (
-            <>
-              <TouchableOpacity
-                // onPress={() => setIsExportPressed(true)}
-                onPress={() =>
-                  navigation.navigate("ReportScreen", {
-                    age: selectedReportData.age,
-                    answers: selectedReportData.answers,
-                    reportData: {
-                      name: selectedReportData.reportData.name,
-                      height: selectedReportData.reportData.height,
-                      age: selectedReportData.reportData.age,
-                      gender: selectedReportData.reportData.gender,
-                      weight: selectedReportData.reportData.weight,
-                      bloodGlucose: selectedReportData.reportData.bloodGlucose,
-                      bloodPressure:
-                        selectedReportData.reportData.bloodPressure,
-                      fasting: selectedReportData.reportData.fasting,
-                      bloodPressureSys:
-                        selectedReportData.reportData?.bloodPressureSys,
-                      bloodPressureDia:
-                        selectedReportData.reportData?.bloodPressureDia,
-                      bloodGlucose_mg:
-                        selectedReportData.reportData?.bloodGlucose_mg,
-                      bloodGlucose_mmol:
-                        selectedReportData.reportData?.bloodGlucose_mmol,
-                      blood_glucose_mmol_points:
-                        selectedReportData.reportData
-                          ?.blood_glucose_mmol_points,
-                      selectedGlucoseUnit:
-                        selectedReportData.reportData?.selectedGlucoseUnit,
-                      healthAge: selectedReportData.reportData.healthAge,
-                      potentialAge: selectedReportData.reportData.potentialAge,
-                      selectedHeightUnit:
-                        selectedReportData.reportData.selectedHeightUnit,
-                      selectedWeightUnit:
-                        selectedReportData.reportData.selectedWeightUnit,
-                      weightValue: selectedReportData.reportData.weightValue,
-                      heightValue: selectedReportData.reportData.heightValue,
-                    },
-                  })
+          <View
+            style={{
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Image
+              source={icons.deleteModal}
+              style={{ width: 180, height: 120 }}
+            ></Image>
+            <Font
+              text="Hs_Confirmation"
+              style={{
+                textAlign: "center",
+                color: "#262F40",
+                fontSize: 18,
+                fontWeight: 500,
+              }}
+            ></Font>
+          </View>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "center",
+              gap: 10,
+              marginVertical: 20,
+            }}
+          >
+            <Button
+              type="cancel"
+              title="Hs_Cancel"
+              style={{ padding: 10 }}
+              onPress={() => {
+                toggleModal();
+              }}
+            ></Button>
+            <Button
+              type="delete"
+              title="Hs_Delete"
+              style={{ padding: 10 }}
+              onPress={() => {
+                if (tab == "Group") {
+                  deleteGroupByArrayOfId();
+                } else {
+                  deleteItemByArrayOfId(selectedReportIds);
                 }
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  gap: 14,
-                  backgroundColor: "#f9fafc",
-                  marginVertical: 5,
-                  paddingVertical: 16,
-                  paddingHorizontal: 12,
-                  borderRadius: 999999,
-                  width: "100%",
-                  alignItems: "center",
-                }}
-              >
-                <Font
-                  text="Hs_View"
-                  style={{
-                    color: "#0B9FD4",
-                    fontWeight: 500,
-                    fontSize: 16,
-                  }}
-                ></Font>
-                <Image
-                  source={icons.Arrow}
-                  style={{ width: 10, height: 16, transform: [{ scaleX: -1 }] }}
-                ></Image>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => setIsDeletePressed(true)}
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  gap: 14,
-                  backgroundColor: "#f9fafc",
-                  marginVertical: 5,
-                  paddingVertical: 16,
-                  paddingHorizontal: 12,
-                  borderRadius: 999999,
-                  width: "100%",
-                  alignItems: "center",
-                }}
-              >
-                <Image
-                  source={icons.delete}
-                  style={{ width: 18, height: 18 }}
-                ></Image>
-                <Font
-                  text="Hs_Delete"
-                  style={{ color: "#FE4A4A", fontWeight: 500, fontSize: 16 }}
-                ></Font>
-              </TouchableOpacity>
-            </>
-          )}
+                toggleModal();
+              }}
+            ></Button>
+          </View>
         </View>
       </Modal>
 
@@ -1325,12 +1107,16 @@ const HistoryScreen: React.FC<NavigationProps> = () => {
         swipeDirection="down"
         style={styles.modal}
       >
-        <View
-          style={[
-            styles.modalContent,
-            { ...{ height: isExistingGroupPressed ? 600 : "auto" } },
-          ]}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 24 : 0}
         >
+          <View
+            style={[
+              styles.modalContent,
+              { ...{ height: isExistingGroupPressed ? 600 : "auto" } },
+            ]}
+          >
           <Font
             text={
               isNewGroupPressed
@@ -1609,117 +1395,10 @@ const HistoryScreen: React.FC<NavigationProps> = () => {
               </TouchableOpacity>
             </>
           )}
-        </View>
+          </View>
+        </KeyboardAvoidingView>
       </Modal>
 
-      <Modal
-        isVisible={isGroupListModalVisible}
-        onBackdropPress={toggleModalGroupList}
-        onSwipeComplete={toggleModalGroupList}
-        swipeDirection="down"
-        style={styles.modal}
-      >
-        <View style={styles.modalContent}>
-          <Font
-            text={"Hs_Options"}
-            style={{ color: "#274273", fontSize: 18, fontWeight: 700 }}
-          ></Font>
-          <View
-            style={{
-              width: "100%",
-              borderWidth: 1,
-              borderColor: "#F4F6F9",
-              marginVertical: 10,
-            }}
-          ></View>
-          <TouchableOpacity
-            onPress={() =>
-              handleExport(selectedGroupDetails.id, selectedGroupDetails.name)
-            }
-            // onPress={() =>
-            //   navigation.navigate("GroupDetailsScreen", {
-            //     groupName: val.name,
-            //     groupId: val.id,
-            //   })
-            // }
-            style={{
-              flexDirection: "row",
-              justifyContent: "center",
-              gap: 14,
-              backgroundColor: "#f9fafc",
-              marginVertical: 5,
-              paddingVertical: 16,
-              paddingHorizontal: 12,
-              borderRadius: 999999,
-              width: "100%",
-              alignItems: "center",
-            }}
-          >
-            <Image source={icons.csv} style={{ width: 18, height: 18 }}></Image>
-            <Font
-              text="Hs_ExportAsCSV"
-              style={{ color: "#274273", fontWeight: 500, fontSize: 16 }}
-            ></Font>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate("GroupDetailsScreen", {
-                groupName: selectedGroupDetails.name,
-                groupId: selectedGroupDetails.id,
-              })
-            }
-            style={{
-              flexDirection: "row",
-              justifyContent: "center",
-              gap: 14,
-              backgroundColor: "#f9fafc",
-              marginVertical: 5,
-              paddingVertical: 16,
-              paddingHorizontal: 12,
-              borderRadius: 999999,
-              width: "100%",
-              alignItems: "center",
-            }}
-          >
-            <Font
-              text="Hs_View"
-              style={{
-                color: "#0B9FD4",
-                fontWeight: 500,
-                fontSize: 16,
-              }}
-            ></Font>
-            <Image
-              source={icons.Arrow}
-              style={{ width: 10, height: 16, transform: [{ scaleX: -1 }] }}
-            ></Image>
-          </TouchableOpacity>
-          {/* <TouchableOpacity
-                onPress={() => setIsDeletePressed(true)}
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  gap: 14,
-                  backgroundColor: "#f9fafc",
-                  marginVertical: 5,
-                  paddingVertical: 16,
-                  paddingHorizontal: 12,
-                  borderRadius: 999999,
-                  width: "100%",
-                  alignItems: "center",
-                }}
-              >
-                <Image
-                  source={icons.delete}
-                  style={{ width: 18, height: 18 }}
-                ></Image>
-                <Font
-                  text="Hs_Delete"
-                  style={{ color: "#FE4A4A", fontWeight: 500, fontSize: 16 }}
-                ></Font>
-              </TouchableOpacity> */}
-        </View>
-      </Modal>
       <DeleteMessageModal
         visible={isDeleted}
         onClose={() => setIsDeleted(false)}
@@ -1763,11 +1442,9 @@ const HistoryScreen: React.FC<NavigationProps> = () => {
             onPress={() => {
               if (selectedReportIds.length > 0) {
                 toggleModal();
-                setIsDeletePressed(true);
               }
               if (selectedGroupIdsToDelete.length > 0) {
                 toggleModal();
-                setIsDeletePressed(true);
               }
             }}
           ></Button>

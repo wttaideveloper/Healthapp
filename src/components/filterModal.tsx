@@ -1,6 +1,8 @@
 import {
   Image,
+  KeyboardAvoidingView,
   Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -23,6 +25,7 @@ import CheckBox from "../components/checkbox";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Modal from "react-native-modal";
 import { useTranslation } from "react-i18next";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type FilterModalProps = {
   isModalVisible: boolean;
@@ -33,11 +36,11 @@ type FilterModalProps = {
   filterGender: string;
   setFilterGender: React.Dispatch<SetStateAction<string>>;
 
-  fromDate: string;
-  setFromDate: React.Dispatch<SetStateAction<string>>;
+  fromDate: Date | null;
+  setFromDate: React.Dispatch<SetStateAction<Date | null>>;
 
-  toDate: string;
-  setToDate: React.Dispatch<SetStateAction<string>>;
+  toDate: Date | null;
+  setToDate: React.Dispatch<SetStateAction<Date | null>>;
 };
 
 const FilterModal: React.FC<FilterModalProps> = ({
@@ -55,6 +58,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
   toDate,
   setToDate,
 }) => {
+  const insets = useSafeAreaInsets();
   const [showFromPicker, setShowFromPicker] = React.useState(false);
   const [showToPicker, setShowToPicker] = React.useState(false);
   const { t } = useTranslation();
@@ -66,8 +70,17 @@ const FilterModal: React.FC<FilterModalProps> = ({
       swipeDirection="down"
       style={styles.modal}
     >
-      <View style={styles.container}>
-        <View style={styles.modalContent}>
+      <KeyboardAvoidingView
+        style={[styles.container, { paddingTop: Math.max(insets.top, 12), paddingBottom: Math.max(insets.bottom, 12) }]}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 24 : 0}
+      >
+        <ScrollView
+          style={styles.modalContent}
+          contentContainerStyle={styles.modalContentContainer}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode={Platform.OS === "ios" ? "interactive" : "on-drag"}
+        >
           <View
             style={{
               marginVertical: 20,
@@ -299,8 +312,8 @@ const FilterModal: React.FC<FilterModalProps> = ({
             onPress={() => {
              setFilterName("");
              setFilterGender("");
-             setFromDate("");
-             setToDate("");
+             setFromDate(null);
+             setToDate(null);
             }}
             style={{
               flexDirection: "row",
@@ -316,9 +329,9 @@ const FilterModal: React.FC<FilterModalProps> = ({
             ></Font>
           </TouchableOpacity>
           {/* </View> */}
-        </View>
+        </ScrollView>
         <Button title="Fs_ShowResults" style={{ padding: 10 }} onPress={toggleModal}/>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 };
@@ -360,6 +373,9 @@ const styles = StyleSheet.create({
     // borderTopLeftRadius: 32,
     // borderTopRightRadius: 32,
     // alignItems: "center",
+  },
+  modalContentContainer: {
+    paddingBottom: 12,
   },
   modalTitle: {
     fontSize: 18,

@@ -1,4 +1,7 @@
 export const icons = {
+  intro1: require("../../assets/images/intro-1.png"),
+  intro2: require("../../assets/images/intro-2.png"),
+  intro3: require("../../assets/images/intro-3.png"),
   heroBg: require("../../assets/images/bg-hero-photo.jpg"),
   introScreen: require("../../assets/images/introScreen.png"),
   Arrow: require("../../assets/images/arrowLeft.png"),

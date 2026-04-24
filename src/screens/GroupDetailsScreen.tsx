@@ -507,6 +507,7 @@ const [isModalVisible, setModalVisible] = React.useState(false);
                       navigation.navigate("ReportScreen", {
                         age: reportDetails.age,
                         answers: answersArray,
+                        reportId: val.id,
                         reportData: {
                           name: reportDetails.name,
                           height: reportDetails.height,

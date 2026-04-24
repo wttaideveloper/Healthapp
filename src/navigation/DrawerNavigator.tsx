@@ -117,6 +117,7 @@ export type DrawerParamList = {
   ReportScreen: {
     age: string;
     answers: { questionId: number; text: string; points: number }[];
+    reportId?: string;
     reportData: {
       name?: string;
       height?: string;
@@ -212,6 +213,7 @@ export type StackParamList = {
   ReportScreen: {
     age: string;
     answers: { questionId: number; text: string; points: number }[];
+    reportId?: string;
     reportData: {
       name: string;
       height: string;
@@ -293,7 +295,7 @@ const WebShellHeader: React.FC<{
   hasPremium: boolean;
   onRequireUpgrade: () => void;
 }> = ({ navigation, hasPremium, onRequireUpgrade }) => {
-  const { user, signOut } = useAuth();
+  const { user, signOut, isAuthenticated } = useAuth();
   const initial = (user?.name?.trim()?.[0] ?? user?.email?.trim()?.[0] ?? "A").toUpperCase();
   const [currentLanguage, setCurrentLanguage] = React.useState(
     (i18n.language ?? "en").split("-")[0].toLowerCase()
@@ -348,15 +350,16 @@ const WebShellHeader: React.FC<{
   };
 
   const handleLogout = async () => {
+    if (!isAuthenticated) {
+      const parent = navigation.getParent?.();
+      parent?.navigate?.("SignIn");
+      return;
+    }
     try {
       await signOut();
       await clearCachedSubscriptionStatus();
       await AsyncStorage.removeItem(DEBUG_SUB_OVERRIDE_KEY);
-      const parent = navigation.getParent?.();
-      parent?.reset?.({
-        index: 0,
-        routes: [{ name: "SignIn" }],
-      });
+      goRoot("Main");
     } catch (error) {
       console.error("Web logout failed:", error);
     }
@@ -460,7 +463,7 @@ const WebShellHeader: React.FC<{
 
         <View style={webStyles.right}>
           <TouchableOpacity style={webStyles.logoutPillBtn} onPress={handleLogout}>
-            <Text style={webStyles.logoutPillText}>Logout</Text>
+            <Text style={webStyles.logoutPillText}>{isAuthenticated ? "Logout" : "Login"}</Text>
           </TouchableOpacity>
           <View style={webStyles.dropdownWrap as any}>
             <TouchableOpacity

@@ -1,19 +1,21 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Image } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 
 import HomeScreen from "../screens/HomeScreen";
 import PurchaseScreen from "../screens/PurchaseScreen";
 import HistoryScreen from "../screens/HistoryScreen";
-import { icons } from "../components/images";
+import AccountScreen from "../screens/AccountScreen";
 import UpgradeModal from "../components/upgradeModal";
 import { useSubscription } from "../context/subScriptionContext";
+import { useAuth } from "../context/authContext";
 
 export type BottomTabParamList = {
   Home: undefined;
   Purchase: undefined;
   History: undefined;
+  Account: undefined;
 };
 
 const Tab = createBottomTabNavigator<BottomTabParamList>();
@@ -22,6 +24,7 @@ const BottomTabNavigator: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { t } = useTranslation();
   const [showModal, setShowModal] = React.useState(false);
   const { isSubscribed } = useSubscription();
+  const { isAuthenticated } = useAuth();
   const hasPremium = isSubscribed;
 
   return (
@@ -29,16 +32,25 @@ const BottomTabNavigator: React.FC<{ navigation: any }> = ({ navigation }) => {
       <Tab.Navigator
         id={undefined}
         screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused }) => {
-            let iconName;
-            if (route.name === "Home") {
-              iconName = focused ? icons.homeLogo : icons.homeLogo;
-            } else if (route.name === "Purchase") {
-              iconName = focused ? icons.purchase : icons.purchase;
-            } else {
-              iconName = focused ? icons.history : icons.history;
-            }
-            return <Image source={iconName} style={{ width: 18, height: 18 }} />;
+          tabBarIcon: ({ focused, color, size }) => {
+            const iconName =
+              route.name === "Home"
+                ? focused
+                  ? "home"
+                  : "home-outline"
+                : route.name === "Purchase"
+                ? focused
+                  ? "card"
+                  : "card-outline"
+                : route.name === "History"
+                ? focused
+                  ? "time"
+                  : "time-outline"
+                : focused
+                ? "person"
+                : "person-outline";
+
+            return <Ionicons name={iconName} size={size ?? 20} color={color} />;
           },
           tabBarActiveTintColor: "black",
           tabBarInactiveTintColor: "black",
@@ -82,6 +94,11 @@ const BottomTabNavigator: React.FC<{ navigation: any }> = ({ navigation }) => {
               }
             },
           })}
+        />
+        <Tab.Screen
+          name="Account"
+          component={AccountScreen}
+          options={{ tabBarLabel: isAuthenticated ? "Account" : "Login" }}
         />
       </Tab.Navigator>
       <UpgradeModal

@@ -30,7 +30,7 @@ type SignUpFieldErrors = {
 };
 
 const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
-  const { signUp, isLoading } = useAuth();
+  const { signUp, isLoading, isAuthenticated } = useAuth();
   const { width } = useWindowDimensions();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -54,6 +54,12 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
       return { ...prev, [field]: undefined };
     });
   };
+
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      navigation.replace("InitialScreen");
+    }
+  }, [isAuthenticated, navigation]);
 
   const onSignUp = async () => {
     const normalizedName = name.trim();
@@ -253,11 +259,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   mobileTopBackRow: {
-    position: "absolute",
-    top: 56,
-    left: 0,
-    right: 0,
-    zIndex: 2,
+    width: "100%",
+    marginBottom: 12,
     alignItems: "center",
   },
   mobileTopBackInner: {

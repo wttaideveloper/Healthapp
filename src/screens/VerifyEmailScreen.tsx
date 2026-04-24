@@ -23,7 +23,7 @@ type VerifyEmailProps = {
 };
 
 const VerifyEmailScreen: React.FC<VerifyEmailProps> = ({ route, navigation }) => {
-  const { verifyEmail, resendVerification, isLoading, pendingVerificationEmail } = useAuth();
+  const { verifyEmail, resendVerification, isLoading, pendingVerificationEmail, isAuthenticated } = useAuth();
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const targetEmail = pendingVerificationEmail ?? route.params?.email ?? "";
@@ -33,6 +33,12 @@ const VerifyEmailScreen: React.FC<VerifyEmailProps> = ({ route, navigation }) =>
       navigation.replace("SignIn");
     }
   }, [navigation, targetEmail]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigation.replace("InitialScreen");
+    }
+  }, [isAuthenticated, navigation]);
 
   const onVerify = async () => {
     if (!code.trim()) {

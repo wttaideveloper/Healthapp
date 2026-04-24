@@ -29,7 +29,7 @@ type SignInFieldErrors = {
 };
 
 const SignInScreen: React.FC<SignInScreenProps> = ({ navigation }) => {
-  const { signIn, isLoading, useMockAuth } = useAuth();
+  const { signIn, isLoading, useMockAuth, isAuthenticated } = useAuth();
   const { width } = useWindowDimensions();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,6 +38,9 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ navigation }) => {
   const [showPassword, setShowPassword] = useState(false);
   const isWebDesktop = width >= 760;
   const isNativeMobile = Platform.OS !== "web";
+  const backToApp = () => {
+    navigation.replace("InitialScreen");
+  };
 
   const clearFieldError = (field: keyof SignInFieldErrors) => {
     setFieldErrors((prev) => {
@@ -45,6 +48,12 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ navigation }) => {
       return { ...prev, [field]: undefined };
     });
   };
+
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      navigation.replace("InitialScreen");
+    }
+  }, [isAuthenticated, navigation]);
 
   const onSignIn = async () => {
     const normalizedEmail = email.trim().toLowerCase();
@@ -193,6 +202,15 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ navigation }) => {
       style={[styles.container, isNativeMobile ? styles.mobileContainer : null]}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
+      {isNativeMobile ? (
+        <View style={styles.mobileTopBackRow}>
+          <View style={styles.mobileTopBackInner}>
+            <TouchableOpacity style={styles.mobileBackButton} onPress={backToApp}>
+              <Ionicons name="arrow-back" size={18} color="#475569" />
+            </TouchableOpacity>
+          </View>
+        </View>
+      ) : null}
       <View
         style={[
           styles.card,
@@ -216,6 +234,25 @@ const styles = StyleSheet.create({
   mobileContainer: {
     justifyContent: "center",
     paddingHorizontal: 24,
+  },
+  mobileTopBackRow: {
+    width: "100%",
+    marginBottom: 12,
+    alignItems: "center",
+  },
+  mobileTopBackInner: {
+    width: "100%",
+    maxWidth: 420,
+    paddingHorizontal: 24,
+  },
+  mobileBackButton: {
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#D2D7E2",
+    alignItems: "center",
+    justifyContent: "center",
   },
   webShell: {
     flex: 1,

@@ -22,20 +22,22 @@ export const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (
   props
 ) => {
   const { isSubscribed } = useSubscription();
-  const { signOut, user } = useAuth();
+  const { signOut, user, isAuthenticated } = useAuth();
   const hasPremium = isSubscribed;
 
   const [showModal, setShowModal] = React.useState(false);
   const handleLogout = async () => {
+    if (!isAuthenticated) {
+      props.navigation.closeDrawer();
+      const parent = props.navigation.getParent();
+      (parent as any)?.navigate?.("SignIn");
+      return;
+    }
     await signOut();
     await clearCachedSubscriptionStatus();
     await AsyncStorage.removeItem(DEBUG_SUB_OVERRIDE_KEY);
     props.navigation.closeDrawer();
-    const parent = props.navigation.getParent();
-    (parent as any)?.reset?.({
-      index: 0,
-      routes: [{ name: "SignIn" }],
-    });
+    props.navigation.navigate("Main");
   };
 
   const drawerContent = [
@@ -89,7 +91,7 @@ export const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (
         ></Image>
         <Image source={icons.drawerLogo} style={styles.overlayImage} />
         <TouchableOpacity style={styles.headerLogoutBtn} onPress={handleLogout}>
-          <Text style={styles.headerLogoutText}>Logout</Text>
+          <Text style={styles.headerLogoutText}>{isAuthenticated ? "Logout" : "Login"}</Text>
         </TouchableOpacity>
       </View>
 
@@ -170,7 +172,7 @@ export const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (
 
         <TouchableOpacity style={styles.drawerItem} onPress={handleLogout}>
           <Image source={icons.changeLanguage} style={{ width: 20, height: 20 }} />
-          <Text style={styles.logoutInlineText}>Logout</Text>
+          <Text style={styles.logoutInlineText}>{isAuthenticated ? "Logout" : "Login"}</Text>
         </TouchableOpacity>
         <View style={styles.separator} />
       </View>

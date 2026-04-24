@@ -26,6 +26,7 @@ const IntroScreen1: React.FC<IntroScreen1Props> = ({ navigation }) => {
   const { width } = useWindowDimensions();
   const isWebDesktop = width >= 760;
   const isWeb = Platform.OS === "web";
+  const stepImage = step === 1 ? icons.intro1 : step === 2 ? icons.intro2 : icons.intro3;
 
   const handleBackPress = () => {
     if (step > 1 && step <= 3) {
@@ -38,7 +39,7 @@ const IntroScreen1: React.FC<IntroScreen1Props> = ({ navigation }) => {
       return;
     }
 
-    navigation.replace("SignIn");
+    navigation.replace("InitialScreen");
   };
 
   // React.useEffect(() => {
@@ -101,7 +102,7 @@ const IntroScreen1: React.FC<IntroScreen1Props> = ({ navigation }) => {
               <View style={[styles.circle, styles.smallCircle]} />
 
               {/* Image on Top */}
-              <Image source={icons.introScreen} style={styles.image} />
+              <Image source={stepImage} style={styles.image} />
             </View>
           </View>
           <View style={[styles.copyWrap, isWebDesktop && styles.copyWrapDesktop]}>
@@ -168,7 +169,7 @@ const IntroScreen1: React.FC<IntroScreen1Props> = ({ navigation }) => {
               AsyncStorage.setItem(ONBOARDING_COMPLETED_KEY, "true")
                 .catch((error) => console.error("Failed to persist onboarding:", error))
                 .finally(() => {
-                  navigation.replace("SignIn");
+                  navigation.replace("InitialScreen");
                 });
             }
           }}
@@ -176,10 +177,10 @@ const IntroScreen1: React.FC<IntroScreen1Props> = ({ navigation }) => {
         {step === 3 ? (
           <TouchableOpacity
             style={styles.signInLink}
-            onPress={() => navigation.replace("SignIn")}
+            onPress={() => navigation.replace("InitialScreen")}
           >
             <Text style={{ color: "#0C9FD5", fontWeight: "500", fontSize: 13 }}>
-              Already have an account? Sign in
+              Continue to app
             </Text>
           </TouchableOpacity>
         ) : null}

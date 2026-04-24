@@ -30,6 +30,7 @@ import { calculateBMIValues } from "../components/utils/BmiCalculation";
 import { CommonActions, useFocusEffect } from "@react-navigation/native";
 import { useAuth } from "../context/authContext";
 import { getApiRoot } from "../components/utils/api";
+import { deleteReports } from "../components/utils/reportService";
 
 type ReportScreenProps = DrawerScreenProps<DrawerParamList, "ReportScreen">;
 
@@ -186,6 +187,7 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
     }, [goHomeFromReport])
   );
   const { answers } = route?.params;
+  const reportId = route?.params?.reportId;
   const { healthAge, potentialAge } = route?.params?.reportData;
 
   const userName = route?.params?.reportData?.name
@@ -659,6 +661,20 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
   };
 
   // Back handler is registered via useFocusEffect above.
+  const handleDeleteCurrentReport = React.useCallback(() => {
+    if (!reportId) return;
+    Alert.alert("Delete report", "Are you sure you want to delete this report?", [
+      { text: t("Hs_Cancel"), style: "cancel" },
+      {
+        text: t("Hs_Delete"),
+        style: "destructive",
+        onPress: () => {
+          deleteReports([reportId]);
+          navigation.navigate("HistoryScreen");
+        },
+      },
+    ]);
+  }, [navigation, reportId, t]);
 
   return (
     <View style={styles.container}>
@@ -667,33 +683,45 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
           marginVertical: 20,
           flexDirection: "row",
           justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
         <Font
           text="Rs_Report"
           style={{ fontWeight: 700, fontSize: 20, color: "#262F40" }}
         ></Font>
-        <TouchableOpacity
-          onPress={goHomeFromReport}
-          style={{
-            flexDirection: "row",
-            gap: 4,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Font
-            text="Fs_Close"
-            style={{ fontWeight: 500, fontSize: 16, color: "#0C9FD5" }}
-          ></Font>
-          <Image
-            source={icons.close}
+        <View style={styles.headerActions}>
+          {reportId ? (
+            <TouchableOpacity
+              onPress={handleDeleteCurrentReport}
+              style={styles.deleteHeaderAction}
+            >
+              <Image source={icons.delete} style={{ width: 16, height: 16 }} />
+              <Text style={styles.deleteHeaderText}>Delete</Text>
+            </TouchableOpacity>
+          ) : null}
+          <TouchableOpacity
+            onPress={goHomeFromReport}
             style={{
-              width: 25,
-              height: 25,
+              flexDirection: "row",
+              gap: 4,
+              justifyContent: "center",
+              alignItems: "center",
             }}
-          ></Image>
-        </TouchableOpacity>
+          >
+            <Font
+              text="Fs_Close"
+              style={{ fontWeight: 500, fontSize: 16, color: "#0C9FD5" }}
+            ></Font>
+            <Image
+              source={icons.close}
+              style={{
+                width: 25,
+                height: 25,
+              }}
+            ></Image>
+          </TouchableOpacity>
+        </View>
       </View>
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
         <LinearGradient
@@ -1107,5 +1135,26 @@ const styles = StyleSheet.create({
   linkRow: { flexDirection: "row", alignItems: "center" },
   legalLink: { color: "#0B9FD4", fontSize: 12, textDecorationLine: "underline", fontWeight: "500" },
   linkSeparator: { color: "#7D8699", marginHorizontal: 8 },
+  headerActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  deleteHeaderAction: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 10,
+    height: 32,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: "#F5C3C3",
+    backgroundColor: "#FFF3F3",
+  },
+  deleteHeaderText: {
+    color: "#C62828",
+    fontSize: 13,
+    fontWeight: "600",
+  },
 
 });
