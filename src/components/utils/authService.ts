@@ -6,10 +6,24 @@ export type AuthUser = {
   name: string;
   email: string;
   role?: "user" | "admin";
-  isLicensed?: boolean;
+  hasAccess?: boolean;
   isEmailVerified?: boolean;
   status?: "pending" | "active";
-  licenseId?: string | null;
+  entitlement?: {
+    source: "workspace" | "individual_iap" | "individual_stripe" | null;
+    expiresAt: string | null;
+    providerStatus: string | null;
+    workspace?: {
+      id: string;
+      name: string;
+      role: "owner" | "admin" | "member";
+      memberStatus: "invited" | "active" | "revoked";
+      plan: string | null;
+      seatLimit: number | null;
+      subscriptionStatus: string | null;
+    } | null;
+    individual?: Record<string, unknown> | null;
+  } | null;
 
   // Backwards-compat for older screens.
   emailVerified: boolean;
@@ -140,6 +154,7 @@ const toAuthUser = (user: StoredMockUser): AuthUser => ({
   id: user.id,
   name: user.name,
   email: user.email,
+  hasAccess: false,
   emailVerified: user.emailVerified,
 });
 
@@ -175,15 +190,20 @@ const buildUserFromBackend = (raw: unknown): AuthUser | null => {
         ? source.emailVerified
         : true;
 
+  const entitlement =
+    source.entitlement && typeof source.entitlement === "object"
+      ? (source.entitlement as AuthUser["entitlement"])
+      : null;
+
   return {
     id,
     email,
     name,
     role: source.role === "admin" || source.role === "user" ? source.role : undefined,
-    isLicensed: typeof source.isLicensed === "boolean" ? source.isLicensed : undefined,
+    hasAccess: typeof source.hasAccess === "boolean" ? source.hasAccess : undefined,
     isEmailVerified,
     status: source.status === "pending" || source.status === "active" ? source.status : undefined,
-    licenseId: typeof source.licenseId === "string" ? source.licenseId : null,
+    entitlement,
     emailVerified: isEmailVerified,
   };
 };
@@ -413,12 +433,8 @@ export const authService = {
     if (!isValidEmail(email)) {
       throw new Error("Please enter a valid email address.");
     }
-    if (!input.password || input.password.length < 6) {
-      throw new Error("Password must be at least 6 characters.");
-    }
-    const checkBackendHealth = await apiRequest("/health", { method: "GET" });
-    if (!checkBackendHealth || typeof checkBackendHealth !== "object") {
-      throw new Error("Unable to connect to authentication server.");
+    if (!input.password || input.password.length < 8) {
+      throw new Error("Password must be at least 8 characters.");
     }
 
     const payload = await apiRequest<unknown>("/auth/register", {

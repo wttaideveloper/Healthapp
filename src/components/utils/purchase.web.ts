@@ -3,20 +3,30 @@ import { Linking } from "react-native";
 import { apiRequest, getApiRoot } from "./api";
 
 const SUB_STATUS_STORAGE_KEY = "sub_status";
-const LICENSE_STATUS_PATH = process.env.EXPO_PUBLIC_LICENSE_STATUS_PATH ?? "/licenses/me";
-const LICENSE_ACTIVATE_PATH = process.env.EXPO_PUBLIC_LICENSE_ACTIVATE_PATH ?? "/licenses/activate";
+const ENTITLEMENT_STATUS_PATH =
+  process.env.EXPO_PUBLIC_ENTITLEMENT_STATUS_PATH ?? "/entitlements/me";
 const STRIPE_CHECKOUT_PATH =
   process.env.EXPO_PUBLIC_STRIPE_CHECKOUT_PATH ?? "/stripe/checkout";
 const STRIPE_PORTAL_PATH =
   process.env.EXPO_PUBLIC_STRIPE_PORTAL_PATH ?? "/stripe/portal";
-const LICENSE_KEY_REGEX = /^ORG-[A-Z0-9]{6}-[A-Z0-9]{6}-[A-Z0-9]{6}-[A-Z0-9]{6}$/;
 
 export type SubscriptionStatus = {
   isValid: boolean;
   autoRenewing: boolean;
   expiryDate: Date | null;
-  provider?: "enterprise" | "revenuecat" | "stripe" | null;
+  source?: "workspace" | "individual_iap" | "individual_stripe" | null;
+  provider?: "workspace" | "revenuecat" | "stripe" | null;
   providerStatus?: string | null;
+  workspace?: {
+    id: string;
+    name: string;
+    role: "owner" | "admin" | "member";
+    memberStatus: "invited" | "active" | "revoked";
+    plan: string | null;
+    seatLimit: number | null;
+    subscriptionStatus: string | null;
+  } | null;
+  individual?: Record<string, unknown> | null;
 };
 
 export type RevenueCatPackageSummary = {
@@ -34,42 +44,57 @@ const normalizeBackendStatus = (payload: unknown): SubscriptionStatus | null => 
     return null;
   }
 
-  const source = payload as Record<string, unknown>;
+  const rawSource = payload as Record<string, unknown>;
   const nested =
-    source.data && typeof source.data === "object"
-      ? (source.data as Record<string, unknown>)
+    rawSource.data && typeof rawSource.data === "object"
+      ? (rawSource.data as Record<string, unknown>)
       : null;
-  const target = nested ?? source;
+  const target = nested ?? rawSource;
 
   const isValidRaw =
-    target.isLicensed ??
+    target.hasAccess ??
     target.isSubscribed ??
     target.isValid ??
     target.subscribed ??
-    target.premium ??
-    target.activated ??
-    (target.license && typeof target.license === "object"
-      ? (target.license as any).isActive
-      : undefined);
+    target.premium;
 
   const expiryRaw =
-    target.expiryDate ??
     target.expiresAt ??
-    target.expirationDate ??
-    target.licenseExpiry ??
-    (target.license && typeof target.license === "object"
-      ? (target.license as any).expiresAt
-      : undefined);
+    target.expiryDate ??
+    target.expirationDate;
+
+  const entitlementSource =
+    target.source === "workspace" ||
+    target.source === "individual_iap" ||
+    target.source === "individual_stripe"
+      ? target.source
+      : null;
+  const workspace =
+    target.workspace && typeof target.workspace === "object"
+      ? (target.workspace as SubscriptionStatus["workspace"])
+      : null;
+  const individual =
+    target.individual && typeof target.individual === "object"
+      ? (target.individual as Record<string, unknown>)
+      : null;
+  const provider =
+    entitlementSource === "workspace"
+      ? "workspace"
+      : entitlementSource === "individual_iap"
+        ? "revenuecat"
+        : entitlementSource === "individual_stripe"
+          ? "stripe"
+          : null;
 
   return {
     isValid: Boolean(isValidRaw),
     autoRenewing: Boolean(target.autoRenewing ?? target.willRenew ?? false),
     expiryDate: typeof expiryRaw === "string" ? new Date(expiryRaw) : null,
-    provider:
-      target.provider === "enterprise" || target.provider === "revenuecat" || target.provider === "stripe"
-        ? target.provider
-        : null,
+    source: entitlementSource,
+    provider,
     providerStatus: typeof target.providerStatus === "string" ? target.providerStatus : null,
+    workspace,
+    individual,
   };
 };
 
@@ -98,12 +123,22 @@ export const verifySubscriptionStatusSafe = async (): Promise<SubscriptionStatus
       isValid?: boolean;
       autoRenewing?: boolean;
       expiryDate?: string | null;
+      source?: SubscriptionStatus["source"];
+      provider?: SubscriptionStatus["provider"];
+      providerStatus?: string | null;
+      workspace?: SubscriptionStatus["workspace"];
+      individual?: SubscriptionStatus["individual"];
     };
 
     return {
       isValid: Boolean(parsed.isValid),
-      autoRenewing: false,
+      autoRenewing: Boolean(parsed.autoRenewing),
       expiryDate: parsed.expiryDate ? new Date(parsed.expiryDate) : null,
+      source: parsed.source ?? null,
+      provider: parsed.provider ?? null,
+      providerStatus: parsed.providerStatus ?? null,
+      workspace: parsed.workspace ?? null,
+      individual: parsed.individual ?? null,
     };
   } catch {
     return { isValid: false, autoRenewing: false, expiryDate: null };
@@ -119,7 +154,7 @@ export const verifySubscriptionStatusBackend = async (
     }
 
     const payload = await apiRequest<unknown>(
-      LICENSE_STATUS_PATH,
+      ENTITLEMENT_STATUS_PATH,
       { method: "GET" },
       accessToken
     );
@@ -134,48 +169,6 @@ export const verifySubscriptionStatusBackend = async (
   } catch {
     return null;
   }
-};
-
-export const activateLicenseKey = async (
-  accessToken: string,
-  licenseKey: string
-): Promise<SubscriptionStatus> => {
-  if (!getApiRoot() || !accessToken) {
-    throw new Error("Missing API base URL or access token");
-  }
-
-  const normalizedKey = licenseKey.trim().toUpperCase();
-  if (!normalizedKey) {
-    throw new Error("License key is required");
-  }
-  if (!LICENSE_KEY_REGEX.test(normalizedKey)) {
-    throw new Error("Invalid license key format. Expected ORG-XXXXXX-XXXXXX-XXXXXX-XXXXXX");
-  }
-
-  const deviceIdKey = "device_id";
-  const existing = await AsyncStorage.getItem(deviceIdKey);
-  const deviceId =
-    existing ?? `device_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
-  if (!existing) {
-    await AsyncStorage.setItem(deviceIdKey, deviceId);
-  }
-
-  const payload = await apiRequest<unknown>(
-    LICENSE_ACTIVATE_PATH,
-    {
-      method: "POST",
-      body: JSON.stringify({ licenseKey: normalizedKey, deviceId, platform: "web" }),
-    },
-    accessToken
-  );
-
-  const status = normalizeBackendStatus(payload);
-  if (!status) {
-    throw new Error("Invalid license response from server");
-  }
-
-  await AsyncStorage.setItem(SUB_STATUS_STORAGE_KEY, JSON.stringify(status));
-  return status;
 };
 
 export const clearCachedSubscriptionStatus = async (): Promise<void> => {
@@ -207,35 +200,10 @@ export const cancelSubscription = async (): Promise<void> => {
 };
 
 export const startStripeCheckout = async (accessToken?: string | null): Promise<void> => {
-  const apiRoot = getApiRoot();
-  if (!apiRoot) {
-    throw new Error("Missing EXPO_PUBLIC_API_BASE_URL");
-  }
-
-  const response = await fetch(`${apiRoot}${STRIPE_CHECKOUT_PATH}`, {
+  const payload = await apiRequest<unknown>(STRIPE_CHECKOUT_PATH, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-    },
     body: JSON.stringify({}),
-  });
-
-  let payload: unknown = null;
-  try {
-    payload = await response.json();
-  } catch {
-    payload = null;
-  }
-
-  if (!response.ok) {
-    const source = payload as Record<string, unknown> | null;
-    const message =
-      source && typeof source.message === "string"
-        ? source.message
-        : "Unable to start checkout";
-    throw new Error(message);
-  }
+  }, accessToken);
 
   const url =
     payload && typeof payload === "object" && "url" in payload && typeof (payload as any).url === "string"
@@ -255,35 +223,10 @@ export const startStripeCheckout = async (accessToken?: string | null): Promise<
 };
 
 export const startStripePortal = async (accessToken?: string | null): Promise<void> => {
-  const apiRoot = getApiRoot();
-  if (!apiRoot) {
-    throw new Error("Missing EXPO_PUBLIC_API_BASE_URL");
-  }
-
-  const response = await fetch(`${apiRoot}${STRIPE_PORTAL_PATH}`, {
+  const payload = await apiRequest<unknown>(STRIPE_PORTAL_PATH, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-    },
     body: JSON.stringify({}),
-  });
-
-  let payload: unknown = null;
-  try {
-    payload = await response.json();
-  } catch {
-    payload = null;
-  }
-
-  if (!response.ok) {
-    const source = payload as Record<string, unknown> | null;
-    const message =
-      source && typeof source.message === "string"
-        ? source.message
-        : "Unable to open billing portal";
-    throw new Error(message);
-  }
+  }, accessToken);
 
   const url =
     payload && typeof payload === "object" && "url" in payload && typeof (payload as any).url === "string"

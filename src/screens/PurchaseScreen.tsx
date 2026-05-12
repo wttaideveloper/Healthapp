@@ -4,10 +4,10 @@ import {
   StyleSheet,
   ActivityIndicator,
   Alert,
+  Linking,
   Platform,
   Text,
   TouchableOpacity,
-  TextInput,
   ScrollView,
 } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
@@ -18,27 +18,22 @@ import Font from "../components/CustomisedFont";
 import { useSubscription } from "../context/subScriptionContext";
 import { useAuth } from "../context/authContext";
 import {
-  activateLicenseKey,
   cancelSubscription,
   getRevenueCatConfigurationError,
   getSubscriptions,
   getSubscriptionSummaries,
   initIAP,
   purchaseSubscription,
-  restorePurchases,
   startStripeCheckout,
   startStripePortal,
   syncRevenueCatStatusToBackend,
   verifySubscriptionStatusRevenueCat,
   type RevenueCatPackageSummary,
 } from "../components/utils/purchase";
+import { PRIVACY_POLICY_URL, TERMS_OF_USE_URL } from "../components/utils/legal";
 
-const TERMS_OF_USE_URL = "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/";
-const PRIVACY_POLICY_URL = "https://www.apple.com/legal/privacy/";
 const FALLBACK_PLAN_PRICE = "$49/year";
 const FALLBACK_PLAN_DESCRIPTION = "Annual Pro subscription";
-const LICENSE_KEY_FORMAT = "ORG-******-******-******-******";
-const LICENSE_KEY_REGEX = /^ORG-[A-Z0-9]{6}-[A-Z0-9]{6}-[A-Z0-9]{6}-[A-Z0-9]{6}$/;
 
 const formatDate = (value: Date | null): string | null => {
   if (!value) return null;
@@ -58,20 +53,19 @@ const PurchaseScreen: React.FC = () => {
     expiryDate,
     subscriptionSource,
     providerStatus,
+    workspace,
     refreshSubscription,
     setDebugSubscriptionOverride,
     debugSubscriptionOverride,
   } = useSubscription();
   const { accessToken, user } = useAuth();
 
-  const [licenseKey, setLicenseKey] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [availablePlans, setAvailablePlans] = useState<RevenueCatPackageSummary[]>([]);
   const [selectedPackageIdentifier, setSelectedPackageIdentifier] = useState<string | null>(null);
   const [storeError, setStoreError] = useState<string | null>(null);
   const [webNotice, setWebNotice] = useState<string | null>(null);
-  const [licenseError, setLicenseError] = useState<string | null>(null);
 
   const promptSignIn = React.useCallback((message: string) => {
     Alert.alert("Sign in required", message, [
@@ -82,6 +76,14 @@ const PurchaseScreen: React.FC = () => {
       },
     ]);
   }, [navigation]);
+
+  const openExternalUrl = React.useCallback(async (url: string) => {
+    try {
+      await Linking.openURL(url);
+    } catch {
+      Alert.alert("Unable to open link", url);
+    }
+  }, []);
 
   const isInitialMount = React.useRef(true);
   const refreshInFlight = React.useRef(false);
@@ -223,60 +225,6 @@ const PurchaseScreen: React.FC = () => {
     }, [loadNativePlanOptions])
   );
 
-  const handleActivateLicense = async () => {
-    if (!accessToken) {
-      promptSignIn("Please sign in before activating a license key.");
-      return;
-    }
-
-    const normalizedKey = licenseKey.trim().toUpperCase().replace(/[^A-Z0-9-]/g, "");
-    setLicenseKey(normalizedKey);
-
-    if (!normalizedKey) {
-      const message = "Please enter your license key.";
-      setLicenseError(message);
-      Alert.alert("Missing key", message);
-      return;
-    }
-
-    if (!LICENSE_KEY_REGEX.test(normalizedKey)) {
-      const message = `Invalid license key format. Use ${LICENSE_KEY_FORMAT}`;
-      setLicenseError(message);
-      Alert.alert("Invalid format", message);
-      return;
-    }
-
-    setActionLoading(true);
-    try {
-      await setDebugSubscriptionOverride(null);
-      setLicenseError(null);
-      const status = await activateLicenseKey(accessToken, normalizedKey);
-      await refreshSubscription(true);
-      if (!status.isValid) {
-        const statusText =
-          status.providerStatus && status.providerStatus.trim()
-            ? ` (status: ${status.providerStatus})`
-            : "";
-        const message = `License key was submitted but is not active${statusText}.`;
-        setLicenseError(message);
-        Alert.alert("Activation pending", message);
-        return;
-      }
-      Alert.alert("License activated", "Pro features are now enabled.");
-      setLicenseKey("");
-    } catch (error) {
-      const rawMessage = error instanceof Error ? error.message : "Unable to activate license";
-      const message =
-        /max.*activation|activation.*limit|device.*limit/i.test(rawMessage)
-          ? "This license key has reached its maximum activation limit. Please contact your admin."
-          : rawMessage;
-      setLicenseError(message);
-      Alert.alert("Activation failed", message);
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
   const handleDevSubscriptionToggle = async () => {
     if (!__DEV__ || actionLoading) return;
 
@@ -315,7 +263,7 @@ const PurchaseScreen: React.FC = () => {
       if (existingStoreStatus?.isValid) {
         Alert.alert(
           "Already subscribed on this Apple ID",
-          "This Apple ID already has an active subscription. Use Restore Purchases to link it to this account."
+          "This Apple ID already has an active subscription. Please sign in with the account linked to this purchase."
         );
         return;
       }
@@ -327,37 +275,6 @@ const PurchaseScreen: React.FC = () => {
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unable to subscribe";
       Alert.alert("Subscription failed", message);
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  const handleRestore = async () => {
-    if (actionLoading) return;
-    if (!accessToken) {
-      promptSignIn("Please sign in before restoring purchases.");
-      return;
-    }
-
-    setActionLoading(true);
-    try {
-      await setDebugSubscriptionOverride(null);
-      const restored = await restorePurchases();
-      await syncRevenueCatStatusToBackend(accessToken, user?.id ?? null);
-      await refreshSubscription(true);
-
-      if (restored?.isValid) {
-        const expiryLabel = formatDate(restored.expiryDate);
-        Alert.alert(
-          "Restore complete",
-          expiryLabel ? `Subscription restored until ${expiryLabel}.` : "Subscription restored successfully."
-        );
-      } else {
-        Alert.alert("Restore complete", "No active subscription was found to restore.");
-      }
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Unable to restore purchases";
-      Alert.alert("Restore failed", message);
     } finally {
       setActionLoading(false);
     }
@@ -430,13 +347,15 @@ const PurchaseScreen: React.FC = () => {
   const showPlanOptions = Platform.OS !== "web" && __DEV__;
   const sourceLabel =
     subscriptionSource === "iap"
-      ? "In-app purchase (RevenueCat)"
+      ? "In-app purchase"
       : subscriptionSource === "stripe"
-        ? "Stripe subscription"
-        : subscriptionSource === "enterprise"
-          ? "Enterprise license key"
+        ? Platform.OS === "web"
+          ? "Stripe subscription"
+          : "Individual account access"
+        : subscriptionSource === "workspace"
+          ? "Workspace access"
           : subscriptionSource === "mixed"
-            ? "RevenueCat + backend license sync"
+            ? "Store purchase + backend entitlement sync"
             : "Not active";
   const canOpenStripeBilling =
     Platform.OS === "web" &&
@@ -447,11 +366,15 @@ const PurchaseScreen: React.FC = () => {
     isSubscribed &&
     !autoRenewing &&
     Boolean(expiryLabel);
+  const isWorkspaceAccess = subscriptionSource === "workspace";
+  const isStoreManagedAccess = subscriptionSource === "iap" || subscriptionSource === "mixed";
   const statusMessage = stripeCancelAtPeriodEnd
     ? `Your subscription is scheduled to end on ${expiryLabel}.`
-    : autoRenewing
-      ? `Subscription is active${expiryLabel ? ` until ${expiryLabel}` : ""}.`
-      : `Premium access is active${expiryLabel ? ` until ${expiryLabel}` : ""}.`;
+    : isWorkspaceAccess
+      ? `${workspace?.name ?? "Your workspace"} provides your Pro access.`
+      : autoRenewing
+        ? `Subscription is active${expiryLabel ? ` until ${expiryLabel}` : ""}.`
+        : `Premium access is active${expiryLabel ? ` until ${expiryLabel}` : ""}.`;
 
   const webContentWidthStyle = Platform.OS === "web" ? styles.webContentWidth : null;
   const isNativeMobile = Platform.OS !== "web";
@@ -475,15 +398,13 @@ const PurchaseScreen: React.FC = () => {
               Access source: {sourceLabel}
               {providerStatus ? `   |   Provider status: ${providerStatus}` : ""}
             </Text>
-            {Platform.OS !== "web" ? (
+            {workspace ? (
+              <Text style={styles.workspaceMetaText}>
+                Workspace: {workspace.name} ({workspace.role}, {workspace.memberStatus})
+              </Text>
+            ) : null}
+            {Platform.OS !== "web" && isStoreManagedAccess ? (
               <>
-                <Button
-                  type="intro"
-                  style={{ padding: 10, marginTop: 12 }}
-                  title="Restore Purchases"
-                  onPress={handleRestore}
-                  disabled={actionLoading}
-                />
                 <Button
                   type="intro"
                   style={{ padding: 10, marginTop: 12 }}
@@ -504,9 +425,9 @@ const PurchaseScreen: React.FC = () => {
         ) : (
           <View
             style={[
-              styles.licenseCard,
+              styles.accessCard,
               webContentWidthStyle,
-              isNativeMobile ? styles.licenseCardMobile : null,
+              isNativeMobile ? styles.accessCardMobile : null,
             ]}
           >
             {webNotice ? (
@@ -514,10 +435,10 @@ const PurchaseScreen: React.FC = () => {
                 <Text style={styles.noticeText}>{webNotice}</Text>
               </View>
             ) : null}
-            <Text style={styles.licenseTitle}>Health Age Pro</Text>
-            <Text style={styles.licenseSubtitle}>
-              Subscribe yearly for full premium access. If you were given a manual license key from your admin panel,
-              you can activate it below instead of purchasing.
+            <Text style={styles.accessTitle}>Health Age Pro</Text>
+            <Text style={styles.accessSubtitle}>
+              Subscribe yearly for individual Pro access. Workspace access is applied automatically when your
+              organization invites the email address you use to sign in.
             </Text>
 
             {Platform.OS !== "web" && storeError ? (
@@ -572,73 +493,16 @@ const PurchaseScreen: React.FC = () => {
               </View>
             ) : null} */}
 
-            <TextInput
-              style={[styles.licenseInput, licenseError ? styles.licenseInputError : null]}
-              value={licenseKey}
-              onChangeText={(value) => {
-                const normalized = value.toUpperCase().replace(/[^A-Z0-9-]/g, "");
-                setLicenseKey(normalized);
-                if (licenseError) {
-                  setLicenseError(null);
-                }
-              }}
-              placeholder={`Enter license key (${LICENSE_KEY_FORMAT})`}
-              placeholderTextColor="#8b909b"
-              autoCapitalize="characters"
-              autoCorrect={false}
-              autoComplete="off"
-              maxLength={31}
+            <Button
+              type="intro"
+              style={styles.actionButton}
+              title="Subscribe"
+              onPress={handleSubscribe}
+              disabled={actionLoading}
             />
-            {licenseError ? <Text style={styles.licenseErrorText}>{licenseError}</Text> : null}
-            {Platform.OS === "web" ? (
-              <View style={styles.webActionRow}>
-                <View style={styles.webActionItem}>
-                  <Button
-                    style={styles.webActionButton}
-                    title={actionLoading ? "Activating..." : "Activate License"}
-                    onPress={handleActivateLicense}
-                    disabled={actionLoading}
-                  />
-                </View>
-                <View style={styles.webActionItem}>
-                  <Button
-                    style={styles.webActionButton}
-                    title="Subscribe"
-                    onPress={handleSubscribe}
-                    disabled={actionLoading}
-                  />
-                </View>
-              </View>
-            ) : (
-              <>
-                <Button
-                  type="intro"
-                  style={styles.actionButton}
-                  title={actionLoading ? "Activating..." : "Activate License"}
-                  onPress={handleActivateLicense}
-                  disabled={actionLoading}
-                />
-
-                <Text style={styles.orText}>or</Text>
-                <Button
-                  type="intro"
-                  style={styles.actionButtonSecondary}
-                  title="Subscribe"
-                  onPress={handleSubscribe}
-                  disabled={actionLoading}
-                />
-              </>
-            )}
 
             {Platform.OS !== "web" ? (
               <>
-                <Button
-                  type="intro"
-                  style={{ marginTop: 20 }}
-                  title="Restore Purchases"
-                  onPress={handleRestore}
-                  disabled={actionLoading}
-                />
                 <TouchableOpacity
                   style={{ marginTop: 10, alignItems: "center" }}
                   onPress={handleManageSubscription}
@@ -657,25 +521,29 @@ const PurchaseScreen: React.FC = () => {
               </TouchableOpacity>
             ) : null}
 
-            <TouchableOpacity
-              style={{ marginTop: 10, alignItems: "center" }}
-              onPress={handleManualStatusRefresh}
-              disabled={actionLoading}
-            >
-              <Text style={styles.refreshText}>I already have a license, refresh status</Text>
-            </TouchableOpacity>
           </View>
         )}
 
         <View style={styles.legalSection}>
           <Text style={styles.disclosureText}>
-            Premium access is tied to your signed-in account. Native apps use store subscriptions through RevenueCat.
+            {Platform.OS === "web"
+              ? "Health Age Pro web subscriptions are processed by Stripe Checkout and can be managed from the billing portal."
+              : `Health Age Pro is an auto-renewable annual subscription. Payment is charged through your ${Platform.OS === "ios" ? "Apple App Store" : "Google Play"} account.`}
           </Text>
-          <Text style={styles.disclosureText}>
-            Web checkout uses Stripe. Admin-issued license keys can also unlock premium access.
-          </Text>
-          <Text style={styles.disclosureText}>Terms: {TERMS_OF_USE_URL}</Text>
-          <Text style={styles.disclosureText}>Privacy: {PRIVACY_POLICY_URL}</Text>
+          {Platform.OS !== "web" ? (
+            <Text style={styles.disclosureText}>
+              The subscription renews automatically unless canceled at least 24 hours before the current period ends.
+            </Text>
+          ) : null}
+          <View style={styles.legalLinkRow}>
+            <TouchableOpacity onPress={() => openExternalUrl(TERMS_OF_USE_URL)}>
+              <Text style={styles.legalLink}>Terms of Use</Text>
+            </TouchableOpacity>
+            <Text style={styles.legalDivider}> • </Text>
+            <TouchableOpacity onPress={() => openExternalUrl(PRIVACY_POLICY_URL)}>
+              <Text style={styles.legalLink}>Privacy Policy</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {__DEV__ ? (
@@ -730,7 +598,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 12,
   },
-  licenseCard: {
+  accessCard: {
     backgroundColor: "#F8FAFB",
     borderRadius: 24,
     padding: 24,
@@ -738,7 +606,7 @@ const styles = StyleSheet.create({
     borderColor: "#EAECF1",
     marginTop: 8,
   },
-  licenseCardMobile: {
+  accessCardMobile: {
     backgroundColor: "transparent",
     borderWidth: 0,
     borderColor: "transparent",
@@ -747,8 +615,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     marginTop: 0,
   },
-  licenseTitle: { color: "#274273", fontWeight: "700", fontSize: 20 },
-  licenseSubtitle: { color: "#274273", fontSize: 14, marginTop: 8, marginBottom: 12 },
+  accessTitle: { color: "#274273", fontWeight: "700", fontSize: 20 },
+  accessSubtitle: { color: "#274273", fontSize: 14, marginTop: 8, marginBottom: 12 },
   planCard: {
     borderWidth: 1,
     borderColor: "#E5DCC7",
@@ -793,6 +661,37 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     marginTop: 6,
   },
+  organizationAccessBox: {
+    marginTop: 18,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: "#E6ECF2",
+  },
+  organizationAccessQuestion: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 10,
+  },
+  organizationAccessQuestionText: {
+    color: "#274273",
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  organizationAccessChevron: {
+    color: "#64748B",
+    fontSize: 12,
+    fontWeight: "700",
+  },
+  organizationAccessPanel: {
+    paddingTop: 2,
+  },
+  organizationAccessText: {
+    color: "#64748B",
+    fontSize: 12,
+    lineHeight: 17,
+    marginBottom: 10,
+  },
   noticeCard: {
     borderWidth: 1,
     borderColor: "#C9E3FF",
@@ -836,31 +735,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
     fontSize: 13,
   },
-  licenseInput: {
-    borderWidth: 1,
-    borderColor: "#d8deea",
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    color: "#111827",
-    backgroundColor: "#fbfcfe",
-  },
-  licenseInputError: {
-    borderColor: "#DC2626",
-  },
-  licenseErrorText: {
-    alignSelf: "flex-start",
-    marginTop: 6,
-    color: "#B42318",
-    fontSize: 13,
-    fontWeight: "500",
-  },
-  licenseHintText: {
-    alignSelf: "flex-start",
-    marginTop: 4,
-    color: "#64748B",
-    fontSize: 12,
-  },
   refreshText: {
     color: "#1663d6",
     textDecorationLine: "underline",
@@ -886,6 +760,21 @@ const styles = StyleSheet.create({
     color: "#7D8699",
     fontSize: 11,
     lineHeight: 16,
+  },
+  legalLinkRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 8,
+  },
+  legalLink: {
+    color: "#1663d6",
+    fontSize: 12,
+    fontWeight: "600",
+    textDecorationLine: "underline",
+  },
+  legalDivider: {
+    color: "#7D8699",
+    marginHorizontal: 6,
   },
   proBadgeCard: {
     borderRadius: 20,
@@ -924,6 +813,14 @@ const styles = StyleSheet.create({
     color: "#315E99",
     fontWeight: "600",
     fontSize: 12,
+    textAlign: "left",
+    width: "100%",
+  },
+  workspaceMetaText: {
+    marginTop: 8,
+    color: "#315E99",
+    fontSize: 12,
+    fontWeight: "600",
     textAlign: "left",
     width: "100%",
   },

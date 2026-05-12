@@ -18,7 +18,7 @@ const CheckoutResultScreen: React.FC<Props> = ({ navigation, route }) => {
         <Text style={styles.title}>{success ? "Checkout completed" : "Checkout was canceled"}</Text>
         <Text style={styles.subtitle}>
           {success
-            ? "Your payment was received. We are verifying your license status now."
+            ? "Your payment was received. We are verifying your access status now."
             : "No charge was made. You can continue using the app or try checkout again."}
         </Text>
 

@@ -4,6 +4,8 @@ type ApiErrorPayload = {
     message?: string;
     details?: unknown | null;
   };
+  code?: string;
+  message?: string;
 };
 
 const rawBase = (process.env.EXPO_PUBLIC_API_BASE_URL ?? "").trim();
@@ -61,7 +63,9 @@ export const apiRequest = async <T>(
   if (!res.ok) {
     const msg =
       (payload as ApiErrorPayload | null)?.error?.message ??
-      (typeof (payload as any)?.message === "string" ? (payload as any).message : null) ??
+      (typeof (payload as ApiErrorPayload | null)?.message === "string"
+        ? (payload as ApiErrorPayload).message
+        : null) ??
       `Request failed (${res.status})`;
     throw new Error(msg);
   }

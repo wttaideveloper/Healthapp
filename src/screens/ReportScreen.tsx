@@ -31,6 +31,8 @@ import { CommonActions, useFocusEffect } from "@react-navigation/native";
 import { useAuth } from "../context/authContext";
 import { getApiRoot } from "../components/utils/api";
 import { deleteReports } from "../components/utils/reportService";
+import { MEDICAL_DISCLAIMER_TEXT, PRIVACY_POLICY_URL, TERMS_OF_USE_URL } from "../components/utils/legal";
+import { CORE_MEDICAL_SOURCES, REPORT_SOURCE_BY_TOPIC } from "../components/utils/medicalSources";
 
 type ReportScreenProps = DrawerScreenProps<DrawerParamList, "ReportScreen">;
 
@@ -41,13 +43,6 @@ type HealthTip = {
   citations_link: string;
 }
 
-const MEDICAL_DISCLAIMER_TEXT =
-  "This report is for educational wellness purposes only and is not medical advice, diagnosis, or treatment. Consult a qualified healthcare professional before making medical decisions.";
-
-const TERMS_OF_USE_URL =
-  "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/";
-const PRIVACY_POLICY_URL =
-  "https://example.com/privacy-policy";
 const REPORT_PDF_PATH = process.env.EXPO_PUBLIC_REPORT_PDF_PATH ?? "/reports/pdf";
 
 const healthTips = [
@@ -55,82 +50,82 @@ const healthTips = [
     id: 1,
     title: "Rs_1_title",
     description: "Rs_1_desc",
-    citations_link: "https://www.webmd.com/food-recipes/breakfast-lose-weight"
+    citations_link: REPORT_SOURCE_BY_TOPIC.breakfast
   },
   {
     id: 2,
     title: "Rs_2_title",
     description: "Rs_2_desc",
-    citations_link: "https://pubmed.ncbi.nlm.nih.gov/34144310/"
+    citations_link: REPORT_SOURCE_BY_TOPIC.snacking
   },
   {
     id: 3,
     title: "Rs_3_title",
     description: "Rs_3_desc",
-    citations_link: "https://nutritionsource.hsph.harvard.edu/what-should-you-eat/vegetables-and-fruits/"
+    citations_link: REPORT_SOURCE_BY_TOPIC.fruitsVegetables
 
   },
   {
     id: 4,
     title: "Rs_4_title",
     description: "Rs_4_desc",
-    citations_link: "https://www.mayoclinic.org/healthy-lifestyle/nutrition-and-healthy-eating/in-depth/whole-grains/art-20047826"
+    citations_link: REPORT_SOURCE_BY_TOPIC.wholeGrains
 
   },
   {
     id: 5,
     title: "Rs_5_title",
     description: "Rs_5_desc",
-    citations_link: "https://adventisthealthstudy.org/studies/AHS-1/findings-nuts"
+    citations_link: REPORT_SOURCE_BY_TOPIC.nuts
 
   },
   {
     id: 6,
     title: "Rs_6_title",
     description: "Rs_6_desc",
-    citations_link: "https://www.health.harvard.edu/staying-healthy/whats-the-beef-with-red-meat"
+    citations_link: REPORT_SOURCE_BY_TOPIC.redMeat
 
   },
   {
     id: 7,
     title: "Rs_7_title",
     description: "Rs_7_desc",
-    citations_link: "https://www.mayoclinic.org/healthy-lifestyle/fitness/in-depth/exercise/art-20048389"
+    citations_link: REPORT_SOURCE_BY_TOPIC.exercise
 
   },
   {
     id: 8,
     title: "Rs_8_title",
     description: "Rs_8_desc",
-    citations_link: "https://www.nhlbi.nih.gov/health/educational/lose_wt/index.htm"
+    citations_link: REPORT_SOURCE_BY_TOPIC.weight
 
   },
   {
     id: 9,
     title: "Rs_9_title",
     description: "Rs_9_desc",
-    citations_link: "https://www.nhlbi.nih.gov/health/sleep/why-sleep-important"
+    citations_link: REPORT_SOURCE_BY_TOPIC.sleep
 
   },
   {
     id: 10,
     title: "Rs_10_title",
     description: "Rs_10_desc",
-    citations_link: "https://www.cdc.gov/tobacco/about/benefits-of-quitting.html"
+    citations_link: REPORT_SOURCE_BY_TOPIC.tobacco
 
   },
   {
     id: 11,
     title: "Rs_11_title",
     description: "Rs_11_desc",
-    citations_link: "https://www.who.int/europe/news/item/04-01-2023-no-level-of-alcohol-consumption-is-safe-for-our-health"
+    citations_link: REPORT_SOURCE_BY_TOPIC.alcohol
 
   },
   {
     id: 12,
     title: "Rs_12_title",
     description: "Rs_12_desc",
-    citations_link: "https://hsph.harvard.edu/news/more-spirituality-in-health-system-could-boost-health-well-being/"
+    citations_link: REPORT_SOURCE_BY_TOPIC.spirituality
   },
 ];
 const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
@@ -292,7 +287,7 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
         bloodGlucoseStatus == "low"
           ? "maintainLowBloodGlucoseDesc"
           : "maintainHighBloodGlucoseDesc",
-      citations_link: "https://www.heart.org/en/healthy-living/healthy-lifestyle/lifes-essential-8/how-to-manage-blood-sugar-fact-sheet"
+      citations_link: REPORT_SOURCE_BY_TOPIC.bloodGlucose
 
     },
     {
@@ -302,7 +297,7 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
         bloodPressureStatus == "low"
           ? "maintainLowBloodPressureDesc"
           : "maintainHighBloodPressureDesc",
-      citations_link: "https://www.heart.org/en/health-topics/high-blood-pressure/changes-you-can-make-to-manage-high-blood-pressure"
+      citations_link: REPORT_SOURCE_BY_TOPIC.bloodPressure
 
     },
   ];
@@ -347,6 +342,16 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
   `
     )
     .join("");
+
+  const generateCoreSourcesHTML = CORE_MEDICAL_SOURCES.map(
+    (source) => `
+      <li>
+        <strong>${source.title}</strong><br>
+        ${source.description}<br>
+        <a href="${source.url}" style="font-size:12px;color:#0B9FD5;">${source.url}</a>
+      </li>
+    `
+  ).join("");
 
   const reportHtml = `
     <html lang="en">
@@ -467,6 +472,22 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
               border-radius: 8px;
               padding: 10px;
             }
+            .sources {
+              margin-top: 16px;
+              padding: 12px;
+              border-radius: 8px;
+              background: #f4fafd;
+              border: 1px solid #d7ecf5;
+              font-size: 12px;
+              color: #194959;
+            }
+            .sources h3 {
+              margin: 0 0 8px;
+              font-size: 14px;
+            }
+            .sources li {
+              margin-bottom: 8px;
+            }
         </style>
     </head>
     <body>
@@ -494,6 +515,10 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
           ${generateRecommendationsHTML}
         </div>
         <div class="disclaimer">${MEDICAL_DISCLAIMER_TEXT}</div>
+        <div class="sources">
+          <h3>Medical Sources</h3>
+          <ul>${generateCoreSourcesHTML}</ul>
+        </div>
       </div>
     </body>
     </html>
@@ -848,6 +873,20 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
           <Text style={styles.disclaimerTitle}>Medical Disclaimer</Text>
           <Text style={styles.disclaimerText}>{MEDICAL_DISCLAIMER_TEXT}</Text>
         </View>
+        <View style={styles.sourcesCard}>
+          <Text style={styles.sourcesTitle}>Medical Sources</Text>
+          {CORE_MEDICAL_SOURCES.map((source) => (
+            <TouchableOpacity
+              key={source.url}
+              style={styles.sourceItem}
+              onPress={() => openExternalUrl(source.url)}
+            >
+              <Text style={styles.sourceTitle}>{source.title}</Text>
+              <Text style={styles.sourceDescription}>{source.description}</Text>
+              <Text style={styles.sourceUrl}>{source.url}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
         <View style={styles.recommendations}>
           <Font text="Rs_Recommendations" style={styles.sectionTitle}></Font>
           {recommendations.length > 0 ? (
@@ -885,7 +924,7 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
         </View>
         <View style={styles.legalSection}>
           <Text style={styles.disclosureText}>
-            One-time purchase for lifetime access. No recurring charges or auto-renewals.
+            Health Age Pro is an auto-renewable subscription. Manage or cancel it from your App Store account settings.
           </Text>
           <View style={styles.linkRow}>
             <TouchableOpacity onPress={() => openExternalUrl(TERMS_OF_USE_URL)}>
@@ -1034,6 +1073,42 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 19,
     color: "#7A1A1A",
+  },
+  sourcesCard: {
+    marginTop: 14,
+    backgroundColor: "#F4FAFD",
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: "#D7ECF5",
+  },
+  sourcesTitle: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#194959",
+    marginBottom: 6,
+  },
+  sourceItem: {
+    paddingVertical: 8,
+    borderTopWidth: 1,
+    borderTopColor: "#D7ECF5",
+  },
+  sourceTitle: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#194959",
+  },
+  sourceDescription: {
+    marginTop: 3,
+    fontSize: 12,
+    lineHeight: 17,
+    color: "#3E5964",
+  },
+  sourceUrl: {
+    marginTop: 4,
+    color: "#0B85B4",
+    fontSize: 11,
+    textDecorationLine: "underline",
   },
   sectionTitle: {
     fontSize: 16,

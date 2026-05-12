@@ -4,12 +4,14 @@ import type { CustomerInfo, PurchasesPackage } from "react-native-purchases";
 import { apiRequest, getApiRoot } from "./api";
 
 const SUB_STATUS_STORAGE_KEY = "sub_status";
-const LICENSE_STATUS_PATH =
-  process.env.EXPO_PUBLIC_LICENSE_STATUS_PATH ?? "/licenses/me";
-const LICENSE_ACTIVATE_PATH =
-  process.env.EXPO_PUBLIC_LICENSE_ACTIVATE_PATH ?? "/licenses/activate";
+const ENTITLEMENT_STATUS_PATH =
+  process.env.EXPO_PUBLIC_ENTITLEMENT_STATUS_PATH ?? "/entitlements/me";
 const REVENUECAT_SYNC_PATH =
-  (process.env.EXPO_PUBLIC_REVENUECAT_SYNC_PATH ?? "").trim();
+  (
+    process.env.EXPO_PUBLIC_ENTITLEMENT_REVENUECAT_SYNC_PATH ??
+    process.env.EXPO_PUBLIC_REVENUECAT_SYNC_PATH ??
+    "/entitlements/revenuecat/sync"
+  ).trim();
 
 const REVENUECAT_IOS_API_KEY =
   (process.env.EXPO_PUBLIC_REVENUECAT_IOS_API_KEY ?? "").trim();
@@ -25,7 +27,6 @@ const REVENUECAT_PRODUCT_IDS = (process.env.EXPO_PUBLIC_REVENUECAT_PRODUCT_IDS ?
   .split(",")
   .map((value) => value.trim())
   .filter(Boolean);
-const LICENSE_KEY_REGEX = /^ORG-[A-Z0-9]{6}-[A-Z0-9]{6}-[A-Z0-9]{6}-[A-Z0-9]{6}$/;
 
 type RevenueCatRuntimeConfig = {
   iosApiKey: string;
@@ -51,8 +52,19 @@ export type SubscriptionStatus = {
   isValid: boolean;
   autoRenewing: boolean;
   expiryDate: Date | null;
-  provider?: "enterprise" | "revenuecat" | "stripe" | null;
+  source?: "workspace" | "individual_iap" | "individual_stripe" | null;
+  provider?: "workspace" | "revenuecat" | "stripe" | null;
   providerStatus?: string | null;
+  workspace?: {
+    id: string;
+    name: string;
+    role: "owner" | "admin" | "member";
+    memberStatus: "invited" | "active" | "revoked";
+    plan: string | null;
+    seatLimit: number | null;
+    subscriptionStatus: string | null;
+  } | null;
+  individual?: Record<string, unknown> | null;
 };
 
 export type RevenueCatPackageSummary = {
@@ -63,15 +75,6 @@ export type RevenueCatPackageSummary = {
   description: string;
   priceString: string;
   billingPeriod: string;
-};
-
-const DEVICE_ID_KEY = "device_id";
-const getOrCreateDeviceId = async (): Promise<string> => {
-  const existing = await AsyncStorage.getItem(DEVICE_ID_KEY);
-  if (existing) return existing;
-  const next = `device_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
-  await AsyncStorage.setItem(DEVICE_ID_KEY, next);
-  return next;
 };
 
 const getRevenueCatConfig = (): RevenueCatRuntimeConfig => ({
@@ -123,42 +126,58 @@ const normalizeBackendStatus = (payload: unknown): SubscriptionStatus | null => 
     return null;
   }
 
-  const source = payload as Record<string, unknown>;
+  const rawSource = payload as Record<string, unknown>;
   const nested =
-    source.data && typeof source.data === "object"
-      ? (source.data as Record<string, unknown>)
+    rawSource.data && typeof rawSource.data === "object"
+      ? (rawSource.data as Record<string, unknown>)
       : null;
-  const target = nested ?? source;
+  const target = nested ?? rawSource;
 
   const isValidRaw =
-    target.isLicensed ??
+    target.hasAccess ??
     target.isSubscribed ??
     target.isValid ??
     target.subscribed ??
-    target.premium ??
-    target.activated ??
-    (target.license && typeof target.license === "object"
-      ? (target.license as any).isActive
-      : undefined);
+    target.premium;
 
   const expiryRaw =
-    target.expiryDate ??
     target.expiresAt ??
-    target.expirationDate ??
-    target.licenseExpiry ??
-    (target.license && typeof target.license === "object"
-      ? (target.license as any).expiresAt
-      : undefined);
+    target.expiryDate ??
+    target.expirationDate;
+
+  const entitlementSource =
+    target.source === "workspace" ||
+    target.source === "individual_iap" ||
+    target.source === "individual_stripe"
+      ? target.source
+      : null;
+  const workspace =
+    target.workspace && typeof target.workspace === "object"
+      ? (target.workspace as SubscriptionStatus["workspace"])
+      : null;
+  const individual =
+    target.individual && typeof target.individual === "object"
+      ? (target.individual as Record<string, unknown>)
+      : null;
+
+  const provider =
+    entitlementSource === "workspace"
+      ? "workspace"
+      : entitlementSource === "individual_iap"
+        ? "revenuecat"
+        : entitlementSource === "individual_stripe"
+          ? "stripe"
+          : null;
 
   return {
     isValid: Boolean(isValidRaw),
     autoRenewing: Boolean(target.autoRenewing ?? target.willRenew ?? false),
     expiryDate: typeof expiryRaw === "string" ? new Date(expiryRaw) : null,
-    provider:
-      target.provider === "enterprise" || target.provider === "revenuecat" || target.provider === "stripe"
-        ? target.provider
-        : null,
+    source: entitlementSource,
+    provider,
     providerStatus: typeof target.providerStatus === "string" ? target.providerStatus : null,
+    workspace,
+    individual,
   };
 };
 
@@ -277,8 +296,11 @@ const statusFromCustomerInfo = (
     isValid: Boolean(entitlement) || activeSubscriptions.length > 0,
     autoRenewing,
     expiryDate,
+    source: "individual_iap",
     provider: "revenuecat",
     providerStatus: Boolean(entitlement) || activeSubscriptions.length > 0 ? "active" : null,
+    workspace: null,
+    individual: null,
   };
 };
 
@@ -399,12 +421,22 @@ export const verifySubscriptionStatusSafe = async (): Promise<SubscriptionStatus
       isValid?: boolean;
       autoRenewing?: boolean;
       expiryDate?: string | null;
+      source?: SubscriptionStatus["source"];
+      provider?: SubscriptionStatus["provider"];
+      providerStatus?: string | null;
+      workspace?: SubscriptionStatus["workspace"];
+      individual?: SubscriptionStatus["individual"];
     };
 
     return {
       isValid: Boolean(parsed.isValid),
-      autoRenewing: false,
+      autoRenewing: Boolean(parsed.autoRenewing),
       expiryDate: parsed.expiryDate ? new Date(parsed.expiryDate) : null,
+      source: parsed.source ?? null,
+      provider: parsed.provider ?? null,
+      providerStatus: parsed.providerStatus ?? null,
+      workspace: parsed.workspace ?? null,
+      individual: parsed.individual ?? null,
     };
   } catch {
     return { isValid: false, autoRenewing: false, expiryDate: null };
@@ -420,7 +452,7 @@ export const verifySubscriptionStatusBackend = async (
     }
 
     const payload = await apiRequest<unknown>(
-      LICENSE_STATUS_PATH,
+      ENTITLEMENT_STATUS_PATH,
       { method: "GET" },
       accessToken
     );
@@ -433,48 +465,9 @@ export const verifySubscriptionStatusBackend = async (
     await AsyncStorage.setItem(SUB_STATUS_STORAGE_KEY, JSON.stringify(status));
     return status;
   } catch (error) {
-    console.error("Backend license status fetch failed:", error);
+    console.error("Backend entitlement status fetch failed:", error);
     return null;
   }
-};
-
-export const activateLicenseKey = async (
-  accessToken: string,
-  licenseKey: string
-): Promise<SubscriptionStatus> => {
-  if (!getApiRoot() || !accessToken) {
-    throw new Error("Missing API base URL or access token");
-  }
-
-  const normalizedKey = licenseKey.trim().toUpperCase();
-  if (!normalizedKey) {
-    throw new Error("License key is required");
-  }
-  if (!LICENSE_KEY_REGEX.test(normalizedKey)) {
-    throw new Error("Invalid license key format. Expected ORG-XXXXXX-XXXXXX-XXXXXX-XXXXXX");
-  }
-
-  const deviceId = await getOrCreateDeviceId();
-  const payload = await apiRequest<unknown>(
-    LICENSE_ACTIVATE_PATH,
-    {
-      method: "POST",
-      body: JSON.stringify({
-        licenseKey: normalizedKey,
-        deviceId,
-        platform: Platform.OS,
-      }),
-    },
-    accessToken
-  );
-
-  const status = normalizeBackendStatus(payload);
-  if (!status) {
-    throw new Error("Invalid license response from server");
-  }
-
-  await AsyncStorage.setItem(SUB_STATUS_STORAGE_KEY, JSON.stringify(status));
-  return status;
 };
 
 export const clearCachedSubscriptionStatus = async (): Promise<void> => {
@@ -664,7 +657,7 @@ export const syncRevenueCatStatusToBackend = async (
 
   const config = getRevenueCatConfig();
   if (!config.syncPath) {
-    console.warn("Skipping RevenueCat backend sync: EXPO_PUBLIC_REVENUECAT_SYNC_PATH is not configured.");
+    console.warn("Skipping RevenueCat backend sync: EXPO_PUBLIC_ENTITLEMENT_REVENUECAT_SYNC_PATH is not configured.");
     return false;
   }
 

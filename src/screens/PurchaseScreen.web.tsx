@@ -4,35 +4,37 @@ import {
     StyleSheet,
     ActivityIndicator,
     Alert,
+    Linking,
     Text,
     TouchableOpacity,
-    TextInput,
     ScrollView,
     useWindowDimensions,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import Font from "../components/CustomisedFont";
 import Button from "../components/Button";
 import { useSubscription } from "../context/subScriptionContext";
 import { useAuth } from "../context/authContext";
 import {
     startStripeCheckout,
     startStripePortal,
-    activateLicenseKey,
 } from "../components/utils/purchase";
-
-const LICENSE_KEY_FORMAT = "ORG-******-******-******-******";
+import { PRIVACY_POLICY_URL, TERMS_OF_USE_URL } from "../components/utils/legal";
 
 const PurchaseScreenWeb: React.FC = () => {
     const { width } = useWindowDimensions();
-    const { isSubscribed, expiryDate, subscriptionSource, refreshSubscription } = useSubscription();
+    const { isSubscribed, subscriptionSource, workspace, refreshSubscription } = useSubscription();
     const { accessToken } = useAuth();
 
-    const [licenseKey, setLicenseKey] = useState("");
     const [actionLoading, setActionLoading] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
     const isDesktop = width > 900;
+    const openExternalUrl = async (url: string) => {
+        try {
+            await Linking.openURL(url);
+        } catch {
+            Alert.alert("Unable to open link", url);
+        }
+    };
 
     useEffect(() => {
         const init = async () => {
@@ -49,21 +51,6 @@ const PurchaseScreenWeb: React.FC = () => {
             await startStripeCheckout(accessToken);
         } catch (e) {
             Alert.alert("Error", "Could not initiate checkout.");
-        } finally {
-            setActionLoading(false);
-        }
-    };
-
-    const handleActivateLicense = async () => {
-        if (!accessToken) return Alert.alert("Login Required", "Please sign in.");
-        setActionLoading(true);
-        try {
-            await activateLicenseKey(accessToken, licenseKey);
-            await refreshSubscription(true);
-            setLicenseKey("");
-            Alert.alert("Success", "License activated!");
-        } catch (e) {
-            Alert.alert("Failed", "Invalid key or limit reached.");
         } finally {
             setActionLoading(false);
         }
@@ -117,10 +104,25 @@ const PurchaseScreenWeb: React.FC = () => {
 
                     {isSubscribed ? (
                         <View style={styles.activeContainer}>
-                            <Text style={styles.activeText}>Your subscription is active</Text>
+                            <Text style={styles.activeText}>
+                                {subscriptionSource === "workspace"
+                                    ? "Workspace access is active"
+                                    : "Your subscription is active"}
+                            </Text>
+                            {workspace ? (
+                                <Text style={styles.workspaceText}>
+                                    {workspace.name} • {workspace.role} • {workspace.memberStatus}
+                                </Text>
+                            ) : null}
                             <Button
-                                title="Manage Billing"
-                                onPress={() => startStripePortal(accessToken!)}
+                                title={subscriptionSource === "workspace" ? "Refresh Access" : "Manage Billing"}
+                                onPress={() => {
+                                    if (subscriptionSource === "workspace") {
+                                        refreshSubscription(true);
+                                        return;
+                                    }
+                                    startStripePortal(accessToken!);
+                                }}
                                 style={styles.manageBtn}
                             />
                         </View>
@@ -135,30 +137,11 @@ const PurchaseScreenWeb: React.FC = () => {
                             </Text>
                         </TouchableOpacity>
                     )}
-                    <Text style={styles.secureText}>🔒 Secure checkout via Stripe</Text>
-                </View>
-
-                {/* Right Column: License Key (The "Enterprise") */}
-                <View style={styles.card}>
-                    <Text style={styles.cardTitle}>Redeem Key</Text>
-                    <Text style={styles.cardSub}>Have an organization or admin key?</Text>
-                    <TextInput
-                        style={styles.input}
-                        value={licenseKey}
-                        onChangeText={setLicenseKey}
-                        placeholder={LICENSE_KEY_FORMAT}
-                        placeholderTextColor="#94A3B8"
-                    />
-                    <TouchableOpacity
-                        style={styles.activateBtn}
-                        onPress={handleActivateLicense}
-                        disabled={actionLoading || !licenseKey}
-                    >
-                        <Text style={styles.activateBtnText}>Activate Key</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => refreshSubscription(true)}>
-                        <Text style={styles.refreshLink}>Refresh status</Text>
-                    </TouchableOpacity>
+                    {subscriptionSource === "workspace" ? (
+                        <Text style={styles.secureText}>No individual checkout is needed for workspace access.</Text>
+                    ) : (
+                        <Text style={styles.secureText}>Secure checkout via Stripe</Text>
+                    )}
                 </View>
 
             </View>
@@ -166,9 +149,17 @@ const PurchaseScreenWeb: React.FC = () => {
             {/* Footer Legal */}
             <View style={styles.footer}>
                 <Text style={styles.footerText}>
-                    By upgrading, you agree to our Terms of Service and Privacy Policy.
-                    Annual subscriptions auto-renew until canceled.
+                    Web subscriptions are processed by Stripe. Workspace members do not need to purchase an individual web subscription.
                 </Text>
+                <View style={styles.footerLinks}>
+                    <TouchableOpacity onPress={() => openExternalUrl(TERMS_OF_USE_URL)}>
+                        <Text style={styles.footerLink}>Terms of Use</Text>
+                    </TouchableOpacity>
+                    <Text style={styles.footerText}> • </Text>
+                    <TouchableOpacity onPress={() => openExternalUrl(PRIVACY_POLICY_URL)}>
+                        <Text style={styles.footerLink}>Privacy Policy</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
         </ScrollView>
     );
@@ -205,6 +196,12 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         transform: [{ scale: 1.02 }],
     },
+    organizationQuestion: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+    },
+    organizationChevron: { color: "#64748B", fontSize: 12, fontWeight: "800", marginLeft: 10 },
     cardTitle: { fontSize: 20, fontWeight: "700", color: "#0F172A", marginBottom: 20 },
     cardSub: { color: "#64748B", fontSize: 14, marginBottom: 15 },
 
@@ -257,12 +254,15 @@ const styles = StyleSheet.create({
     manageBtn: { marginTop: 20 },
     activeContainer: { marginTop: 20, alignItems: "center" },
     activeText: { color: "#10B981", fontWeight: "700", fontSize: 14 },
+    workspaceText: { color: "#475569", fontSize: 13, marginTop: 8, textAlign: "center" },
 
     secureText: { fontSize: 12, color: "#94A3B8", textAlign: "center", marginTop: 16 },
     refreshLink: { color: "#3B82F6", fontSize: 13, textAlign: "center", marginTop: 20, textDecorationLine: "underline" },
 
     footer: { marginTop: 60, maxWidth: 800 },
     footerText: { textAlign: "center", color: "#94A3B8", fontSize: 12, lineHeight: 18 },
+    footerLinks: { flexDirection: "row", justifyContent: "center", alignItems: "center", marginTop: 8 },
+    footerLink: { color: "#3B82F6", fontSize: 13, fontWeight: "700", textDecorationLine: "underline" },
 });
 
 export default PurchaseScreenWeb;

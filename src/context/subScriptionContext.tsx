@@ -7,6 +7,7 @@ import {
     verifySubscriptionStatusRevenueCat,
     verifySubscriptionStatusBackend,
     verifySubscriptionStatusSafe,
+    type SubscriptionStatus,
 } from "../components/utils/purchase";
 import { useAuth } from "./authContext";
 import { Platform } from "react-native";
@@ -15,8 +16,17 @@ interface SubscriptionContextProps {
     isSubscribed: boolean;
     autoRenewing: boolean;
     expiryDate: Date | null;
-    subscriptionSource: "none" | "iap" | "enterprise" | "stripe" | "mixed";
+    subscriptionSource: "none" | "iap" | "workspace" | "stripe" | "mixed";
     providerStatus: string | null;
+    workspace: {
+        id: string;
+        name: string;
+        role: "owner" | "admin" | "member";
+        memberStatus: "invited" | "active" | "revoked";
+        plan: string | null;
+        seatLimit: number | null;
+        subscriptionStatus: string | null;
+    } | null;
     refreshSubscription: (forceLive?: boolean) => Promise<void>;
     setDebugSubscriptionOverride: (enabled: boolean | null) => Promise<void>;
     debugSubscriptionOverride: boolean | null;
@@ -30,6 +40,7 @@ const SubscriptionContext = createContext<SubscriptionContextProps>({
     expiryDate: null,
     subscriptionSource: "none",
     providerStatus: null,
+    workspace: null,
     refreshSubscription: async () => { },
     setDebugSubscriptionOverride: async () => { },
     debugSubscriptionOverride: null,
@@ -45,26 +56,26 @@ export const SubscriptionProvider: React.FC<ProviderProps> = ({ children }) => {
     const [isSubscribed, setIsSubscribed] = useState(false);
     const [autoRenewing, setAutoRenewing] = useState(false);
     const [expiryDate, setExpiryDate] = useState<Date | null>(null);
-    const [subscriptionSource, setSubscriptionSource] = useState<"none" | "iap" | "enterprise" | "stripe" | "mixed">("none");
+    const [subscriptionSource, setSubscriptionSource] = useState<"none" | "iap" | "workspace" | "stripe" | "mixed">("none");
     const [providerStatus, setProviderStatus] = useState<string | null>(null);
+    const [workspace, setWorkspace] = useState<SubscriptionContextProps["workspace"]>(null);
     const [debugSubscriptionOverride, setDebugSubscriptionOverrideState] = useState<boolean | null>(null);
 
     const refreshSubscription = useCallback(async (forceLive = false) => {
-        // 1) Backend/license + Stripe(web) status (cached-first).
+        // 1) Backend entitlement + Stripe(web) status (cached-first).
         let result = await verifySubscriptionStatusSafe();
-        let backendResult: { isValid: boolean; autoRenewing: boolean; expiryDate: Date | null } | null = null;
         if (forceLive) {
             if (!accessToken) {
                 await clearCachedSubscriptionStatus();
                 result = { isValid: false, autoRenewing: false, expiryDate: null };
             } else {
-                backendResult = await verifySubscriptionStatusBackend(accessToken);
+                const backendResult = await verifySubscriptionStatusBackend(accessToken);
                 result = backendResult ?? { isValid: false, autoRenewing: false, expiryDate: null };
             }
         }
 
         // 2) RevenueCat store subscription (native only).
-        let revenueCat: { isValid: boolean; autoRenewing: boolean; expiryDate: Date | null } | null = null;
+        let revenueCat: SubscriptionStatus | null = null;
         if (Platform.OS !== "web") {
             try {
                 await initIAP();
@@ -91,6 +102,7 @@ export const SubscriptionProvider: React.FC<ProviderProps> = ({ children }) => {
             setExpiryDate((prev) => prev ?? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000));
             setSubscriptionSource("mixed");
             setProviderStatus("active");
+            setWorkspace(null);
             return;
         }
 
@@ -100,6 +112,7 @@ export const SubscriptionProvider: React.FC<ProviderProps> = ({ children }) => {
             setExpiryDate((prev) => (prev === null ? prev : null));
             setSubscriptionSource("none");
             setProviderStatus(null);
+            setWorkspace(null);
             return;
         }
 
@@ -124,21 +137,30 @@ export const SubscriptionProvider: React.FC<ProviderProps> = ({ children }) => {
                   (allowDirectRevenueCatEntitlement ? revenueCat?.expiryDate : null) ??
                   null;
 
-        const source: "none" | "iap" | "enterprise" | "stripe" | "mixed" =
+        const source: "none" | "iap" | "workspace" | "stripe" | "mixed" =
             !mergedIsValid
                 ? "none"
                 : allowDirectRevenueCatEntitlement && revenueCat?.isValid && result.isValid
                     ? "mixed"
                     : result.provider === "stripe"
                         ? "stripe"
+                        : result.provider === "workspace"
+                            ? "workspace"
                         : allowDirectRevenueCatEntitlement && revenueCat?.isValid
                             ? "iap"
-                        : "enterprise";
+                        : result.source === "individual_iap"
+                            ? "iap"
+                        : "workspace";
 
         setIsSubscribed((prev) => (prev === mergedIsValid ? prev : mergedIsValid));
         setAutoRenewing((prev) => (prev === mergedAutoRenewing ? prev : mergedAutoRenewing));
         setSubscriptionSource((prev) => (prev === source ? prev : source));
-        setProviderStatus((prev) => (prev === (result.providerStatus ?? null) ? prev : (result.providerStatus ?? null)));
+        const nextProviderStatus = result.providerStatus ?? revenueCat?.providerStatus ?? null;
+        setProviderStatus((prev) => (prev === nextProviderStatus ? prev : nextProviderStatus));
+        setWorkspace((prev) => {
+            const nextWorkspace = result.workspace ?? null;
+            return JSON.stringify(prev) === JSON.stringify(nextWorkspace) ? prev : nextWorkspace;
+        });
         setExpiryDate((prev) => {
             const prevTime = prev ? prev.getTime() : null;
             const nextTime = mergedExpiry ? mergedExpiry.getTime() : null;
@@ -190,6 +212,7 @@ export const SubscriptionProvider: React.FC<ProviderProps> = ({ children }) => {
                 setExpiryDate(null);
                 setSubscriptionSource("none");
                 setProviderStatus(null);
+                setWorkspace(null);
                 lastUserIdRef.current = currentUserId;
             }
             await refreshSubscription(true);
@@ -207,6 +230,7 @@ export const SubscriptionProvider: React.FC<ProviderProps> = ({ children }) => {
             expiryDate,
             subscriptionSource,
             providerStatus,
+            workspace,
             refreshSubscription,
             setDebugSubscriptionOverride,
             debugSubscriptionOverride,
@@ -217,6 +241,7 @@ export const SubscriptionProvider: React.FC<ProviderProps> = ({ children }) => {
             expiryDate,
             subscriptionSource,
             providerStatus,
+            workspace,
             refreshSubscription,
             setDebugSubscriptionOverride,
             debugSubscriptionOverride,

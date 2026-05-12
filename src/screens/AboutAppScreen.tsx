@@ -1,14 +1,24 @@
 import React from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { Alert, Linking, View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import Font from "../components/CustomisedFont";
+import { MEDICAL_DISCLAIMER_TEXT } from "../components/utils/legal";
+import { CORE_MEDICAL_SOURCES } from "../components/utils/medicalSources";
 
 type AboutAppScreenProps = {
   navigation: StackNavigationProp<RootStackParamList>;
 };
 
 const AboutAppScreen: React.FC<AboutAppScreenProps> = ({ navigation }) => {
+  const openSource = async (url: string) => {
+    try {
+      await Linking.openURL(url);
+    } catch {
+      Alert.alert("Error", "Unable to open this source link.");
+    }
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -19,9 +29,22 @@ const AboutAppScreen: React.FC<AboutAppScreenProps> = ({ navigation }) => {
         <View style={styles.disclaimerContainer}>
           <Text style={styles.disclaimerTitle}>Medical Disclaimer</Text>
           <Text style={styles.disclaimerText}>
-            This app is <Text style={{ fontWeight: "bold" }}>not a substitute for professional medical care</Text>. Always consult with a qualified healthcare provider regarding any medical concerns, conditions, or before making changes to your diet, exercise, or lifestyle.{"\n\n"}
-            By using this app, you acknowledge and agree that the creators, developers, and associated organizations are <Text style={{ fontWeight: "bold" }}>not responsible</Text> for any decisions, actions, or outcomes resulting from its use.
+            {MEDICAL_DISCLAIMER_TEXT}
           </Text>
+        </View>
+        <View style={styles.sourcesContainer}>
+          <Text style={styles.sourcesTitle}>Medical Sources</Text>
+          {CORE_MEDICAL_SOURCES.map((source) => (
+            <TouchableOpacity
+              key={source.url}
+              style={styles.sourceItem}
+              onPress={() => openSource(source.url)}
+            >
+              <Text style={styles.sourceTitle}>{source.title}</Text>
+              <Text style={styles.sourceDescription}>{source.description}</Text>
+              <Text style={styles.sourceUrl}>{source.url}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
       </ScrollView>
     </View>
@@ -79,6 +102,44 @@ const styles = StyleSheet.create({
     color: '#333',
     lineHeight: 22,
     textAlign: 'justify',
+  },
+  sourcesContainer: {
+    marginTop: 20,
+    width: "100%",
+    borderRadius: 10,
+    padding: 18,
+    backgroundColor: "#F4FAFD",
+    borderWidth: 1,
+    borderColor: "#D7ECF5",
+  },
+  sourcesTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    marginBottom: 12,
+    color: "#194959",
+    textAlign: "center",
+  },
+  sourceItem: {
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    borderTopColor: "#D7ECF5",
+  },
+  sourceTitle: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#194959",
+  },
+  sourceDescription: {
+    marginTop: 3,
+    fontSize: 13,
+    lineHeight: 18,
+    color: "#3E5964",
+  },
+  sourceUrl: {
+    marginTop: 4,
+    fontSize: 12,
+    color: "#0B85B4",
+    textDecorationLine: "underline",
   },
 });
 

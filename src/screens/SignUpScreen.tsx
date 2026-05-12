@@ -205,7 +205,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
             <Image source={icons.menuLogo} style={styles.webLogo} />
             <Text style={styles.webHeroTitle}>Join Health Age</Text>
             <Text style={styles.webHeroText}>
-              Create your account to save assessments, sync license status, and unlock pro features.
+              Create your account to save assessments, sync access status, and unlock Pro features.
             </Text>
             <Image source={icons.signup} style={styles.webHeroImage} />
           </View>
