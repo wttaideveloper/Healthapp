@@ -3,6 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
     clearCachedSubscriptionStatus,
     initIAP,
+    syncRevenueCatStatusToBackend,
     syncRevenueCatUser,
     verifySubscriptionStatusRevenueCat,
     verifySubscriptionStatusBackend,
@@ -62,25 +63,39 @@ export const SubscriptionProvider: React.FC<ProviderProps> = ({ children }) => {
     const [debugSubscriptionOverride, setDebugSubscriptionOverrideState] = useState<boolean | null>(null);
 
     const refreshSubscription = useCallback(async (forceLive = false) => {
-        // 1) Backend entitlement + Stripe(web) status (cached-first).
+        // Backend entitlement is the gate. Cached-first keeps the UI responsive.
         let result = await verifySubscriptionStatusSafe();
         if (forceLive) {
             if (!accessToken) {
                 await clearCachedSubscriptionStatus();
                 result = { isValid: false, autoRenewing: false, expiryDate: null };
             } else {
+                if (Platform.OS !== "web") {
+                    try {
+                        await initIAP();
+                        await syncRevenueCatUser(user?.id ?? null);
+                        await syncRevenueCatStatusToBackend(accessToken, user?.id ?? null, "status_check");
+                    } catch (error) {
+                        console.warn("RevenueCat backend sync before entitlement refresh failed:", error);
+                    }
+                }
+
                 const backendResult = await verifySubscriptionStatusBackend(accessToken);
                 result = backendResult ?? { isValid: false, autoRenewing: false, expiryDate: null };
             }
         }
 
-        // 2) RevenueCat store subscription (native only).
+        // Direct RevenueCat fallback is only for signed-out/native debugging. Signed-in users
+        // must unlock from backend ownership to avoid sharing Apple-ID purchases across accounts.
         let revenueCat: SubscriptionStatus | null = null;
         if (Platform.OS !== "web") {
             try {
-                await initIAP();
-                await syncRevenueCatUser(user?.id ?? null);
-                revenueCat = await verifySubscriptionStatusRevenueCat();
+                const hasAuthenticatedUser = Boolean(accessToken && user?.id);
+                if (!hasAuthenticatedUser) {
+                    await initIAP();
+                    await syncRevenueCatUser(null);
+                    revenueCat = await verifySubscriptionStatusRevenueCat();
+                }
             } catch (error) {
                 console.warn("RevenueCat refresh failed:", error);
                 revenueCat = null;
@@ -117,9 +132,6 @@ export const SubscriptionProvider: React.FC<ProviderProps> = ({ children }) => {
         }
 
         const hasAuthenticatedUser = Boolean(accessToken && user?.id);
-        // IMPORTANT:
-        // For authenticated app users, subscription access must be tied to backend ownership.
-        // This prevents Apple-ID-based entitlements from being auto-shared across different app accounts.
         const allowDirectRevenueCatEntitlement = !hasAuthenticatedUser;
 
         const mergedIsValid =
@@ -146,11 +158,11 @@ export const SubscriptionProvider: React.FC<ProviderProps> = ({ children }) => {
                         ? "stripe"
                         : result.provider === "workspace"
                             ? "workspace"
-                        : allowDirectRevenueCatEntitlement && revenueCat?.isValid
-                            ? "iap"
                         : result.source === "individual_iap"
                             ? "iap"
-                        : "workspace";
+                            : allowDirectRevenueCatEntitlement && revenueCat?.isValid
+                                ? "iap"
+                                : "none";
 
         setIsSubscribed((prev) => (prev === mergedIsValid ? prev : mergedIsValid));
         setAutoRenewing((prev) => (prev === mergedAutoRenewing ? prev : mergedAutoRenewing));

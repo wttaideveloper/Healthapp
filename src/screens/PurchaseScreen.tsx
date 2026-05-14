@@ -20,6 +20,8 @@ import { useAuth } from "../context/authContext";
 import {
   cancelSubscription,
   getRevenueCatConfigurationError,
+  getRevenueCatTargetProductIds,
+  isNativeStorePurchaseEnabled,
   getSubscriptions,
   getSubscriptionSummaries,
   initIAP,
@@ -27,6 +29,7 @@ import {
   startStripeCheckout,
   startStripePortal,
   syncRevenueCatStatusToBackend,
+  verifySubscriptionStatusBackend,
   verifySubscriptionStatusRevenueCat,
   type RevenueCatPackageSummary,
 } from "../components/utils/purchase";
@@ -94,6 +97,55 @@ const PurchaseScreen: React.FC = () => {
   }, [refreshSubscription]);
 
   React.useEffect(() => {
+    if (Platform.OS === "web" || isNativeStorePurchaseEnabled()) {
+      return;
+    }
+
+    const handleNativeBillingReturn = async (urlValue: string) => {
+      if (!urlValue) return;
+
+      try {
+        const parsed = new URL(urlValue);
+        const path = parsed.pathname.toLowerCase();
+        if (!path.includes("purchase")) {
+          return;
+        }
+
+        const checkout = (parsed.searchParams.get("checkout") ?? "").toLowerCase();
+        const portal = (parsed.searchParams.get("portal") ?? "").toLowerCase();
+
+        if (checkout === "success" || portal === "return") {
+          setWebNotice("Checkout completed. Verifying your subscription status...");
+          await refreshSubscriptionRef.current(true);
+          return;
+        }
+
+        if (checkout === "cancel") {
+          setWebNotice("Checkout was canceled. You can try again any time.");
+        }
+      } catch {
+        // Ignore malformed callback URLs.
+      }
+    };
+
+    Linking.getInitialURL()
+      .then((value) => {
+        if (value) {
+          handleNativeBillingReturn(value).catch(() => undefined);
+        }
+      })
+      .catch(() => undefined);
+
+    const sub = Linking.addEventListener("url", ({ url }) => {
+      handleNativeBillingReturn(url).catch(() => undefined);
+    });
+
+    return () => {
+      sub.remove();
+    };
+  }, []);
+
+  React.useEffect(() => {
     if (Platform.OS !== "web" || typeof window === "undefined") {
       return;
     }
@@ -138,7 +190,9 @@ const PurchaseScreen: React.FC = () => {
 
   const selectedPlan = React.useMemo(() => {
     if (!availablePlans.length) return null;
+    const targetProductIds = getRevenueCatTargetProductIds();
     return (
+      availablePlans.find((item) => targetProductIds.includes(item.productIdentifier)) ??
       availablePlans.find((item) => item.identifier === selectedPackageIdentifier) ??
       availablePlans.find((item) => item.packageType.toUpperCase() === "ANNUAL") ??
       availablePlans[0]
@@ -146,7 +200,10 @@ const PurchaseScreen: React.FC = () => {
   }, [availablePlans, selectedPackageIdentifier]);
 
   const loadNativePlanOptions = React.useCallback(async () => {
-    if (Platform.OS === "web") {
+    if (Platform.OS === "web" || !isNativeStorePurchaseEnabled()) {
+      setStoreError(null);
+      setAvailablePlans([]);
+      setSelectedPackageIdentifier(null);
       return;
     }
 
@@ -171,6 +228,14 @@ const PurchaseScreen: React.FC = () => {
       setStoreError(null);
       setAvailablePlans(summaries);
       setSelectedPackageIdentifier((prev) => {
+        const targetProductIds = getRevenueCatTargetProductIds();
+        const configuredProduct = summaries.find((item) =>
+          targetProductIds.includes(item.productIdentifier)
+        );
+        if (configuredProduct) {
+          return configuredProduct.identifier;
+        }
+
         if (prev && summaries.some((item) => item.identifier === prev)) {
           return prev;
         }
@@ -245,7 +310,7 @@ const PurchaseScreen: React.FC = () => {
       return;
     }
 
-    if (Platform.OS !== "web" && storeError) {
+    if (Platform.OS !== "web" && isNativeStorePurchaseEnabled() && storeError) {
       Alert.alert("RevenueCat setup required", storeError);
       return;
     }
@@ -253,7 +318,7 @@ const PurchaseScreen: React.FC = () => {
     setActionLoading(true);
     try {
       await setDebugSubscriptionOverride(null);
-      if (Platform.OS === "web") {
+      if (Platform.OS === "web" || !isNativeStorePurchaseEnabled()) {
         await startStripeCheckout(accessToken);
         return;
       }
@@ -261,17 +326,28 @@ const PurchaseScreen: React.FC = () => {
       await initIAP();
       const existingStoreStatus = await verifySubscriptionStatusRevenueCat();
       if (existingStoreStatus?.isValid) {
+        await refreshSubscription(true);
+        const backendStatus = await verifySubscriptionStatusBackend(accessToken);
+        if (backendStatus?.isValid) {
+          Alert.alert("Subscription active", "Your Pro access is already active for this account.");
+          return;
+        }
+
         Alert.alert(
           "Already subscribed on this Apple ID",
-          "This Apple ID already has an active subscription. Please sign in with the account linked to this purchase."
+          "This Apple ID already has an active subscription. Sign in with the app account that owns this purchase, or manage the subscription from your App Store settings."
         );
         return;
       }
       const packages = await getSubscriptions();
       await purchaseSubscription(packages, selectedPackageIdentifier);
-      await syncRevenueCatStatusToBackend(accessToken, user?.id ?? null);
+      const syncedStatus = await syncRevenueCatStatusToBackend(accessToken, user?.id ?? null, "purchase");
       await refreshSubscription(true);
-      Alert.alert("Upgrade complete", "Subscription is active. Pro features are unlocked.");
+      if (syncedStatus?.isValid) {
+        Alert.alert("Upgrade complete", "Subscription is active. Pro features are unlocked.");
+      } else {
+        Alert.alert("Purchase synced", "Your purchase was sent to the backend. Refreshing access now.");
+      }
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unable to subscribe";
       Alert.alert("Subscription failed", message);
@@ -287,6 +363,11 @@ const PurchaseScreen: React.FC = () => {
     }
     try {
       if (Platform.OS === "web") {
+        await startStripePortal(accessToken);
+        return;
+      }
+
+      if (!isNativeStorePurchaseEnabled()) {
         await startStripePortal(accessToken);
         return;
       }
@@ -361,6 +442,9 @@ const PurchaseScreen: React.FC = () => {
     Platform.OS === "web" &&
     isSubscribed &&
     subscriptionSource === "stripe";
+  const showNativeStripeRefresh =
+    Platform.OS !== "web" &&
+    !isNativeStorePurchaseEnabled();
   const stripeCancelAtPeriodEnd =
     subscriptionSource === "stripe" &&
     isSubscribed &&
@@ -418,6 +502,14 @@ const PurchaseScreen: React.FC = () => {
                 style={styles.actionButton}
                 title="Manage Billing"
                 onPress={handleManageSubscription}
+                disabled={actionLoading}
+              />
+            ) : null}
+            {showNativeStripeRefresh ? (
+              <Button
+                style={styles.actionButtonSecondary}
+                title="Refresh Status"
+                onPress={handleManualStatusRefresh}
                 disabled={actionLoading}
               />
             ) : null}
@@ -510,6 +602,15 @@ const PurchaseScreen: React.FC = () => {
                 >
                   <Text style={styles.refreshText}>Manage existing subscription</Text>
                 </TouchableOpacity>
+                {showNativeStripeRefresh ? (
+                  <TouchableOpacity
+                    style={{ marginTop: 10, alignItems: "center" }}
+                    onPress={handleManualStatusRefresh}
+                    disabled={actionLoading}
+                  >
+                    <Text style={styles.refreshText}>Refresh status in app</Text>
+                  </TouchableOpacity>
+                ) : null}
               </>
             ) : canOpenStripeBilling ? (
               <TouchableOpacity

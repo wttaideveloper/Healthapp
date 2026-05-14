@@ -13,7 +13,11 @@ import Font from "./CustomisedFont";
 import { icons } from "./images";
 import { LinearGradient } from "expo-linear-gradient";
 import Button from "./Button";
-import { getSubscriptionSummaries, initIAP } from "./utils/purchase";
+import {
+  getRevenueCatTargetProductIds,
+  getSubscriptionSummaries,
+  initIAP,
+} from "./utils/purchase";
 // import { useNavigation } from "@react-navigation/native";
 
 interface upgradeModalProps {
@@ -43,7 +47,9 @@ const UpgradeModal: React.FC<upgradeModalProps> = ({
       try {
         await initIAP();
         const summaries = await getSubscriptionSummaries();
+        const targetProductIds = getRevenueCatTargetProductIds();
         const preferred =
+          summaries.find((item) => targetProductIds.includes(item.productIdentifier)) ??
           summaries.find((item) => item.packageType.toUpperCase() === "ANNUAL") ??
           summaries[0];
 

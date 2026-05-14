@@ -1,5 +1,6 @@
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useSubscription } from "../context/subScriptionContext";
 
 type Props = {
   navigation: any;
@@ -9,7 +10,16 @@ type Props = {
 };
 
 const CheckoutResultScreen: React.FC<Props> = ({ navigation, route }) => {
+  const { isSubscribed, subscriptionSource, refreshSubscription } = useSubscription();
   const success = route?.name?.toLowerCase() === "success";
+
+  React.useEffect(() => {
+    if (success) {
+      refreshSubscription(true).catch((error) => {
+        console.warn("Failed to refresh entitlement after checkout:", error);
+      });
+    }
+  }, [refreshSubscription, success]);
 
   return (
     <View style={styles.container}>
@@ -17,10 +27,17 @@ const CheckoutResultScreen: React.FC<Props> = ({ navigation, route }) => {
         <Text style={styles.badge}>{success ? "PAYMENT SUCCESS" : "PAYMENT CANCELED"}</Text>
         <Text style={styles.title}>{success ? "Checkout completed" : "Checkout was canceled"}</Text>
         <Text style={styles.subtitle}>
-          {success
+          {success && isSubscribed
+            ? `Access is active${subscriptionSource !== "none" ? ` via ${subscriptionSource}` : ""}.`
+            : success
             ? "Your payment was received. We are verifying your access status now."
             : "No charge was made. You can continue using the app or try checkout again."}
         </Text>
+        {Platform.OS === "web" ? (
+          <Text style={styles.helperNote}>
+            You can close this page and refresh status in the app.
+          </Text>
+        ) : null}
 
         <View style={styles.actions}>
           <TouchableOpacity style={styles.primaryBtn} onPress={() => navigation.navigate("Main")}>
@@ -74,6 +91,13 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "#516B8F",
     lineHeight: 22,
+  },
+  helperNote: {
+    marginTop: 8,
+    fontSize: 14,
+    color: "#274273",
+    lineHeight: 20,
+    fontWeight: "600",
   },
   actions: {
     marginTop: 22,

@@ -6,6 +6,10 @@ import { apiRequest, getApiRoot } from "./api";
 const SUB_STATUS_STORAGE_KEY = "sub_status";
 const ENTITLEMENT_STATUS_PATH =
   process.env.EXPO_PUBLIC_ENTITLEMENT_STATUS_PATH ?? "/entitlements/me";
+const STRIPE_CHECKOUT_PATH =
+  process.env.EXPO_PUBLIC_STRIPE_CHECKOUT_PATH ?? "/stripe/checkout";
+const STRIPE_PORTAL_PATH =
+  process.env.EXPO_PUBLIC_STRIPE_PORTAL_PATH ?? "/stripe/portal";
 const REVENUECAT_SYNC_PATH =
   (
     process.env.EXPO_PUBLIC_ENTITLEMENT_REVENUECAT_SYNC_PATH ??
@@ -27,6 +31,21 @@ const REVENUECAT_PRODUCT_IDS = (process.env.EXPO_PUBLIC_REVENUECAT_PRODUCT_IDS ?
   .split(",")
   .map((value) => value.trim())
   .filter(Boolean);
+const MAC_CATALYST_BILLING_MODE = (
+  process.env.EXPO_PUBLIC_MAC_CATALYST_BILLING_MODE ?? "stripe"
+).trim().toLowerCase();
+const NATIVE_RETURN_SCHEME = (
+  process.env.EXPO_PUBLIC_NATIVE_RETURN_SCHEME ?? "com.wtt.healthAge"
+).trim();
+const MAC_STRIPE_SUCCESS_URL = (
+  process.env.EXPO_PUBLIC_MAC_STRIPE_SUCCESS_URL ?? "https://health-age.vercel.app/success?checkout=success&source=macapp"
+).trim();
+const MAC_STRIPE_CANCEL_URL = (
+  process.env.EXPO_PUBLIC_MAC_STRIPE_CANCEL_URL ?? "https://health-age.vercel.app/cancel?checkout=cancel&source=macapp"
+).trim();
+const MAC_STRIPE_PORTAL_RETURN_URL = (
+  process.env.EXPO_PUBLIC_MAC_STRIPE_PORTAL_RETURN_URL ?? "https://health-age.vercel.app/purchase?portal=return&source=macapp"
+).trim();
 
 type RevenueCatRuntimeConfig = {
   iosApiKey: string;
@@ -37,6 +56,8 @@ type RevenueCatRuntimeConfig = {
   productIds: string[];
   syncPath: string;
 };
+
+type RevenueCatSyncAction = "purchase" | "restore" | "status_check";
 
 type PurchasesModule = {
   configure: (args: { apiKey: string }) => void;
@@ -86,6 +107,36 @@ const getRevenueCatConfig = (): RevenueCatRuntimeConfig => ({
   productIds: REVENUECAT_PRODUCT_IDS,
   syncPath: REVENUECAT_SYNC_PATH,
 });
+
+export const getRevenueCatTargetProductIds = (): string[] =>
+  getRevenueCatConfig().productIds;
+
+const isMacCatalyst = (): boolean =>
+  Platform.OS === "ios" && Boolean((Platform as any)?.constants?.isMacCatalyst);
+
+const shouldUseStripeOnNative = (): boolean =>
+  isMacCatalyst() && MAC_CATALYST_BILLING_MODE !== "iap";
+
+export const isNativeStorePurchaseEnabled = (): boolean =>
+  Platform.OS !== "web" && !shouldUseStripeOnNative();
+
+const getNativeBillingReturnUrls = (): { successUrl: string; cancelUrl: string; returnUrl: string } => {
+  if (isMacCatalyst()) {
+    return {
+      successUrl: MAC_STRIPE_SUCCESS_URL,
+      cancelUrl: MAC_STRIPE_CANCEL_URL,
+      returnUrl: MAC_STRIPE_PORTAL_RETURN_URL,
+    };
+  }
+
+  const encodedSuccess = encodeURIComponent("success");
+  const encodedCancel = encodeURIComponent("cancel");
+  return {
+    successUrl: `${NATIVE_RETURN_SCHEME}://purchase?checkout=${encodedSuccess}`,
+    cancelUrl: `${NATIVE_RETURN_SCHEME}://purchase?checkout=${encodedCancel}`,
+    returnUrl: `${NATIVE_RETURN_SCHEME}://purchase?portal=return`,
+  };
+};
 
 const getApiKeyForPlatform = (config: RevenueCatRuntimeConfig): string => {
   if (Platform.OS === "ios") return config.iosApiKey;
@@ -181,6 +232,10 @@ const normalizeBackendStatus = (payload: unknown): SubscriptionStatus | null => 
   };
 };
 
+const cacheSubscriptionStatus = async (status: SubscriptionStatus): Promise<void> => {
+  await AsyncStorage.setItem(SUB_STATUS_STORAGE_KEY, JSON.stringify(status));
+};
+
 let configuredRevenueCat = false;
 
 const getPurchases = (): PurchasesModule | null => {
@@ -259,6 +314,35 @@ const getPackageSummary = (pkg: PurchasesPackage): RevenueCatPackageSummary => {
   };
 };
 
+const getPackageProductIdentifiers = (pkg: PurchasesPackage): string[] => {
+  const storeProduct = (pkg as any)?.storeProduct ?? {};
+  return [
+    storeProduct?.identifier,
+    storeProduct?.productIdentifier,
+    storeProduct?.productId,
+    (pkg as any)?.productIdentifier,
+    (pkg as any)?.productId,
+  ]
+    .map((value) => String(value ?? "").trim())
+    .filter(Boolean);
+};
+
+const packageMatchesConfiguredProduct = (
+  pkg: PurchasesPackage,
+  productIds: string[]
+): boolean => {
+  if (!productIds.length) {
+    return false;
+  }
+
+  const configured = new Set(productIds.map((value) => value.trim()).filter(Boolean));
+  return getPackageProductIdentifiers(pkg).some((identifier) =>
+    Array.from(configured).some(
+      (productId) => identifier === productId || identifier.startsWith(`${productId}:`)
+    )
+  );
+};
+
 const statusFromCustomerInfo = (
   info: CustomerInfo | null,
   entitlementId: string
@@ -320,20 +404,24 @@ const getTransactionIds = (
     (info as any)?.latestTransaction?.originalTransactionIdentifier ??
     null;
 
+  const normalizedTransactionId =
+    typeof latestTransactionId === "string" && latestTransactionId.trim()
+      ? latestTransactionId.trim()
+      : typeof originalTransactionId === "string" && originalTransactionId.trim()
+        ? originalTransactionId.trim()
+        : null;
+
   return {
-    transactionId:
-      typeof latestTransactionId === "string" && latestTransactionId.trim()
-        ? latestTransactionId
-        : null,
+    transactionId: normalizedTransactionId,
     originalTransactionId:
       typeof originalTransactionId === "string" && originalTransactionId.trim()
-        ? originalTransactionId
-        : null,
+        ? originalTransactionId.trim()
+        : normalizedTransactionId,
   };
 };
 
 export const initIAP = async (): Promise<void> => {
-  if (Platform.OS === "web") {
+  if (Platform.OS === "web" || !isNativeStorePurchaseEnabled()) {
     return;
   }
 
@@ -364,7 +452,7 @@ export const initIAP = async (): Promise<void> => {
 };
 
 export const verifySubscriptionStatusRevenueCat = async (): Promise<SubscriptionStatus | null> => {
-  if (Platform.OS === "web") return null;
+  if (Platform.OS === "web" || !isNativeStorePurchaseEnabled()) return null;
 
   const configError = getRevenueCatConfigurationError();
   if (configError) {
@@ -387,7 +475,7 @@ export const verifySubscriptionStatusRevenueCat = async (): Promise<Subscription
 };
 
 export const syncRevenueCatUser = async (appUserId?: string | null): Promise<void> => {
-  if (Platform.OS === "web") return;
+  if (Platform.OS === "web" || !isNativeStorePurchaseEnabled()) return;
 
   const configError = getRevenueCatConfigurationError();
   if (configError) {
@@ -462,7 +550,7 @@ export const verifySubscriptionStatusBackend = async (
       return null;
     }
 
-    await AsyncStorage.setItem(SUB_STATUS_STORAGE_KEY, JSON.stringify(status));
+    await cacheSubscriptionStatus(status);
     return status;
   } catch (error) {
     console.error("Backend entitlement status fetch failed:", error);
@@ -492,11 +580,16 @@ export const verifySubscriptionStatus = async (): Promise<SubscriptionStatus> =>
     isValid: backend.isValid || rc.isValid,
     autoRenewing: backend.autoRenewing || rc.autoRenewing,
     expiryDate,
+    source: backend.source ?? rc.source ?? null,
+    provider: backend.provider ?? rc.provider ?? null,
+    providerStatus: backend.providerStatus ?? rc.providerStatus ?? null,
+    workspace: backend.workspace ?? rc.workspace ?? null,
+    individual: backend.individual ?? rc.individual ?? null,
   };
 };
 
 export const getSubscriptions = async (): Promise<PurchasesPackage[]> => {
-  if (Platform.OS === "web") return [];
+  if (Platform.OS === "web" || !isNativeStorePurchaseEnabled()) return [];
 
   const configError = getRevenueCatConfigurationError();
   if (configError) {
@@ -549,6 +642,13 @@ export const resolvePreferredPackage = (
 
   const config = getRevenueCatConfig();
 
+  const byProductId = packages.find((pkg) =>
+    packageMatchesConfiguredProduct(pkg, config.productIds)
+  );
+  if (byProductId) {
+    return byProductId;
+  }
+
   if (selectedPackageIdentifier?.trim()) {
     const selected = packages.find(
       (pkg) => String((pkg as any)?.identifier ?? "") === selectedPackageIdentifier.trim()
@@ -572,14 +672,6 @@ export const resolvePreferredPackage = (
     return annual;
   }
 
-  const byProductId = packages.find((pkg) => {
-    const summary = getPackageSummary(pkg);
-    return config.productIds.includes(summary.productIdentifier);
-  });
-  if (byProductId) {
-    return byProductId;
-  }
-
   return packages[0] ?? null;
 };
 
@@ -587,7 +679,7 @@ export const purchaseSubscription = async (
   packages: PurchasesPackage[],
   selectedPackageIdentifier?: string | null
 ): Promise<SubscriptionStatus> => {
-  if (Platform.OS === "web") {
+  if (Platform.OS === "web" || !isNativeStorePurchaseEnabled()) {
     throw new Error("Purchases are not supported on web.");
   }
 
@@ -617,7 +709,7 @@ export const purchaseSubscription = async (
 };
 
 export const restorePurchases = async (): Promise<SubscriptionStatus | null> => {
-  if (Platform.OS === "web") return null;
+  if (Platform.OS === "web" || !isNativeStorePurchaseEnabled()) return null;
 
   const configError = getRevenueCatConfigurationError();
   if (configError) {
@@ -639,58 +731,76 @@ export const restorePurchases = async (): Promise<SubscriptionStatus | null> => 
 
 export const syncRevenueCatStatusToBackend = async (
   accessToken: string,
-  appUserId?: string | null
-): Promise<boolean> => {
-  if (Platform.OS === "web") {
-    return false;
+  appUserId?: string | null,
+  action: RevenueCatSyncAction = "status_check"
+): Promise<SubscriptionStatus | null> => {
+  if (Platform.OS === "web" || !isNativeStorePurchaseEnabled()) {
+    return null;
   }
 
   if (!accessToken || !getApiRoot()) {
-    return false;
+    return null;
   }
 
   const configError = getRevenueCatConfigurationError();
   if (configError) {
     console.warn(`Skipping RevenueCat backend sync: ${configError}`);
-    return false;
+    return null;
   }
 
   const config = getRevenueCatConfig();
   if (!config.syncPath) {
     console.warn("Skipping RevenueCat backend sync: EXPO_PUBLIC_ENTITLEMENT_REVENUECAT_SYNC_PATH is not configured.");
-    return false;
+    return null;
   }
 
   await initIAP();
   const Purchases = getPurchases();
   if (!Purchases) {
-    return false;
+    return null;
   }
 
   try {
     const info = await Purchases.getCustomerInfo();
     const entitlement = (info as any)?.entitlements?.active?.[config.entitlementId] ?? null;
     const status = statusFromCustomerInfo(info, config.entitlementId);
+    const activeSubscriptions = Array.isArray((info as any)?.activeSubscriptions)
+      ? ((info as any).activeSubscriptions as unknown[])
+      : [];
+    const productId =
+      String(entitlement?.productIdentifier ?? "").trim() ||
+      (typeof activeSubscriptions[0] === "string" ? activeSubscriptions[0] : "") ||
+      null;
     const transactionIds = getTransactionIds(info, entitlement);
+    if (!transactionIds.transactionId || !transactionIds.originalTransactionId) {
+      const message =
+        "RevenueCat did not provide transaction identifiers, so the store purchase was not synced to the backend.";
+      if (action === "status_check") {
+        console.warn(message);
+        return null;
+      }
+      throw new Error(message);
+    }
+
+    const originalAppUserId =
+      typeof (info as any)?.originalAppUserId === "string"
+        ? (info as any).originalAppUserId
+        : null;
 
     const payload = {
       appUserId: appUserId?.trim() ? appUserId.trim() : null,
       platform: Platform.OS,
+      action,
       entitlementId: config.entitlementId,
       isActive: Boolean(status?.isValid),
       autoRenewing: Boolean(status?.autoRenewing),
       expiryDate: status?.expiryDate ? status.expiryDate.toISOString() : null,
-      productId: String(entitlement?.productIdentifier ?? "") || null,
+      productId,
       transactionId: transactionIds.transactionId,
       originalTransactionId: transactionIds.originalTransactionId,
       customerInfo: {
-        originalAppUserId:
-          typeof (info as any)?.originalAppUserId === "string"
-            ? (info as any).originalAppUserId
-            : null,
-        activeSubscriptions: Array.isArray((info as any)?.activeSubscriptions)
-          ? (info as any).activeSubscriptions
-          : [],
+        originalAppUserId,
+        activeSubscriptions,
         latestExpirationDate:
           typeof (info as any)?.latestExpirationDate === "string"
             ? (info as any).latestExpirationDate
@@ -699,7 +809,7 @@ export const syncRevenueCatStatusToBackend = async (
       },
     };
 
-    await apiRequest<unknown>(
+    const response = await apiRequest<unknown>(
       config.syncPath,
       {
         method: "POST",
@@ -708,14 +818,22 @@ export const syncRevenueCatStatusToBackend = async (
       accessToken
     );
 
-    return true;
+    const backendStatus = normalizeBackendStatus(response);
+    if (backendStatus) {
+      await cacheSubscriptionStatus(backendStatus);
+    }
+
+    return backendStatus;
   } catch (error) {
     console.warn("RevenueCat backend sync failed:", error);
-    return false;
+    throw error;
   }
 };
 
 export const cancelSubscription = async (): Promise<void> => {
+  if (shouldUseStripeOnNative()) {
+    throw new Error("Use billing portal for direct macOS distribution.");
+  }
   const url =
     Platform.OS === "ios"
       ? "https://apps.apple.com/account/subscriptions"
@@ -723,12 +841,77 @@ export const cancelSubscription = async (): Promise<void> => {
   await Linking.openURL(url);
 };
 
-// Web-only: Stripe checkout (implemented in purchase.web.ts). Keep a stub here for TS.
-export const startStripeCheckout = async (_accessToken?: string | null): Promise<void> => {
-  throw new Error("Stripe checkout is only available on web.");
+export const startStripeCheckout = async (accessToken?: string | null): Promise<void> => {
+  if (!getApiRoot()) {
+    throw new Error("Billing is unavailable: API base URL is not configured.");
+  }
+
+  const body = shouldUseStripeOnNative()
+    ? (() => {
+        const urls = getNativeBillingReturnUrls();
+        return {
+          ...urls,
+          // Compatibility for backends expecting snake_case fields.
+          success_url: urls.successUrl,
+          cancel_url: urls.cancelUrl,
+          return_url: urls.returnUrl,
+        };
+      })()
+    : {};
+
+  const payload = await apiRequest<unknown>(
+    STRIPE_CHECKOUT_PATH,
+    {
+      method: "POST",
+      body: JSON.stringify(body),
+    },
+    accessToken
+  );
+
+  const url =
+    payload && typeof payload === "object" && "url" in payload && typeof (payload as any).url === "string"
+      ? (payload as any).url
+      : null;
+
+  if (!url) {
+    throw new Error("Checkout URL missing from response");
+  }
+
+  await Linking.openURL(url);
 };
 
-// Web-only: Stripe billing portal (implemented in purchase.web.ts). Keep a stub here for TS.
-export const startStripePortal = async (_accessToken?: string | null): Promise<void> => {
-  throw new Error("Stripe billing portal is only available on web.");
+export const startStripePortal = async (accessToken?: string | null): Promise<void> => {
+  if (!getApiRoot()) {
+    throw new Error("Billing portal is unavailable: API base URL is not configured.");
+  }
+
+  const body = shouldUseStripeOnNative()
+    ? (() => {
+        const returnUrl = getNativeBillingReturnUrls().returnUrl;
+        return {
+          returnUrl,
+          return_url: returnUrl,
+        };
+      })()
+    : {};
+
+  const payload = await apiRequest<unknown>(
+    STRIPE_PORTAL_PATH,
+    {
+      method: "POST",
+      body: JSON.stringify(body),
+    },
+    accessToken
+  );
+
+  const url =
+    payload && typeof payload === "object" && "url" in payload && typeof (payload as any).url === "string"
+      ? (payload as any).url
+      : null;
+
+  if (!url) {
+    throw new Error("Billing portal URL missing from response");
+  }
+
+  await Linking.openURL(url);
 };

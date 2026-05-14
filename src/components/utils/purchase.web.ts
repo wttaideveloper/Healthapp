@@ -9,6 +9,7 @@ const STRIPE_CHECKOUT_PATH =
   process.env.EXPO_PUBLIC_STRIPE_CHECKOUT_PATH ?? "/stripe/checkout";
 const STRIPE_PORTAL_PATH =
   process.env.EXPO_PUBLIC_STRIPE_PORTAL_PATH ?? "/stripe/portal";
+const PENDING_STRIPE_CHECKOUT_KEY = "pending_stripe_checkout_started_at";
 
 export type SubscriptionStatus = {
   isValid: boolean;
@@ -98,7 +99,27 @@ const normalizeBackendStatus = (payload: unknown): SubscriptionStatus | null => 
   };
 };
 
+const cacheSubscriptionStatus = async (status: SubscriptionStatus): Promise<void> => {
+  await AsyncStorage.setItem(SUB_STATUS_STORAGE_KEY, JSON.stringify(status));
+};
+
+const getStripeReturnUrls = (): { successUrl?: string; cancelUrl?: string; returnUrl?: string } => {
+  if (typeof window === "undefined" || !window.location?.origin) {
+    return {};
+  }
+
+  const origin = window.location.origin;
+  return {
+    successUrl: `${origin}/success?checkout=success`,
+    cancelUrl: `${origin}/cancel?checkout=cancel`,
+    returnUrl: `${origin}/purchase?portal=return`,
+  };
+};
+
 export const getRevenueCatConfigurationError = (): string | null => null;
+
+export const getRevenueCatTargetProductIds = (): string[] => [];
+export const isNativeStorePurchaseEnabled = (): boolean => false;
 
 export const initIAP = async (): Promise<void> => {
   return;
@@ -164,7 +185,7 @@ export const verifySubscriptionStatusBackend = async (
       return null;
     }
 
-    await AsyncStorage.setItem(SUB_STATUS_STORAGE_KEY, JSON.stringify(status));
+    await cacheSubscriptionStatus(status);
     return status;
   } catch {
     return null;
@@ -193,16 +214,17 @@ export const restorePurchases = async (): Promise<never> => {
   throw new Error("Restore is not supported on web.");
 };
 
-export const syncRevenueCatStatusToBackend = async (): Promise<boolean> => false;
+export const syncRevenueCatStatusToBackend = async (): Promise<SubscriptionStatus | null> => null;
 
 export const cancelSubscription = async (): Promise<void> => {
   throw new Error("Manage subscription is not supported on web.");
 };
 
 export const startStripeCheckout = async (accessToken?: string | null): Promise<void> => {
+  const { successUrl, cancelUrl } = getStripeReturnUrls();
   const payload = await apiRequest<unknown>(STRIPE_CHECKOUT_PATH, {
     method: "POST",
-    body: JSON.stringify({}),
+    body: JSON.stringify({ successUrl, cancelUrl }),
   }, accessToken);
 
   const url =
@@ -215,6 +237,7 @@ export const startStripeCheckout = async (accessToken?: string | null): Promise<
   }
 
   if (typeof window !== "undefined") {
+    window.localStorage.setItem(PENDING_STRIPE_CHECKOUT_KEY, String(Date.now()));
     window.location.assign(url);
     return;
   }
@@ -223,9 +246,10 @@ export const startStripeCheckout = async (accessToken?: string | null): Promise<
 };
 
 export const startStripePortal = async (accessToken?: string | null): Promise<void> => {
+  const { returnUrl } = getStripeReturnUrls();
   const payload = await apiRequest<unknown>(STRIPE_PORTAL_PATH, {
     method: "POST",
-    body: JSON.stringify({}),
+    body: JSON.stringify({ returnUrl }),
   }, accessToken);
 
   const url =

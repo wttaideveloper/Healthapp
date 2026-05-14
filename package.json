@@ -1,5 +1,7 @@
 {
   "name": "healthage",
+  "description": "Health Age desktop app",
+  "author": "Wisdom Tooth Technologies",
   "license": "0BSD",
   "version": "1.0.0",
   "main": "index.ts",
@@ -7,7 +9,16 @@
     "start": "expo start --dev-client",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "build:web": "expo export --platform web",
+    "electron": "electron electron/main.cjs",
+    "electron:preview": "npm run build:web && electron electron/main.cjs",
+    "dist:win:dir": "npm run build:web && electron-builder --win dir --x64",
+    "dist:win": "npm run build:web && electron-builder --win nsis --x64",
+    "dist:win:arm64": "npm run build:web && electron-builder --win nsis --arm64",
+    "dist:win:store": "npm run build:web && electron-builder --win appx --x64",
+    "dist:win:store:arm64": "npm run build:web && electron-builder --win appx --arm64",
+    "dist:win:all": "npm run build:web && electron-builder --win nsis appx --x64"
   },
   "dependencies": {
     "@expo/metro-runtime": "~5.0.5",
@@ -68,9 +79,56 @@
     "@babel/core": "^7.26.0",
     "@types/react": "~19.0.10",
     "@types/react-native-html-to-pdf": "^0.8.3",
+    "electron": "^36.9.5",
+    "electron-builder": "^26.8.1",
     "typescript": "~5.8.3"
   },
   "private": true,
+  "build": {
+    "appId": "com.wtt.healthage",
+    "productName": "Health Age",
+    "copyright": "Copyright © 2026 Wisdom Tooth Technologies",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "assets/healthAge_Icon.png",
+      "package.json",
+      "!node_modules/**/*"
+    ],
+    "npmRebuild": false,
+    "nodeGypRebuild": false,
+    "extraMetadata": {
+      "main": "electron/main.cjs",
+      "dependencies": {},
+      "devDependencies": {}
+    },
+    "win": {
+      "icon": "assets/healthAge_Icon.png",
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Health Age"
+    },
+    "appx": {
+      "applicationId": "HealthAge",
+      "backgroundColor": "#ffffff",
+      "displayName": "Health Age",
+      "identityName": "REPLACE_WITH_PARTNER_CENTER_PACKAGE_IDENTITY_NAME",
+      "publisher": "CN=REPLACE_WITH_PUBLISHER_ID",
+      "publisherDisplayName": "Wisdom Tooth Technologies"
+    }
+  },
   "expo": {
     "doctor": {
       "reactNativeDirectoryCheck": {

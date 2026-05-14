@@ -6,6 +6,7 @@ node_modules/
 dist/
 web-build/
 expo-env.d.ts
+release/
 
 # Native
 *.orig.*
@@ -41,3 +42,4 @@ android/app/@wtt__healthAge.jks
 mac-ios/
 
 *.md
+!WINDOWS_BUILD_GUIDE.md

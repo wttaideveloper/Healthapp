@@ -106,9 +106,6 @@ const AccountScreen: React.FC = () => {
         {/* HEADER */}
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Account</Text>
-          <TouchableOpacity style={styles.settingsButton}>
-            <Settings size={20} color="#1f2a44" />
-          </TouchableOpacity>
         </View>
 
         {/* USER CARD */}
@@ -185,53 +182,6 @@ const AccountScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
 
-        {/* ACCOUNT OPTIONS */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Preferences</Text>
-
-          <TouchableOpacity style={styles.menuItem}>
-            <View style={styles.menuLeft}>
-              <View style={styles.menuIcon}>
-                <User size={18} color="#1F4F92" />
-              </View>
-
-              <Text style={styles.menuText}>
-                Edit Profile
-              </Text>
-            </View>
-
-            <ChevronRight size={18} color="#94A3B8" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.menuItem}>
-            <View style={styles.menuLeft}>
-              <View style={styles.menuIcon}>
-                <Shield size={18} color="#1F4F92" />
-              </View>
-
-              <Text style={styles.menuText}>
-                Privacy & Security
-              </Text>
-            </View>
-
-            <ChevronRight size={18} color="#94A3B8" />
-          </TouchableOpacity>
-
-          <View style={styles.menuItem}>
-            <View style={styles.menuLeft}>
-              <View style={styles.menuIcon}>
-                <Settings size={18} color="#1F4F92" />
-              </View>
-
-              <Text style={styles.menuText}>
-                Notifications
-              </Text>
-            </View>
-
-            <Switch value />
-          </View>
-        </View>
-
         {/* AUTH SECTION */}
         {isAuthenticated ? (
           <TouchableOpacity
@@ -266,7 +216,7 @@ const AccountScreen: React.FC = () => {
         )}
 
         <Text style={styles.footer}>
-          Bloomio • Version 1.0.0
+          HealthAge
         </Text>
       </ScrollView>
     </SafeAreaView>
@@ -278,7 +228,7 @@ export default AccountScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#F4F8FC",
+    backgroundColor: "#fff",
   },
 
   scrollContent: {

@@ -16,16 +16,30 @@ import { useAuth } from "../context/authContext";
 import {
     startStripeCheckout,
     startStripePortal,
+    verifySubscriptionStatusBackend,
+    type SubscriptionStatus,
 } from "../components/utils/purchase";
 import { PRIVACY_POLICY_URL, TERMS_OF_USE_URL } from "../components/utils/legal";
 
+const PENDING_STRIPE_CHECKOUT_KEY = "pending_stripe_checkout_started_at";
+
 const PurchaseScreenWeb: React.FC = () => {
     const { width } = useWindowDimensions();
-    const { isSubscribed, subscriptionSource, workspace, refreshSubscription } = useSubscription();
+    const {
+        isSubscribed,
+        autoRenewing,
+        expiryDate,
+        subscriptionSource,
+        providerStatus,
+        workspace,
+        refreshSubscription,
+    } = useSubscription();
     const { accessToken } = useAuth();
 
     const [actionLoading, setActionLoading] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [notice, setNotice] = useState<string | null>(null);
+    const [isPollingStripe, setIsPollingStripe] = useState(false);
 
     const isDesktop = width > 900;
     const openExternalUrl = async (url: string) => {
@@ -36,13 +50,111 @@ const PurchaseScreenWeb: React.FC = () => {
         }
     };
 
+    const describeEntitlement = React.useCallback((status: SubscriptionStatus | null): string => {
+        if (!accessToken) return "Please sign in to check subscription access.";
+        if (!status) return "Could not read entitlement status from the backend.";
+        if (status.isValid) {
+            const source = status.source === "individual_stripe"
+                ? "Stripe subscription"
+                : status.source === "workspace"
+                    ? "workspace"
+                    : status.source ?? "entitlement";
+            return `Access is active via ${source}.`;
+        }
+
+        return status.providerStatus
+            ? `No active access yet. Backend status: ${status.providerStatus}.`
+            : "No active access yet. If Stripe checkout just completed, wait a moment and refresh again.";
+    }, [accessToken]);
+
+    const refreshAccessStatus = React.useCallback(async (): Promise<SubscriptionStatus | null> => {
+        if (!accessToken) {
+            await refreshSubscription(true);
+            return null;
+        }
+
+        const status = await verifySubscriptionStatusBackend(accessToken);
+        await refreshSubscription(true);
+        return status;
+    }, [accessToken, refreshSubscription]);
+
+    const pollStripeEntitlement = React.useCallback(async () => {
+        if (!accessToken || typeof window === "undefined") return;
+
+        const maxAttempts = 20;
+        const delayMs = 3000;
+        setIsPollingStripe(true);
+
+        try {
+            for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+                const status = await refreshAccessStatus();
+                if (status?.isValid) {
+                    window.localStorage.removeItem(PENDING_STRIPE_CHECKOUT_KEY);
+                    setNotice(describeEntitlement(status));
+                    return;
+                }
+
+                setNotice(
+                    attempt === 0
+                        ? "Waiting for Stripe to confirm your subscription..."
+                        : `Waiting for Stripe confirmation... (${attempt + 1}/${maxAttempts})`
+                );
+                await new Promise((resolve) => setTimeout(resolve, delayMs));
+            }
+
+            const finalStatus = await refreshAccessStatus();
+            setNotice(describeEntitlement(finalStatus));
+        } finally {
+            setIsPollingStripe(false);
+        }
+    }, [accessToken, describeEntitlement, refreshAccessStatus]);
+
     useEffect(() => {
         const init = async () => {
-            await refreshSubscription(true);
+            const status = await refreshAccessStatus();
+            if (status?.isValid && typeof window !== "undefined") {
+                window.localStorage.removeItem(PENDING_STRIPE_CHECKOUT_KEY);
+            }
             setIsLoading(false);
         };
         init();
-    }, []);
+    }, [refreshAccessStatus]);
+
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+
+        const params = new URLSearchParams(window.location.search);
+        const path = window.location.pathname.toLowerCase();
+        const checkout = (params.get("checkout") ?? params.get("stripe") ?? "").toLowerCase();
+        const portal = (params.get("portal") ?? "").toLowerCase();
+
+        const didReturnFromStripe =
+            checkout.includes("success") ||
+            checkout.includes("complete") ||
+            portal === "return" ||
+            path.includes("/success");
+        const didCancel =
+            checkout.includes("cancel") ||
+            path.includes("/cancel");
+
+        const pendingStartedAt = Number(window.localStorage.getItem(PENDING_STRIPE_CHECKOUT_KEY) ?? 0);
+        const hasRecentPendingCheckout =
+            Number.isFinite(pendingStartedAt) &&
+            pendingStartedAt > 0 &&
+            Date.now() - pendingStartedAt < 10 * 60 * 1000;
+
+        if (didReturnFromStripe || hasRecentPendingCheckout) {
+            setNotice("Verifying your latest billing status...");
+            pollStripeEntitlement().catch(() => {
+                setNotice("Could not verify billing status. Please refresh access.");
+            });
+            return;
+        }
+
+        if (didCancel) {
+            setNotice("Checkout was canceled. Your access is unchanged.");
+        }
+    }, [pollStripeEntitlement]);
 
     const handleStripeSubscribe = async () => {
         if (!accessToken) return Alert.alert("Login Required", "Please sign in to upgrade.");
@@ -50,7 +162,39 @@ const PurchaseScreenWeb: React.FC = () => {
         try {
             await startStripeCheckout(accessToken);
         } catch (e) {
-            Alert.alert("Error", "Could not initiate checkout.");
+            const message = e instanceof Error ? e.message : "Could not initiate checkout.";
+            Alert.alert("Error", message);
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleManageBilling = async () => {
+        if (!accessToken) return Alert.alert("Login Required", "Please sign in to manage billing.");
+        setActionLoading(true);
+        try {
+            if (subscriptionSource === "workspace") {
+                await refreshSubscription(true);
+                return;
+            }
+
+            await startStripePortal(accessToken);
+        } catch (e) {
+            const message = e instanceof Error ? e.message : "Could not open billing portal.";
+            Alert.alert("Error", message);
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleRefreshAccess = async () => {
+        setActionLoading(true);
+        try {
+            const status = await refreshAccessStatus();
+            setNotice(describeEntitlement(status));
+        } catch (e) {
+            const message = e instanceof Error ? e.message : "Could not refresh access.";
+            Alert.alert("Error", message);
         } finally {
             setActionLoading(false);
         }
@@ -101,6 +245,11 @@ const PurchaseScreenWeb: React.FC = () => {
                     <View style={styles.bestValueTag}><Text style={styles.tagText}>POPULAR</Text></View>
                     <Text style={styles.cardTitle}>Annual Plan</Text>
                     <Text style={styles.price}>$49<Text style={styles.period}>/year</Text></Text>
+                    {notice ? (
+                        <View style={styles.noticeBox}>
+                            <Text style={styles.noticeText}>{notice}</Text>
+                        </View>
+                    ) : null}
 
                     {isSubscribed ? (
                         <View style={styles.activeContainer}>
@@ -109,6 +258,12 @@ const PurchaseScreenWeb: React.FC = () => {
                                     ? "Workspace access is active"
                                     : "Your subscription is active"}
                             </Text>
+                            <Text style={styles.statusText}>
+                                Source: {subscriptionSource}
+                                {providerStatus ? ` • Status: ${providerStatus}` : ""}
+                                {expiryDate ? ` • Until ${expiryDate.toLocaleDateString()}` : ""}
+                                {!autoRenewing && expiryDate ? " • Ends this period" : ""}
+                            </Text>
                             {workspace ? (
                                 <Text style={styles.workspaceText}>
                                     {workspace.name} • {workspace.role} • {workspace.memberStatus}
@@ -116,26 +271,35 @@ const PurchaseScreenWeb: React.FC = () => {
                             ) : null}
                             <Button
                                 title={subscriptionSource === "workspace" ? "Refresh Access" : "Manage Billing"}
-                                onPress={() => {
-                                    if (subscriptionSource === "workspace") {
-                                        refreshSubscription(true);
-                                        return;
-                                    }
-                                    startStripePortal(accessToken!);
-                                }}
+                                onPress={handleManageBilling}
                                 style={styles.manageBtn}
+                                disabled={actionLoading}
                             />
                         </View>
+                    ) : isPollingStripe ? (
+                        <View style={styles.pendingContainer}>
+                            <ActivityIndicator size="small" color="#3B82F6" />
+                            <Text style={styles.pendingText}>Confirming payment with Stripe</Text>
+                        </View>
                     ) : (
-                        <TouchableOpacity
-                            style={styles.subscribeBtn}
-                            onPress={handleStripeSubscribe}
-                            disabled={actionLoading}
-                        >
-                            <Text style={styles.subscribeBtnText}>
-                                {actionLoading ? "Processing..." : "Subscribe Now"}
-                            </Text>
-                        </TouchableOpacity>
+                        <>
+                            <TouchableOpacity
+                                style={[styles.subscribeBtn, actionLoading ? styles.disabledBtn : null]}
+                                onPress={handleStripeSubscribe}
+                                disabled={actionLoading}
+                            >
+                                <Text style={styles.subscribeBtnText}>
+                                    {actionLoading ? "Processing..." : "Subscribe with Stripe"}
+                                </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.refreshButton}
+                                onPress={handleRefreshAccess}
+                                disabled={actionLoading}
+                            >
+                                <Text style={styles.refreshLink}>Refresh access</Text>
+                            </TouchableOpacity>
+                        </>
                     )}
                     {subscriptionSource === "workspace" ? (
                         <Text style={styles.secureText}>No individual checkout is needed for workspace access.</Text>
@@ -230,7 +394,17 @@ const styles = StyleSheet.create({
         alignItems: "center",
         marginTop: 24,
     },
+    disabledBtn: { opacity: 0.7 },
     subscribeBtnText: { color: "#FFF", fontWeight: "700", fontSize: 16 },
+    noticeBox: {
+        backgroundColor: "#EFF6FF",
+        borderColor: "#BFDBFE",
+        borderWidth: 1,
+        borderRadius: 8,
+        padding: 10,
+        marginTop: 18,
+    },
+    noticeText: { color: "#1D4ED8", fontSize: 13, fontWeight: "600", textAlign: "center" },
 
     input: {
         backgroundColor: "#F1F5F9",
@@ -254,9 +428,19 @@ const styles = StyleSheet.create({
     manageBtn: { marginTop: 20 },
     activeContainer: { marginTop: 20, alignItems: "center" },
     activeText: { color: "#10B981", fontWeight: "700", fontSize: 14 },
+    statusText: { color: "#64748B", fontSize: 12, marginTop: 8, textAlign: "center" },
     workspaceText: { color: "#475569", fontSize: 13, marginTop: 8, textAlign: "center" },
+    pendingContainer: {
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 10,
+        marginTop: 24,
+        minHeight: 86,
+    },
+    pendingText: { color: "#3B82F6", fontSize: 14, fontWeight: "700" },
 
     secureText: { fontSize: 12, color: "#94A3B8", textAlign: "center", marginTop: 16 },
+    refreshButton: { alignItems: "center" },
     refreshLink: { color: "#3B82F6", fontSize: 13, textAlign: "center", marginTop: 20, textDecorationLine: "underline" },
 
     footer: { marginTop: 60, maxWidth: 800 },
