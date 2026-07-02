@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { apiRequest, getApiRoot } from "./api";
+import { isValidName } from "./validation";
 
 export type AuthUser = {
   id: string;
@@ -234,8 +235,13 @@ const buildSessionFromBackend = (raw: unknown): AuthSession | null => {
 
 const mockSignUp = async ({ name, email, password }: SignUpInput): Promise<SignUpResult> => {
   const normalized = normalizeEmail(email);
+  const normalizedName = name.trim();
   const users = await getMockUsers();
   const existing = users.find((u) => normalizeEmail(u.email) === normalized);
+
+  if (!isValidName(normalizedName)) {
+    throw new Error("Name must start with a letter and cannot be numbers only.");
+  }
 
   if (existing) {
     throw new Error("User already exists. Please sign in.");
@@ -243,7 +249,7 @@ const mockSignUp = async ({ name, email, password }: SignUpInput): Promise<SignU
 
   users.push({
     id: randomId(),
-    name: name.trim(),
+    name: normalizedName,
     email: normalized,
     password,
     emailVerified: false,
@@ -427,8 +433,12 @@ export const authService = {
     }
 
     const email = normalizeEmail(input.email);
-    if (!input.name?.trim()) {
+    const normalizedName = input.name?.trim() ?? "";
+    if (!normalizedName) {
       throw new Error("Name is required.");
+    }
+    if (!isValidName(normalizedName)) {
+      throw new Error("Name must start with a letter and cannot be numbers only.");
     }
     if (!isValidEmail(email)) {
       throw new Error("Please enter a valid email address.");
@@ -439,7 +449,7 @@ export const authService = {
 
     const payload = await apiRequest<unknown>("/auth/register", {
       method: "POST",
-      body: JSON.stringify({ name: input.name.trim(), email, password: input.password }),
+      body: JSON.stringify({ name: normalizedName, email, password: input.password }),
     });
 
     const source = payload as Record<string, unknown>;

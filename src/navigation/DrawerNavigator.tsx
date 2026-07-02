@@ -376,8 +376,43 @@ const WebShellHeader: React.FC<{
     }
   };
 
+  React.useEffect(() => {
+    if (Platform.OS !== "web" || (!reportsOpen && !languageOpen)) {
+      return;
+    }
+
+    const closeMenus = () => {
+      setReportsOpen(false);
+      setLanguageOpen(false);
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closeMenus();
+      }
+    };
+
+    window.addEventListener("blur", closeMenus);
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("blur", closeMenus);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [languageOpen, reportsOpen]);
+
   return (
     <View style={webStyles.navbar}>
+      {reportsOpen || languageOpen ? (
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => {
+            setReportsOpen(false);
+            setLanguageOpen(false);
+          }}
+          style={webStyles.dropdownBackdrop as any}
+        />
+      ) : null}
       <View style={webStyles.navInner}>
         <TouchableOpacity style={webStyles.brand} onPress={() => goRoot("Main")}>
           <Image source={icons.menuLogo} style={webStyles.brandLogo} />
@@ -1026,6 +1061,16 @@ const webStyles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    zIndex: 1000,
+  },
+  dropdownBackdrop: {
+    position: "fixed",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    zIndex: 1,
+    backgroundColor: "transparent",
   },
   navInner: {
     width: "100%",
@@ -1033,6 +1078,7 @@ const webStyles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    zIndex: 2,
   },
   brand: { flexDirection: "row", alignItems: "center" },
   brandLogo: { width: 178, height: 50, resizeMode: "contain" },

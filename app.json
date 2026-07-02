@@ -2,7 +2,7 @@
   "expo": {
     "name": "Health Age",
     "slug": "healthAge",
-    "version": "0.1.0",
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/healthAge_Icon.png",
     "userInterfaceStyle": "light",
@@ -15,7 +15,7 @@
     },
     "ios": {
       "bundleIdentifier": "com.wtt.healthAge",
-      "usesAppleSignIn": true,
+      "buildNumber": "13",
       "supportsTablet": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
@@ -24,7 +24,7 @@
       }
     },
     "android": {
-      "versionCode": 10,
+      "versionCode": 11,
       "permissions": [
         "com.android.vending.BILLING",
         "READ_EXTERNAL_STORAGE",

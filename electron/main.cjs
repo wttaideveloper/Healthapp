@@ -41,6 +41,8 @@ function startStaticServer() {
     return staticServer;
   }
 
+  // Expo web exports reference assets from root paths, so packaged Electron
+  // serves dist through localhost instead of loading index.html with file://.
   staticServer = http.createServer((request, response) => {
     const requestUrl = new URL(request.url, "http://127.0.0.1");
     const filePath = getSafeFilePath(requestUrl.pathname);

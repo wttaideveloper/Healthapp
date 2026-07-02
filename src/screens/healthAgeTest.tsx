@@ -27,6 +27,7 @@ import { DrawerScreenProps } from "@react-navigation/drawer";
 import { DrawerParamList } from "../navigation/DrawerNavigator";
 import { useTranslation } from "react-i18next";
 import { Dimensions } from "react-native";
+import { isValidName } from "../components/utils/validation";
 
 type HealthAgeTestProps = DrawerScreenProps<DrawerParamList, "healthAgeTest">;
 
@@ -239,6 +240,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
   const validateStep = (targetStep: number): string | null => {
     if (targetStep === 1) {
       if (!value.name.trim()) return "Name is required.";
+      if (!isValidName(value.name)) return "Name must start with a letter and cannot be numbers only.";
       return null;
     }
 

@@ -14,7 +14,7 @@ import {
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { useAuth } from "../context/authContext";
-import { isValidEmail } from "../components/utils/validation";
+import { isValidEmail, isValidName } from "../components/utils/validation";
 import { icons } from "../components/images";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
@@ -68,6 +68,8 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
 
     if (!normalizedName) {
       nextErrors.name = "Name is required";
+    } else if (!isValidName(normalizedName)) {
+      nextErrors.name = "Name must start with a letter and cannot be numbers only";
     }
 
     if (!normalizedEmail) {

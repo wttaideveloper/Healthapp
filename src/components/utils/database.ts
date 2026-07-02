@@ -43,6 +43,7 @@ export const initDatabase = async () => {
       phone_number TEXT,
       address TEXT
     );
+    -- Settings is a singleton record used by report branding/contact screens.
     INSERT OR IGNORE INTO settings (id) VALUES (1);
     `);
     

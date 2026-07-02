@@ -13,7 +13,6 @@ import { getSettings } from "../components/utils/reportService";
 import i18n from "../components/i18n";
 import Modal from "react-native-modal";
 import { useTranslation } from "react-i18next";
-import * as MediaLibrary from "expo-media-library";
 import * as Sharing from "expo-sharing";
 
 type PrintScreenProps = DrawerScreenProps<DrawerParamList, "PrintScreen">;
@@ -286,19 +285,29 @@ const PrintScreen: React.FC<PrintScreenProps> = ({ navigation, route }) => {
     const fileName = pdfPath.split("/").pop() ?? "healthage.pdf";
 
     if (Platform.OS === "android") {
-      const { status } = await MediaLibrary.requestPermissionsAsync();
-      if (status !== "granted") {
+      const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+      if (!permissions.granted) {
         if (await Sharing.isAvailableAsync()) {
           await Sharing.shareAsync(pdfPath, {
             mimeType: "application/pdf",
             dialogTitle: t("downloadOptions"),
+            UTI: "com.adobe.pdf",
           });
         }
         return;
       }
 
-      const mediaAsset = await MediaLibrary.createAssetAsync(pdfPath);
-      await MediaLibrary.createAlbumAsync("Download", mediaAsset, false);
+      const base64Pdf = await FileSystem.readAsStringAsync(pdfPath, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+      const destinationUri = await FileSystem.StorageAccessFramework.createFileAsync(
+        permissions.directoryUri,
+        fileName,
+        "application/pdf"
+      );
+      await FileSystem.writeAsStringAsync(destinationUri, base64Pdf, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
       Alert.alert(t("pdfDownloaded"), fileName);
       return;
     }
@@ -307,6 +316,7 @@ const PrintScreen: React.FC<PrintScreenProps> = ({ navigation, route }) => {
       await Sharing.shareAsync(pdfPath, {
         mimeType: "application/pdf",
         dialogTitle: t("downloadOptions"),
+        UTI: "com.adobe.pdf",
       });
       return;
     }

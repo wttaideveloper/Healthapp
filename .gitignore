@@ -42,4 +42,12 @@ android/app/@wtt__healthAge.jks
 mac-ios/
 
 *.md
+!README.md
 !WINDOWS_BUILD_GUIDE.md
+.aider*
+.env
+.env
+.env
+.env
+.env
+.env

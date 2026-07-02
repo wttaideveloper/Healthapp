@@ -37,6 +37,7 @@ const AccountScreen: React.FC = () => {
     providerStatus,
     refreshSubscription,
   } = useSubscription();
+  const [isRefreshingAccess, setIsRefreshingAccess] = React.useState(false);
 
   const navigateToSignIn = () => {
     navigation.navigate("SignIn");
@@ -59,6 +60,23 @@ const AccountScreen: React.FC = () => {
         "Error",
         "Unable to sign out right now."
       );
+    }
+  };
+
+  const handleRefreshAccess = async () => {
+    if (isRefreshingAccess) {
+      return;
+    }
+
+    try {
+      setIsRefreshingAccess(true);
+      await refreshSubscription(true);
+      Alert.alert("Access refreshed", "Your latest subscription and workspace access have been loaded.");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to refresh access right now.";
+      Alert.alert("Refresh failed", message);
+    } finally {
+      setIsRefreshingAccess(false);
     }
   };
 
@@ -172,12 +190,13 @@ const AccountScreen: React.FC = () => {
           ) : null}
 
           <TouchableOpacity
-            style={styles.refreshButton}
-            onPress={() => refreshSubscription(true)}
+            style={[styles.refreshButton, isRefreshingAccess ? styles.refreshButtonDisabled : null]}
+            onPress={handleRefreshAccess}
+            disabled={isRefreshingAccess}
           >
             <RefreshCw size={16} color="#0B9FD4" />
             <Text style={styles.refreshText}>
-              Refresh Access
+              {isRefreshingAccess ? "Refreshing..." : "Refresh Access"}
             </Text>
           </TouchableOpacity>
         </View>
@@ -393,6 +412,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
+  },
+  refreshButtonDisabled: {
+    opacity: 0.55,
   },
 
   refreshText: {

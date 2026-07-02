@@ -23,7 +23,7 @@ import { DrawerParamList } from "../navigation/DrawerNavigator";
 // import RNFS from "react-native-fs";
 // import Share from "react-native-share";
 import { LinearGradient } from "expo-linear-gradient";
-import * as MediaLibrary from 'expo-media-library';
+import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
 import { useTranslation } from "react-i18next";
 import { calculateBMIValues } from "../components/utils/BmiCalculation";
@@ -156,6 +156,68 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
       return null;
     }
   }, []);
+
+  const writeAndroidPdfWithPicker = async (sourcePath: string, fileName: string) => {
+    const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+
+    if (!permissions.granted) {
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(sourcePath, {
+          mimeType: "application/pdf",
+          dialogTitle: "Save Health Report",
+          UTI: "com.adobe.pdf",
+        });
+      }
+      return;
+    }
+
+    const base64Pdf = await FileSystem.readAsStringAsync(sourcePath, {
+      encoding: FileSystem.EncodingType.Base64,
+    });
+    const destinationUri = await FileSystem.StorageAccessFramework.createFileAsync(
+      permissions.directoryUri,
+      fileName,
+      "application/pdf"
+    );
+
+    await FileSystem.writeAsStringAsync(destinationUri, base64Pdf, {
+      encoding: FileSystem.EncodingType.Base64,
+    });
+    Alert.alert("Success", "PDF saved successfully.");
+  };
+
+  const createReportPdfFile = React.useCallback(async (htmlContent: string, fileName: string) => {
+    if (Platform.OS === "web") {
+      return null;
+    }
+
+    try {
+      const printed = await Print.printToFileAsync({
+        html: htmlContent,
+        base64: false,
+      });
+      return printed.uri;
+    } catch (error) {
+      console.warn("expo-print PDF generation failed, trying native HTML-to-PDF:", error);
+    }
+
+    const htmlToPdf = getHtmlToPdf();
+    if (!htmlToPdf) {
+      throw new Error("PDF export is not supported on this device.");
+    }
+
+    const pdf = await htmlToPdf.convert({
+      html: htmlContent,
+      fileName: fileName.replace(/\.pdf$/i, ""),
+      directory: "Documents",
+    });
+
+    if (!pdf.filePath) {
+      throw new Error("PDF generation failed.");
+    }
+
+    return pdf.filePath;
+  }, [getHtmlToPdf]);
   const openExternalUrl = async (url: string) => {
     try {
       const supported = await Linking.canOpenURL(url);
@@ -191,6 +253,10 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ")
     : "NA";
+  const safePdfName = React.useMemo(
+    () => `${userName.replace(/[^a-z0-9_-]+/gi, "_") || "Health"}_health_Report.pdf`,
+    [userName]
+  );
   // const totalScore = route?.params?.totalScore || "NA";
   const userGender = route?.params?.reportData?.gender;
 
@@ -531,55 +597,24 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
 
     try {
       if (Platform.OS === "web") {
-        await downloadPdfWeb(htmlContent, `${userName}_health_Report.pdf`);
+        await shareOrDownloadPdfWeb(htmlContent, safePdfName);
         return;
       }
 
-      const htmlToPdf = getHtmlToPdf();
-      if (!htmlToPdf) {
-        Alert.alert("Not supported", "PDF export is not supported on web.");
-        return;
-      }
+      const pdfPath = await createReportPdfFile(htmlContent, safePdfName);
 
-      // Generate PDF
-      const options = {
-        html: htmlContent,
-        fileName: `${userName}_health_Report`,
-        directory: "Documents",
-      };
-      const pdf = await htmlToPdf.convert(options);
-      console.log("Generated PDF:", pdf.filePath);
-
-      if (!pdf.filePath) {
-        throw new Error(t("Error"));
-      }
-
-      // Define destination path in the Downloads folder (Public Storage)
-      // Save the PDF in a location that Expo Sharing can access
-      const newPdfPath =
-        FileSystem.documentDirectory + `${userName}_health_Report.pdf`;
-
-      // Read the file as base64
-      const base64Pdf = await FileSystem.readAsStringAsync(pdf.filePath, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
-
-      // Write it to FileSystem.documentDirectory
-      await FileSystem.writeAsStringAsync(newPdfPath, base64Pdf, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
-
-      console.log("PDF saved at:", newPdfPath);
-
-      // Share the PDF
-      if (await Sharing.isAvailableAsync()) {
-        await Sharing.shareAsync(newPdfPath);
+      if (pdfPath && await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(pdfPath, {
+          mimeType: "application/pdf",
+          dialogTitle: "Share Health Report",
+          UTI: "com.adobe.pdf",
+        });
       } else {
-        alert(t("Error"));
+        Alert.alert(t("Error"), "Sharing is not available on this device.");
       }
     } catch (error) {
       console.error("Error generating or sharing PDF:", error);
-      alert(t("Error"));
+      Alert.alert(t("Error"), "Failed to share PDF");
     }
   };
 
@@ -588,50 +623,22 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
 
     try {
       if (Platform.OS === "web") {
-        await downloadPdfWeb(htmlContent, `${userName}_health_Report.pdf`);
+        await downloadPdfWeb(htmlContent, safePdfName);
         return;
       }
 
-      const htmlToPdf = getHtmlToPdf();
-      if (!htmlToPdf) {
-        Alert.alert("Not supported", "PDF download is not supported on web.");
-        return;
+      const pdfPath = await createReportPdfFile(htmlContent, safePdfName);
+      if (!pdfPath) {
+        throw new Error("PDF generation failed.");
       }
-
-      // ✅ 1. Generate PDF
-      const options = {
-        html: htmlContent,
-        fileName: `${userName}_health_Report`, // no .pdf extension
-        directory: "Documents", // or "cache"
-      };
-
-      const pdf = await htmlToPdf.convert(options);
-      const tempPath = pdf.filePath;
-
-      if (!tempPath) throw new Error("PDF generation failed.");
-
-      // 2. Move to Expo-accessible location
-      const newPath = FileSystem.documentDirectory + "Health_Report.pdf";
-      await FileSystem.copyAsync({
-        from: tempPath,
-        to: newPath,
-      });
 
       if (Platform.OS === "android") {
-        const { status } = await MediaLibrary.requestPermissionsAsync();
-        if (status !== "granted") {
-          Alert.alert("Permission denied", "Storage access required.");
-          return;
-        }
-
-        const asset = await MediaLibrary.createAssetAsync(newPath);
-        await MediaLibrary.createAlbumAsync("Download", asset, false);
-        Alert.alert("Success", "PDF saved to Downloads folder!");
+        await writeAndroidPdfWithPicker(pdfPath, safePdfName);
       } else {
-        // iOS - share sheet
-        await Sharing.shareAsync(newPath, {
+        await Sharing.shareAsync(pdfPath, {
           mimeType: "application/pdf",
           dialogTitle: "Share Health Report",
+          UTI: "com.adobe.pdf",
         });
       }
     } catch (error) {
@@ -640,9 +647,7 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
     }
   };
 
-  const downloadPdfWeb = async (html: string, fileName: string) => {
-    // Preferred: backend renders HTML to PDF.
-    // Fallback: open browser print dialog (user can "Save as PDF").
+  const renderPdfBlobWeb = async (html: string, fileName: string): Promise<Blob | null> => {
     const API_BASE_URL = getApiRoot();
     if (API_BASE_URL) {
       try {
@@ -660,19 +665,16 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
         }
 
         const ab = await resp.arrayBuffer();
-        const blob = new Blob([ab], { type: "application/pdf" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = fileName;
-        a.click();
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
-        return;
+        return new Blob([ab], { type: "application/pdf" });
       } catch (error) {
         console.warn("Backend PDF render failed, falling back to print:", error);
       }
     }
 
+    return null;
+  };
+
+  const printHtmlWeb = (html: string) => {
     const w = window.open("", "_blank");
     if (!w) {
       Alert.alert("Popup blocked", "Please allow popups to download/print the report.");
@@ -683,6 +685,49 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
     w.document.close();
     w.focus();
     w.print();
+  };
+
+  const downloadPdfWeb = async (html: string, fileName: string) => {
+    // Preferred: backend renders HTML to PDF.
+    // Fallback: open browser print dialog (user can "Save as PDF").
+    const blob = await renderPdfBlobWeb(html, fileName);
+    if (!blob) {
+      printHtmlWeb(html);
+      return;
+    }
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = fileName;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+
+  const shareOrDownloadPdfWeb = async (html: string, fileName: string) => {
+    const blob = await renderPdfBlobWeb(html, fileName);
+    if (!blob) {
+      printHtmlWeb(html);
+      return;
+    }
+
+    const file = new File([blob], fileName, { type: "application/pdf" });
+    const nav = navigator as Navigator & {
+      canShare?: (data: { files?: File[] }) => boolean;
+      share?: (data: { files?: File[]; title?: string }) => Promise<void>;
+    };
+
+    if (nav.canShare?.({ files: [file] }) && nav.share) {
+      await nav.share({ files: [file], title: "Health Report" });
+      return;
+    }
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = fileName;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
   // Back handler is registered via useFocusEffect above.

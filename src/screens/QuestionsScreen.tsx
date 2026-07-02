@@ -292,8 +292,6 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
           weightValue: route?.params?.weightValue,
         },
       });
-      setSelectedAnswers([]);
-      setCurrentIndex(0);
       setQuestionError(null);
       //   console.log(totalScore, "total Score");
     }

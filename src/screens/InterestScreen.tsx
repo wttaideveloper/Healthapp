@@ -36,7 +36,7 @@ import CustomInput from "../components/CustomInput";
 import { addReport } from "../components/utils/reportService";
 import { useTranslation } from "react-i18next";
 import { useSubscription } from "../context/subScriptionContext";
-import { isValidEmail } from "../components/utils/validation";
+import { isValidEmail, isValidName } from "../components/utils/validation";
 import { useAuth } from "../context/authContext";
 import {
   FREE_DAILY_TASK_LIMIT,
@@ -118,12 +118,14 @@ const InterestScreen: React.FC<InterestScreenProps> = ({
   const { isSubscribed } = useSubscription();
   const { user } = useAuth();
   const [otherText, setOtherText] = React.useState("");
+  const [interestError, setInterestError] = React.useState<string | null>(null);
 
   const [interestList, setInterestList] = React.useState<
     { Id: number; interestTopic: string }[]
   >([]); // Store selected interest IDs
 
   const toggleInterest = (id: number, interestTopic: string) => {
+    setInterestError(null);
     setInterestList(
       (prevList) =>
         prevList.some((item) => item.Id === id)
@@ -297,7 +299,11 @@ const InterestScreen: React.FC<InterestScreenProps> = ({
 
   const handleNext = () => {
     if (step == 1) {
-      // if (interestList.length == 0) return;
+      if (interestList.length == 0) {
+        setInterestError("Please select at least one interest.");
+        return;
+      }
+      setInterestError(null);
       setFormError(null);
       setStep(2);
     } else {
@@ -305,6 +311,10 @@ const InterestScreen: React.FC<InterestScreenProps> = ({
       const email = value.Email.trim().toLowerCase();
       if (!name || !email) {
         setFormError("Name and email are required.");
+        return;
+      }
+      if (!isValidName(name)) {
+        setFormError("Name must start with a letter and cannot be numbers only.");
         return;
       }
       if (!isValidEmail(email)) {
@@ -317,27 +327,37 @@ const InterestScreen: React.FC<InterestScreenProps> = ({
     }
   };
 
-    const confirmExit = () => {
-        Alert.alert(
-          t("leavePage"),
-          t("leavePageConfirmation"),
-          [
-            { text: t("Hs_Cancel"), style: "cancel" },
-            {
-              text: t("home"),
-              onPress: () => {
-                setInterestList([]);
-                navigation.navigate("Main")
-              }, // Or replace('Main')
-            },
-          ],
-          { cancelable: true }
-        );
-      };
+    const goBackToPreviousScreen = React.useCallback(() => {
+        if (step > 1) {
+          setStep(1);
+          return;
+        }
+
+        navigation.navigate("QuestionsScreen", {
+          name: route?.params?.reportData?.name,
+          height: route?.params?.reportData?.height,
+          age: route?.params?.reportData?.age,
+          gender: route?.params?.reportData?.gender,
+          weight: route?.params?.reportData?.weight,
+          bloodGlucose: route?.params?.reportData?.bloodGlucose,
+          bloodPressure: route?.params?.reportData?.bloodPressure,
+          fasting: route?.params?.reportData?.fasting,
+          bloodPressureSys: route?.params?.reportData?.bloodPressureSys,
+          bloodPressureDia: route?.params?.reportData?.bloodPressureDia,
+          bloodGlucose_mg: route?.params?.reportData?.bloodGlucose_mg,
+          bloodGlucose_mmol: route?.params?.reportData?.bloodGlucose_mmol,
+          selectedGlucoseUnit: route?.params?.reportData?.selectedGlucoseUnit,
+          blood_glucose_mmol_points: route?.params?.reportData?.blood_glucose_mmol_points,
+          selectedWeightUnit: route?.params?.reportData?.selectedWeightUnit,
+          selectedHeightUnit: route?.params?.reportData?.selectedHeightUnit,
+          heightValue: route?.params?.reportData?.heightValue,
+          weightValue: route?.params?.reportData?.weightValue,
+        } as any);
+      }, [navigation, route?.params?.reportData, step]);
     
       React.useEffect(() => {
         const backAction = () => {
-          confirmExit();
+          goBackToPreviousScreen();
           return true; // Prevent default back action
         };
     
@@ -347,14 +367,9 @@ const InterestScreen: React.FC<InterestScreenProps> = ({
         );
     
         return () => backHandler.remove();
-      }, []);
+      }, [goBackToPreviousScreen]);
   const handleBack = () => {
-    if (step == 1) {
-confirmExit();
-      // navigation.navigate("Main");
-    } else {
-      setStep(1);
-    }
+    goBackToPreviousScreen();
   };
 
   console.log(interestList, "interestList");
@@ -480,6 +495,9 @@ confirmExit();
       </ScrollView>
       {step == 2 && formError ? (
         <Text style={styles.formErrorText}>{formError}</Text>
+      ) : null}
+      {step == 1 && interestError ? (
+        <Text style={styles.formErrorText}>{interestError}</Text>
       ) : null}
       {step == 1 && interestList.some((item) => item.Id === 12) && (
         <CustomInput
