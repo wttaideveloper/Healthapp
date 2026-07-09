@@ -7,41 +7,41 @@
     "development": {
       "autoIncrement": true,
       "distribution": "internal",
-      "image": "macos-sequoia-15.6-xcode-26.2",
       "ios": {
         "scheme": "HealthAge",
         "buildConfiguration": "Release",
-        "simulator": false
+        "simulator": false,
+        "image": "macos-sequoia-15.6-xcode-26.2"
       }
     },
     "devclient": {
       "autoIncrement": true,
       "developmentClient": true,
       "distribution": "internal",
-      "image": "macos-sequoia-15.6-xcode-26.2",
       "ios": {
         "scheme": "HealthAge",
         "buildConfiguration": "Debug",
-        "simulator": false
+        "simulator": false,
+        "image": "macos-sequoia-15.6-xcode-26.2"
       }
     },
     "preview": {
       "autoIncrement": true,
       "distribution": "internal",
-      "image": "macos-sequoia-15.6-xcode-26.2",
       "ios": {
         "scheme": "HealthAge",
         "buildConfiguration": "Release",
-        "simulator": false
+        "simulator": false,
+        "image": "macos-sequoia-15.6-xcode-26.2"
       }
     },
     "production": {
       "autoIncrement": true,
-      "image": "macos-sequoia-15.6-xcode-26.2",
       "ios": {
         "scheme": "HealthAge",
         "buildConfiguration": "Release",
-        "simulator": false
+        "simulator": false,
+        "image": "macos-sequoia-15.6-xcode-26.2"
       }
     }
   },
