@@ -79,7 +79,7 @@
     "@types/react": "~19.0.10",
     "@types/react-native-html-to-pdf": "^0.8.3",
     "electron": "^36.9.5",
-    "electron-builder": "^26.8.1",
+    "electron-builder": "^26.15.3",
     "typescript": "~5.8.3"
   },
   "private": true,
@@ -122,10 +122,10 @@
     "appx": {
       "applicationId": "HealthAge",
       "backgroundColor": "#ffffff",
-      "displayName": "Health Age",
-      "identityName": "REPLACE_WITH_PARTNER_CENTER_PACKAGE_IDENTITY_NAME",
-      "publisher": "CN=REPLACE_WITH_PUBLISHER_ID",
-      "publisherDisplayName": "Wisdom Tooth Technologies"
+      "displayName": "Health Age Calculator",
+      "identityName": "HealthEducationResources.HealthAgeCalculator",
+      "publisher": "CN=E87D3985-E226-4B00-AA09-7D370D67A92A",
+      "publisherDisplayName": "Health Education Resources"
     }
   },
   "expo": {

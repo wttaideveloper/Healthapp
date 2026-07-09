@@ -42,7 +42,15 @@
     "plugins": [
       "expo-localization",
       "expo-sqlite",
-      "expo-build-properties"
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "deploymentTarget": "15.1"
+          }
+        }
+      ],
+      "./plugins/withIosNoMacCatalyst"
     ],
     "extra": {
       "eas": {
