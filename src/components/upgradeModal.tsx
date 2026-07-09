@@ -131,7 +131,12 @@ const UpgradeModal: React.FC<upgradeModalProps> = ({
                 {planName}
               </Text>
           <View style={{flexDirection:"row"}}>
-              <Button title="upgrade" onPress={navigationTo} style={{padding:10}} ></Button>
+              <Button
+                type="intro"
+                title="upgrade"
+                onPress={navigationTo}
+                style={{ padding: 10 }}
+              />
           </View>
           </View>
               </LinearGradient>

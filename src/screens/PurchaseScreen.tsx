@@ -21,11 +21,13 @@ import {
   cancelSubscription,
   getRevenueCatConfigurationError,
   getRevenueCatTargetProductIds,
-  isNativeStorePurchaseEnabled,
   getSubscriptions,
   getSubscriptionSummaries,
   initIAP,
+  isNativeStorePurchaseEnabled,
+  isPurchaseCancelledError,
   purchaseSubscription,
+  restorePurchases,
   startStripeCheckout,
   startStripePortal,
   syncRevenueCatStatusToBackend,
@@ -311,7 +313,7 @@ const PurchaseScreen: React.FC = () => {
     }
 
     if (Platform.OS !== "web" && isNativeStorePurchaseEnabled() && storeError) {
-      Alert.alert("RevenueCat setup required", storeError);
+      Alert.alert("Store unavailable", storeError);
       return;
     }
 
@@ -349,8 +351,60 @@ const PurchaseScreen: React.FC = () => {
         Alert.alert("Purchase synced", "Your purchase was sent to the backend. Refreshing access now.");
       }
     } catch (error) {
+      if (isPurchaseCancelledError(error)) {
+        return;
+      }
       const message = error instanceof Error ? error.message : "Unable to subscribe";
       Alert.alert("Subscription failed", message);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleRestorePurchases = async () => {
+    if (actionLoading) return;
+    if (!accessToken) {
+      promptSignIn("Please sign in before restoring purchases.");
+      return;
+    }
+
+    if (Platform.OS === "web" || !isNativeStorePurchaseEnabled()) {
+      Alert.alert("Restore unavailable", "Restore purchases is only available in the iOS and Android apps.");
+      return;
+    }
+
+    if (storeError) {
+      Alert.alert("Store unavailable", storeError);
+      return;
+    }
+
+    setActionLoading(true);
+    try {
+      await initIAP();
+      const restoredStatus = await restorePurchases();
+      if (!restoredStatus?.isValid) {
+        Alert.alert("No purchases found", "No active subscription was found for this Apple ID.");
+        return;
+      }
+
+      const syncedStatus = await syncRevenueCatStatusToBackend(
+        accessToken,
+        user?.id ?? null,
+        "restore"
+      );
+      await refreshSubscription(true);
+
+      if (syncedStatus?.isValid || restoredStatus.isValid) {
+        Alert.alert("Restore complete", "Your subscription has been restored.");
+      } else {
+        Alert.alert(
+          "Restore pending",
+          "A store subscription was found, but backend access could not be confirmed yet. Try Refresh Status."
+        );
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to restore purchases";
+      Alert.alert("Restore failed", message);
     } finally {
       setActionLoading(false);
     }
@@ -588,10 +642,25 @@ const PurchaseScreen: React.FC = () => {
             <Button
               type="intro"
               style={styles.actionButton}
-              title="Subscribe"
+              title="upgrade"
               onPress={handleSubscribe}
-              disabled={actionLoading}
+              disabled={
+                actionLoading ||
+                (Platform.OS !== "web" &&
+                  isNativeStorePurchaseEnabled() &&
+                  Boolean(storeError))
+              }
             />
+
+            {Platform.OS !== "web" && isNativeStorePurchaseEnabled() ? (
+              <TouchableOpacity
+                style={{ marginTop: 10, alignItems: "center" }}
+                onPress={handleRestorePurchases}
+                disabled={actionLoading || Boolean(storeError)}
+              >
+                <Text style={styles.refreshText}>Restore Purchases</Text>
+              </TouchableOpacity>
+            ) : null}
 
             {Platform.OS !== "web" ? (
               <>

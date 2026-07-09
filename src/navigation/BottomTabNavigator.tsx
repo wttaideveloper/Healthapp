@@ -108,7 +108,8 @@ const BottomTabNavigator: React.FC<{ navigation: any }> = ({ navigation }) => {
         }}
         navigationTo={() => {
           setShowModal(false);
-          navigation.navigate("Purchase");
+          const drawerNavigation = navigation.getParent?.() ?? navigation;
+          drawerNavigation.navigate("Purchase");
         }}
       />
     </>

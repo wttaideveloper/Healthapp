@@ -242,7 +242,7 @@ const HeaderRight = ({ navigation }) => {
   const { isSubscribed } = useSubscription();
 
   return isSubscribed ? null : (
-    <TouchableOpacity onPress={() => navigation.navigate("Main", { screen: "Purchase" })}>
+    <TouchableOpacity onPress={() => navigation.navigate("Purchase")}>
           <LinearGradient
             colors={["#FDE182", "#F6F3EC", "#CCA02D"]}
             start={{ x: 0, y: 0 }}

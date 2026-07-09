@@ -192,7 +192,7 @@ export const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (
         }}
         navigationTo={() => {
           setShowModal(false);
-          props.navigation.navigate("Main", { screen: "Purchase" });
+          props.navigation.navigate("Purchase");
         }}
       ></UpgradeModal>
     </ScrollView>

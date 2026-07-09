@@ -420,6 +420,19 @@ const getTransactionIds = (
   };
 };
 
+export const isPurchaseCancelledError = (error: unknown): boolean => {
+  if (!error || typeof error !== "object") {
+    return false;
+  }
+
+  const candidate = error as { userCancelled?: boolean; code?: string };
+  return (
+    candidate.userCancelled === true ||
+    candidate.code === "PURCHASE_CANCELLED" ||
+    candidate.code === "1"
+  );
+};
+
 export const initIAP = async (): Promise<void> => {
   if (Platform.OS === "web" || !isNativeStorePurchaseEnabled()) {
     return;
@@ -427,13 +440,12 @@ export const initIAP = async (): Promise<void> => {
 
   const Purchases = getPurchases();
   if (!Purchases) {
-    return;
+    throw new Error("RevenueCat native module is unavailable in this build.");
   }
 
   const configError = getRevenueCatConfigurationError();
   if (configError) {
-    console.warn(`RevenueCat init skipped: ${configError}`);
-    return;
+    throw new Error(configError);
   }
 
   if (configuredRevenueCat) {
@@ -447,7 +459,8 @@ export const initIAP = async (): Promise<void> => {
     Purchases.configure({ apiKey });
     configuredRevenueCat = true;
   } catch (error) {
-    console.warn("RevenueCat init failed:", error);
+    const message = error instanceof Error ? error.message : "RevenueCat init failed.";
+    throw new Error(message);
   }
 };
 
@@ -699,13 +712,23 @@ export const purchaseSubscription = async (
     throw new Error("No subscription packages available to purchase.");
   }
 
-  const { customerInfo } = await Purchases.purchasePackage(pkg);
-  const status = statusFromCustomerInfo(customerInfo, getRevenueCatConfig().entitlementId);
-  if (!status) {
-    throw new Error("Purchase completed but status could not be determined.");
-  }
+  try {
+    const { customerInfo } = await Purchases.purchasePackage(pkg);
+    const status = statusFromCustomerInfo(customerInfo, getRevenueCatConfig().entitlementId);
+    if (!status) {
+      throw new Error("Purchase completed but status could not be determined.");
+    }
 
-  return status;
+    return status;
+  } catch (error) {
+    if (isPurchaseCancelledError(error)) {
+      throw error;
+    }
+
+    const message =
+      error instanceof Error ? error.message : "Unable to complete the App Store purchase.";
+    throw new Error(message);
+  }
 };
 
 export const restorePurchases = async (): Promise<SubscriptionStatus | null> => {

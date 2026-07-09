@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import Font from "../components/CustomisedFont";
 import { CORE_MEDICAL_SOURCES } from "../components/utils/medicalSources";
+import { PRIVACY_POLICY_URL, TERMS_OF_USE_URL } from "../components/utils/legal";
 
 type AboutAppScreenProps = {
   navigation: StackNavigationProp<RootStackParamList>;
@@ -33,8 +34,20 @@ const AboutAppScreen: React.FC<AboutAppScreenProps> = ({ navigation }) => {
             {t("Rs_MedicalDisclaimerText")}
           </Text>
         </View>
+        <View style={styles.legalContainer}>
+          <Text style={styles.legalTitle}>Legal</Text>
+          <View style={styles.legalLinksRow}>
+            <TouchableOpacity onPress={() => openSource(TERMS_OF_USE_URL)}>
+              <Text style={styles.legalLink}>Terms of Use</Text>
+            </TouchableOpacity>
+            <Text style={styles.legalSeparator}> • </Text>
+            <TouchableOpacity onPress={() => openSource(PRIVACY_POLICY_URL)}>
+              <Text style={styles.legalLink}>Privacy Policy</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
         <View style={styles.sourcesContainer}>
-          <Text style={styles.sourcesTitle}>Medical Sources</Text>
+          <Text style={styles.sourcesTitle}>{t("Rs_MedicalSources")}</Text>
           {CORE_MEDICAL_SOURCES.map((source) => (
             <TouchableOpacity
               key={source.url}
@@ -103,6 +116,37 @@ const styles = StyleSheet.create({
     color: '#333',
     lineHeight: 22,
     textAlign: 'justify',
+  },
+  legalContainer: {
+    marginTop: 18,
+    width: "100%",
+    borderRadius: 10,
+    padding: 14,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E6ECF2",
+  },
+  legalTitle: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#274273",
+    textAlign: "center",
+  },
+  legalLinksRow: {
+    marginTop: 8,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  legalLink: {
+    fontSize: 13,
+    color: "#1663d6",
+    fontWeight: "600",
+    textDecorationLine: "underline",
+  },
+  legalSeparator: {
+    color: "#7D8699",
+    marginHorizontal: 6,
   },
   sourcesContainer: {
     marginTop: 20,

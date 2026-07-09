@@ -402,7 +402,7 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
       </div>
       <div>
         <strong>${t(rec.title)}</strong><br>${t(rec.description)}
-        <br><a href="${rec.citations_link}" style="font-size:12px;color:#0B9FD5;">Source</a>
+        <br><span style="font-size:12px;color:#3E5964;">${t("Rs_Source")}: </span><a href="${rec.citations_link}" style="font-size:12px;color:#0B9FD5;">${rec.citations_link}</a>
       </div>
     </div>
   `
@@ -585,7 +585,7 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
           ${generateRecommendationsHTML}
         </div>
         <div class="sources">
-          <h3>Medical Sources</h3>
+          <h3>${t("Rs_MedicalSources")}</h3>
           <ul>${generateCoreSourcesHTML}</ul>
         </div>
       </div>
@@ -921,20 +921,6 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
           <Text style={styles.disclaimerTitle}>{t("Rs_MedicalDisclaimerTitle")}</Text>
           <Text style={styles.disclaimerText}>{t("Rs_MedicalDisclaimerText")}</Text>
         </View>
-        <View style={styles.sourcesCard}>
-          <Text style={styles.sourcesTitle}>Medical Sources</Text>
-          {CORE_MEDICAL_SOURCES.map((source) => (
-            <TouchableOpacity
-              key={source.url}
-              style={styles.sourceItem}
-              onPress={() => openExternalUrl(source.url)}
-            >
-              <Text style={styles.sourceTitle}>{source.title}</Text>
-              <Text style={styles.sourceDescription}>{source.description}</Text>
-              <Text style={styles.sourceUrl}>{source.url}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
         <View style={styles.recommendations}>
           <Font text="Rs_Recommendations" style={styles.sectionTitle}></Font>
           {recommendations.length > 0 ? (
@@ -965,10 +951,31 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
 
                   {/* Description wraps below the header */}
                   <Font text={rec?.description} style={styles.recommendationDesc} />
+                  <TouchableOpacity
+                    onPress={() => openExternalUrl(rec?.citations_link)}
+                    style={styles.sourceLink}
+                  >
+                    <Text style={styles.sourceLinkLabel}>{t("Rs_Source")}: </Text>
+                    <Text style={styles.sourceLinkText}>{rec?.citations_link}</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
             ))
           ) : null}
+        </View>
+        <View style={styles.sourcesCard}>
+          <Text style={styles.sourcesTitle}>{t("Rs_MedicalSources")}</Text>
+          {CORE_MEDICAL_SOURCES.map((source) => (
+            <TouchableOpacity
+              key={source.url}
+              style={styles.sourceItem}
+              onPress={() => openExternalUrl(source.url)}
+            >
+              <Text style={styles.sourceTitle}>{source.title}</Text>
+              <Text style={styles.sourceDescription}>{source.description}</Text>
+              <Text style={styles.sourceUrl}>{source.url}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
         <View style={styles.legalSection}>
           <Text style={styles.disclosureText}>
@@ -1220,11 +1227,20 @@ const styles = StyleSheet.create({
   },
   sourceLink: {
     marginTop: 8,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "flex-start",
+  },
+  sourceLinkLabel: {
+    color: "#3E5964",
+    fontSize: 12,
+    fontWeight: "600",
   },
   sourceLinkText: {
     color: "#0B9FD5",
     fontSize: 12,
     textDecorationLine: "underline",
+    flexShrink: 1,
   },
   checkIcon: {
     width: 24,
