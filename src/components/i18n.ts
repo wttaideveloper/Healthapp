@@ -146,6 +146,9 @@ const resources = {
       Rs_PotentialAge: "Potential Age",
       Rs_HealthyHabitsParagraph:
         "Several large research studies, including the well-known Alameda County Study and the Adventist Health Studies reveal a strong correlation between the health habits listed below and one’s risk of disease/death. Individuals practicing all of these healthy habits may influence their longevity by nearly 30 years.",
+      Rs_MedicalDisclaimerTitle: "Medical Disclaimer",
+      Rs_MedicalDisclaimerText:
+        "Health Age is intended for informational and educational purposes only. It is not a medical diagnosis and should not be used as a substitute for professional medical advice, diagnosis, or treatment. Always consult a qualified healthcare professional before making any medical decisions or changes to your healthcare.",
       Rs_Recommendations: "Recommendations",
       Rs_1_title: "Eat a good breakfast daily",
       Rs_1_desc:
@@ -502,6 +505,9 @@ const resources = {
       Rs_PotentialAge: "संभावित आयु",
       Rs_HealthyHabitsParagraph:
         "कई बड़े शोध अध्ययनों, जिनमें प्रसिद्ध अलामेडा काउंटी अध्ययन और एडवेंटिस्ट स्वास्थ्य अध्ययन शामिल हैं, नीचे सूचीबद्ध स्वास्थ्य आदतों और किसी व्यक्ति के रोग/मृत्यु के जोखिम के बीच एक मजबूत संबंध प्रकट करते हैं। इन सभी स्वस्थ आदतों का अभ्यास करने वाले व्यक्ति अपनी दीर्घायु को लगभग 30 वर्षों तक प्रभावित कर सकते हैं।",
+      Rs_MedicalDisclaimerTitle: "चिकित्सा अस्वीकरण",
+      Rs_MedicalDisclaimerText:
+        "हेल्थ एज केवल सूचनात्मक और शैक्षिक उद्देश्यों के लिए है। यह चिकित्सा निदान नहीं है और पेशेवर चिकित्सा सलाह, निदान या उपचार के विकल्प के रूप में उपयोग नहीं किया जाना चाहिए। अपने स्वास्थ्य देखभाल में कोई भी चिकित्सा निर्णय या परिवर्तन करने से पहले हमेशा एक योग्य स्वास्थ्य देखभाल पेशेवर से परामर्श करें।",
       Rs_Recommendations: "सिफारिशें",
       Rs_1_title: "प्रतिदिन अच्छा नाश्ता करें",
       Rs_1_desc:
@@ -844,6 +850,9 @@ const resources = {
       Rs_PotentialAge: "Edad Potencial",
       Rs_HealthyHabitsParagraph:
         "Varios grandes estudios de investigación, incluido el conocido Estudio del Condado de Alameda y los Estudios de Salud Adventista, revelan una fuerte correlación entre los hábitos de salud enumerados a continuación y el riesgo de enfermedad/muerte. Las personas que practican todos estos hábitos saludables pueden influir en su longevidad en casi 30 años.",
+      Rs_MedicalDisclaimerTitle: "Descargo de responsabilidad médica",
+      Rs_MedicalDisclaimerText:
+        "Health Age está destinado únicamente a fines informativos y educativos. No es un diagnóstico médico y no debe utilizarse como sustituto del asesoramiento, diagnóstico o tratamiento médico profesional. Siempre consulte a un profesional de la salud calificado antes de tomar decisiones médicas o realizar cambios en su atención médica.",
       Rs_Recommendations: "Recomendaciones",
       Rs_1_title: "Come un buen desayuno diariamente",
       Rs_1_desc:
@@ -1160,6 +1169,9 @@ const resources = {
       Rs_PotentialAge: "潜在年齢",
       Rs_HealthyHabitsParagraph:
         "有名なアラメダ郡調査やアドベンチスト健康調査を含むいくつかの大規模な研究は、以下にリストされている健康習慣と病気/死亡のリスクとの間に強い相関関係があることを明らかにしています。これらの健康的な習慣をすべて実践している人は、寿命を約30年延ばす可能性があります。",
+      Rs_MedicalDisclaimerTitle: "医療に関する免責事項",
+      Rs_MedicalDisclaimerText:
+        "ヘルスエイジは情報提供および教育目的のみを意図しています。医療診断ではなく、専門的な医療アドバイス、診断、治療の代わりに使用すべきではありません。医療上の決定や医療の変更を行う前に、必ず資格のある医療専門家にご相談ください。",
       Rs_Recommendations: "推奨事項",
       Rs_1_title: "毎日良い朝食を食べる",
       Rs_1_desc:
@@ -1497,6 +1509,9 @@ const resources = {
       Rs_PotentialAge: "Âge potentiel",
       Rs_HealthyHabitsParagraph:
         "Plusieurs grandes études de recherche, y compris la célèbre étude du comté d'Alameda et les études de santé adventistes, révèlent une forte corrélation entre les habitudes de santé énumérées ci-dessous et le risque de maladie/décès. Les individus pratiquant toutes ces habitudes de santé peuvent influencer leur longévité de près de 30 ans.",
+      Rs_MedicalDisclaimerTitle: "Avertissement médical",
+      Rs_MedicalDisclaimerText:
+        "Health Age est destiné uniquement à des fins d'information et d'éducation. Il ne constitue pas un diagnostic médical et ne doit pas être utilisé en remplacement d'un avis, d'un diagnostic ou d'un traitement médical professionnel. Consultez toujours un professionnel de santé qualifié avant de prendre des décisions médicales ou de modifier vos soins de santé.",
       Rs_Recommendations: "Recommandations",
       Rs_1_title: "Prendre un bon petit-déjeuner quotidiennement",
       Rs_1_desc:
@@ -1843,6 +1858,9 @@ const resources = {
       Rs_PotentialAge: "潜在年龄",
       Rs_HealthyHabitsParagraph:
         "几项大型研究，包括著名的阿拉米达县研究和基督复临安息日会健康研究，揭示了以下列出的健康习惯与疾病/死亡风险之间的密切关系。实践所有这些健康习惯的人可能会将寿命延长近30年。",
+      Rs_MedicalDisclaimerTitle: "医疗免责声明",
+      Rs_MedicalDisclaimerText:
+        "健康年龄仅供信息和教育目的使用。它不是医学诊断，不能替代专业医疗建议、诊断或治疗。在做出任何医疗决定或更改医疗保健方案之前，请务必咨询合格的医疗专业人士。",
       Rs_Recommendations: "建议",
       Rs_1_title: "每天吃一顿营养早餐",
       Rs_1_desc:
@@ -2148,6 +2166,9 @@ const resources = {
       Rs_PotentialAge: "العمر المحتمل",
       Rs_HealthyHabitsParagraph:
         "تكشف العديد من الدراسات البحثية الكبيرة، بما في ذلك دراسة مقاطعة ألاميدا الشهيرة ودراسات صحة الأدventist، عن وجود علاقة قوية بين العادات الصحية المذكورة أدناه وخطر الإصابة بالأمراض/الوفاة. قد يؤثر الأفراد الذين يمارسون كل هذه العادات الصحية على طول أعمارهم بما يقرب من 30 عامًا.",
+      Rs_MedicalDisclaimerTitle: "إخلاء المسؤولية الطبية",
+      Rs_MedicalDisclaimerText:
+        "يُخصص عمر الصحة لأغراض إعلامية وتعليمية فقط. وهو ليس تشخيصًا طبيًا ولا ينبغي استخدامه كبديل للاستشارة الطبية المهنية أو التشخيص أو العلاج. استشر دائمًا متخصصًا في الرعاية الصحية مؤهلًا قبل اتخاذ أي قرارات طبية أو إجراء تغييرات على رعايتك الصحية.",
       Rs_Recommendations: "التوصيات",
       Rs_1_title: "تناول وجبة إفطار جيدة يوميًا",
       Rs_1_desc:
@@ -2451,6 +2472,9 @@ const resources = {
       Rs_PotentialAge: "Età Potenziale",
       Rs_HealthyHabitsParagraph:
         "Diversi studi di ricerca di grandi dimensioni, tra cui il noto Studio della Contea di Alameda e gli Studi sulla Salute degli Avventisti, rivelano una forte correlazione tra le abitudini di salute elencate di seguito e il rischio di malattie/morte. Gli individui che praticano tutte queste abitudini salutari possono influenzare la loro longevità di quasi 30 anni.",
+      Rs_MedicalDisclaimerTitle: "Disclaimer medico",
+      Rs_MedicalDisclaimerText:
+        "Health Age è destinato esclusivamente a scopi informativi ed educativi. Non è una diagnosi medica e non deve essere utilizzato come sostituto di consulenza, diagnosi o trattamento medico professionale. Consultare sempre un professionista sanitario qualificato prima di prendere decisioni mediche o apportare modifiche alla propria assistenza sanitaria.",
       Rs_Recommendations: "Raccomandazioni",
       Rs_1_title: "Fai una buona colazione ogni giorno",
       Rs_1_desc:
@@ -2753,6 +2777,9 @@ const resources = {
       Rs_PotentialAge: "잠재적 나이",
       Rs_HealthyHabitsParagraph:
         "유명한 Alameda County 연구 및 Adventist 건강 연구를 포함한 여러 대규모 연구에서 아래 나열된 건강 습관과 질병/사망 위험 사이에 강력한 상관관계가 있음을 보여줍니다. 이러한 건강한 습관을 모두 실천하는 개인은 수명을 거의 30년까지 늘릴 수 있습니다.",
+      Rs_MedicalDisclaimerTitle: "의료 면책 조항",
+      Rs_MedicalDisclaimerText:
+        "헬스 에이지는 정보 및 교육 목적으로만 제공됩니다. 의학적 진단이 아니며 전문적인 의료 조언, 진단 또는 치료를 대체해서는 안 됩니다. 의료 결정을 내리거나 건강 관리를 변경하기 전에 항상 자격을 갖춘 의료 전문가와 상담하십시오.",
       Rs_Recommendations: "권장 사항",
       Rs_1_title: "매일 아침 식사를 잘 챙겨 드세요",
       Rs_1_desc:
@@ -3084,6 +3111,9 @@ const resources = {
       Rs_PotentialAge: "Потенциальный возраст",
       Rs_HealthyHabitsParagraph:
         "Несколько крупных исследований, включая известные исследования округа Аламеда и адвентистские исследования здоровья, показывают сильную связь между перечисленными ниже здоровыми привычками и риском заболеваний/смерти. Люди, соблюдающие все эти здоровые привычки, могут повлиять на свою продолжительность жизни почти на 30 лет.",
+      Rs_MedicalDisclaimerTitle: "Медицинский отказ от ответственности",
+      Rs_MedicalDisclaimerText:
+        "Health Age предназначен только для информационных и образовательных целей. Это не медицинский диагноз и не должен использоваться в качестве замены профессиональной медицинской консультации, диагностики или лечения. Всегда консультируйтесь с квалифицированным медицинским специалистом перед принятием медицинских решений или изменением вашего медицинского обслуживания.",
       Rs_Recommendations: "Рекомендации",
       Rs_1_title: "Ешьте хороший завтрак каждый день",
       Rs_1_desc:
@@ -3432,6 +3462,9 @@ const resources = {
       Rs_PotentialAge: "Idade Potencial",
       Rs_HealthyHabitsParagraph:
         "Vários grandes estudos de pesquisa, incluindo o conhecido Estudo do Condado de Alameda e os Estudos de Saúde Adventista, revelam uma forte correlação entre os hábitos de saúde listados abaixo e o risco de doença/morte. Indivíduos que praticam todos esses hábitos saudáveis podem influenciar sua longevidade em quase 30 anos.",
+      Rs_MedicalDisclaimerTitle: "Aviso médico",
+      Rs_MedicalDisclaimerText:
+        "O Health Age destina-se apenas a fins informativos e educacionais. Não é um diagnóstico médico e não deve ser utilizado como substituto de aconselhamento, diagnóstico ou tratamento médico profissional. Consulte sempre um profissional de saúde qualificado antes de tomar decisões médicas ou alterar os seus cuidados de saúde.",
       Rs_Recommendations: "Recomendações",
       Rs_1_title: "Tome um bom café da manhã diariamente",
       Rs_1_desc:
@@ -3781,6 +3814,9 @@ const resources = {
       Rs_PotentialAge: "Potenzielles Alter",
       Rs_HealthyHabitsParagraph:
         "Mehrere große Forschungsstudien, darunter die bekannte Alameda County Study und die Adventist Health Studies, zeigen eine starke Korrelation zwischen den unten aufgeführten Gesundheitsgewohnheiten und dem Krankheits-/Sterberisiko. Personen, die all diese gesunden Gewohnheiten praktizieren, können ihre Langlebigkeit um fast 30 Jahre beeinflussen.",
+      Rs_MedicalDisclaimerTitle: "Medizinischer Haftungsausschluss",
+      Rs_MedicalDisclaimerText:
+        "Health Age dient ausschließlich zu Informations- und Bildungszwecken. Es stellt keine medizinische Diagnose dar und sollte nicht als Ersatz für professionelle medizinische Beratung, Diagnose oder Behandlung verwendet werden. Konsultieren Sie immer einen qualifizierten Gesundheitsfachmann, bevor Sie medizinische Entscheidungen treffen oder Änderungen an Ihrer Gesundheitsversorgung vornehmen.",
       Rs_Recommendations: "Empfehlungen",
       Rs_1_title: "Täglich ein gutes Frühstück essen",
       Rs_1_desc:
@@ -4110,6 +4146,9 @@ const resources = {
       Rs_PotentialAge: "Edad Potensial",
       Rs_HealthyHabitsParagraph:
         "Vários estudio di investigashon grandi, inkluyendo e konosido Estudio di Condado di Alameda i e Estudionan di Salú Adventista ta revelá un fuerte relashon entre e kustumbernan di salú menshoná abou i e riesgo di malesa/morto di un hende. Individuonan ku ta praktiká tur e kustumbernan di salú aki por influenshá nan longevidad ku kasi 30 aña.",
+      Rs_MedicalDisclaimerTitle: "Disclaimer médiko",
+      Rs_MedicalDisclaimerText:
+        "Health Age ta destiná solamente pa propósitonan informativo i educativo. No ta un diagnóstiko médiko i no mester usa'é komo sustituto di conseho, diagnóstiko of tratamentu médiko profesional. Konsultá semper un profesional di salud kualifiká promé ku hasi kualke desishon médiko of kambionan den bo kuido di salud.",
       Rs_Recommendations: "Rekomendashonnan",
       Rs_1_title: "Kome un bon desayuno tur dia",
       Rs_1_desc:
@@ -4421,6 +4460,9 @@ const resources = {
       Rs_PotentialAge: "Tuổi Tiềm năng",
       Rs_HealthyHabitsParagraph:
         "Một số nghiên cứu lớn, bao gồm Nghiên cứu Hạt Alameda nổi tiếng và Nghiên cứu Sức khỏe Adventist, cho thấy mối tương quan chặt chẽ giữa các thói quen sức khỏe được liệt kê dưới đây và nguy cơ mắc bệnh/tử vong. Những người thực hiện tất cả các thói quen lành mạnh này có thể ảnh hưởng đến tuổi thọ của họ gần 30 năm.",
+      Rs_MedicalDisclaimerTitle: "Tuyên bố miễn trừ y tế",
+      Rs_MedicalDisclaimerText:
+        "Health Age chỉ nhằm mục đích thông tin và giáo dục. Đây không phải là chẩn đoán y tế và không nên được sử dụng thay thế cho tư vấn, chẩn đoán hoặc điều trị y tế chuyên nghiệp. Luôn tham khảo ý kiến chuyên gia chăm sóc sức khỏe có trình độ trước khi đưa ra bất kỳ quyết định y tế nào hoặc thay đổi chăm sóc sức khỏe của bạn.",
       Rs_Recommendations: "Khuyến nghị",
       Rs_1_title: "Ăn sáng đầy đủ mỗi ngày",
       Rs_1_desc:
@@ -4765,6 +4807,9 @@ const resources = {
       Rs_PotentialAge: "Taona mety ho tratrarina",
       Rs_HealthyHabitsParagraph:
         "Fikarohana lehibe maromaro, ao anatin'izany ny Fikarohana Alameda County malaza sy ny Fikarohana Adventist Health, dia manambara fifandraisana matanjaka eo amin'ny fahazarana ara-pahasalamana voatanisa etsy ambany sy ny mety hisian'ny aretina/fahafatesana. Ny olona manao ireo fahazarana ara-pahasalamana rehetra ireo dia mety hisy fiantraikany amin'ny faharetan'ny fiainany amin'ny efa ho 30 taona.",
+      Rs_MedicalDisclaimerTitle: "Fanazavana momba ny fahasalamana",
+      Rs_MedicalDisclaimerText:
+        "Ny Health Age dia natao ho an'ny tanjona fanazavana sy fanabeazana fotsiny. Tsy diagnôzy ara-pitsaboana izany ary tsy tokony hampiasaina ho solon'ny torohevitra, diagnôzy na fitsaboana ara-pitsaboana matihanina. Mila mihevitra matihanina momba ny fahasalamana foana alohan'ny handraisana fanapahan-kevitra ara-pitsaboana na fanovana ny fikarakarana ny fahasalamanao.",
       Rs_Recommendations: "Tolo-kevitra",
       Rs_1_title: "Mihinàna sakafo maraina tsara isan'andro",
       Rs_1_desc:
@@ -5100,6 +5145,9 @@ const resources = {
       Rs_PotentialAge: "Potentiel alder",
       Rs_HealthyHabitsParagraph:
         "Flere store forskningsstudier, herunder det velkendte Alameda County Study og Adventist Health Studies, afslører en stærk sammenhæng mellem de sundhedsvaner, der er anført nedenfor, og ens risiko for sygdom/død. Personer, der praktiserer alle disse sunde vaner, kan påvirke deres levetid med næsten 30 år.",
+      Rs_MedicalDisclaimerTitle: "Medicinsk ansvarsfraskrivelse",
+      Rs_MedicalDisclaimerText:
+        "Health Age er kun beregnet til informations- og uddannelsesformål. Det er ikke en medicinsk diagnose og skal ikke bruges som erstatning for professionel medicinsk rådgivning, diagnose eller behandling. Kontakt altid en kvalificeret sundhedsfaglig person, før du træffer medicinske beslutninger eller ændrer din sundhedspleje.",
       Rs_Recommendations: "Anbefalinger",
       Rs_1_title: "Spis en god morgenmad dagligt",
       Rs_1_desc:
@@ -5431,6 +5479,9 @@ const resources = {
       Rs_PotentialAge: "சாத்தியமான வயது",
       Rs_HealthyHabitsParagraph:
         "அலமேடா கவுண்டி ஆய்வு மற்றும் அட்வென்டிஸ்ட் சுகாதார ஆய்வுகள் உள்ளிட்ட பல பெரிய ஆராய்ச்சி ஆய்வுகள், கீழே பட்டியலிடப்பட்டுள்ள சுகாதார பழக்கங்களுக்கும் ஒருவரின் நோய்/இறப்பு ஆபத்துக்கும் இடையே வலுவான தொடர்பை வெளிப்படுத்துகின்றன. இந்த ஆரோக்கியமான பழக்கங்கள் அனைத்தையும் கடைப்பிடிக்கும் நபர்கள் தங்கள் ஆயுளை கிட்டத்தட்ட 30 ஆண்டுகள் வரை பாதிக்கலாம்.",
+      Rs_MedicalDisclaimerTitle: "மருத்துவ மறுப்பு",
+      Rs_MedicalDisclaimerText:
+        "ஹெல்த் ஏஜ் தகவல் மற்றும் கல்வி நோக்கங்களுக்காக மட்டுமே பயன்படுத்தப்படுகிறது. இது மருத்துவ கண்டறிதல் அல்ல, மேலும் தொழில்முறை மருத்துவ ஆலோசனை, கண்டறிதல் அல்லது சிகிச்சைக்கு மாற்றாக பயன்படுத்தப்படக்கூடாது. எந்த மருத்துவ முடிவுகளையும் எடுப்பதற்கோ அல்லது உங்கள் சுகாதார பராமரிப்பில் மாற்றங்கள் செய்வதற்கோ முன் எப்போதும் தகுதிபெற்ற சுகாதார நிபுணரை அணுகவும்.",
       Rs_Recommendations: "பரிந்துரைகள்",
       Rs_1_title: "தினமும் நல்ல காலை உணவு சாப்பிடுங்கள்",
       Rs_1_desc:

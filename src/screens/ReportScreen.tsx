@@ -31,7 +31,7 @@ import { CommonActions, useFocusEffect } from "@react-navigation/native";
 import { useAuth } from "../context/authContext";
 import { getApiRoot } from "../components/utils/api";
 import { deleteReports } from "../components/utils/reportService";
-import { MEDICAL_DISCLAIMER_TEXT, PRIVACY_POLICY_URL, TERMS_OF_USE_URL } from "../components/utils/legal";
+import { PRIVACY_POLICY_URL, TERMS_OF_USE_URL } from "../components/utils/legal";
 import { CORE_MEDICAL_SOURCES, REPORT_SOURCE_BY_TOPIC } from "../components/utils/medicalSources";
 
 type ReportScreenProps = DrawerScreenProps<DrawerParamList, "ReportScreen">;
@@ -576,11 +576,14 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
           </div>
         </div>
         <p style="margin-top: 15px; font-size: 13px;">${t("Rs_HealthyHabitsParagraph")}</p>
+        <div class="disclaimer">
+          <strong>${t("Rs_MedicalDisclaimerTitle")}</strong>
+          <p>${t("Rs_MedicalDisclaimerText")}</p>
+        </div>
         <div class="recommendations">
           <h3>${t("Rs_Recommendations")}</h3>
           ${generateRecommendationsHTML}
         </div>
-        <div class="disclaimer">${MEDICAL_DISCLAIMER_TEXT}</div>
         <div class="sources">
           <h3>Medical Sources</h3>
           <ul>${generateCoreSourcesHTML}</ul>
@@ -915,8 +918,8 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
           style={styles.description}
         ></Font>
         <View style={styles.disclaimerCard}>
-          <Text style={styles.disclaimerTitle}>Medical Disclaimer</Text>
-          <Text style={styles.disclaimerText}>{MEDICAL_DISCLAIMER_TEXT}</Text>
+          <Text style={styles.disclaimerTitle}>{t("Rs_MedicalDisclaimerTitle")}</Text>
+          <Text style={styles.disclaimerText}>{t("Rs_MedicalDisclaimerText")}</Text>
         </View>
         <View style={styles.sourcesCard}>
           <Text style={styles.sourcesTitle}>Medical Sources</Text>

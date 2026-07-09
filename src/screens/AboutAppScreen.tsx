@@ -1,9 +1,9 @@
 import React from "react";
 import { Alert, Linking, View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
+import { useTranslation } from "react-i18next";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import Font from "../components/CustomisedFont";
-import { MEDICAL_DISCLAIMER_TEXT } from "../components/utils/legal";
 import { CORE_MEDICAL_SOURCES } from "../components/utils/medicalSources";
 
 type AboutAppScreenProps = {
@@ -11,6 +11,7 @@ type AboutAppScreenProps = {
 };
 
 const AboutAppScreen: React.FC<AboutAppScreenProps> = ({ navigation }) => {
+  const { t } = useTranslation();
   const openSource = async (url: string) => {
     try {
       await Linking.openURL(url);
@@ -27,9 +28,9 @@ const AboutAppScreen: React.FC<AboutAppScreenProps> = ({ navigation }) => {
           {/* This app helps to determine the “health age” of one's body according to an individual’s lifestyle practices. This app combines information from both the well-known Alameda County longevity studies and the new Adventist Health Studies. This app helps participants understand the strong correlation between one’s health habits and their risk of death. It provides an excellent basis for health counseling. */}
         </Font>
         <View style={styles.disclaimerContainer}>
-          <Text style={styles.disclaimerTitle}>Medical Disclaimer</Text>
+          <Text style={styles.disclaimerTitle}>{t("Rs_MedicalDisclaimerTitle")}</Text>
           <Text style={styles.disclaimerText}>
-            {MEDICAL_DISCLAIMER_TEXT}
+            {t("Rs_MedicalDisclaimerText")}
           </Text>
         </View>
         <View style={styles.sourcesContainer}>
