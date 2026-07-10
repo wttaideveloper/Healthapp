@@ -4,7 +4,10 @@ export const initDatabase = async () => {
   return null;
 };
 
+export const waitForDatabase = async () => null;
+
+export const isDatabaseReady = () => true;
+
 export const getDatabase = () => {
   throw new Error("Database is not available on web.");
 };
-

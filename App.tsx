@@ -6,14 +6,14 @@ import { SubscriptionProvider } from "./src/context/subScriptionContext";
 import { AuthProvider } from "./src/context/authContext";
 import { initDatabase } from "./src/components/utils/database";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { Platform, Text, View } from "react-native";
+import { Platform, Text, View, ActivityIndicator } from "react-native";
 import ErrorBoundary from "./src/components/ErrorBoundary";
 import WebPreloader from "./src/components/WebPreloader";
 
 const App: React.FC = () => {
   const [fatalError, setFatalError] = React.useState<string | null>(null);
-  const [isBootReady, setIsBootReady] = React.useState(Platform.OS !== "web");
-  const [isNavReady, setIsNavReady] = React.useState(Platform.OS !== "web");
+  const [isBootReady, setIsBootReady] = React.useState(false);
+  const [isNavReady, setIsNavReady] = React.useState(false);
   const [showWebPreloader, setShowWebPreloader] = React.useState(Platform.OS === "web");
   const bootStartRef = React.useRef<number>(Date.now());
 
@@ -144,6 +144,19 @@ const App: React.FC = () => {
       }
     }
   };
+
+  if (!isBootReady) {
+    return (
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <SafeAreaProvider>
+          <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#ffffff" }}>
+            <ActivityIndicator size="large" color="#0B9FD4" />
+            <Text style={{ marginTop: 10, color: "#475569" }}>Loading...</Text>
+          </View>
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
+    );
+  }
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

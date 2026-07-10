@@ -3,6 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
     clearCachedSubscriptionStatus,
     initIAP,
+    logStoreError,
     syncRevenueCatStatusToBackend,
     syncRevenueCatUser,
     verifySubscriptionStatusRevenueCat,
@@ -76,7 +77,7 @@ export const SubscriptionProvider: React.FC<ProviderProps> = ({ children }) => {
                         await syncRevenueCatUser(user?.id ?? null);
                         await syncRevenueCatStatusToBackend(accessToken, user?.id ?? null, "status_check");
                     } catch (error) {
-                        console.warn("RevenueCat backend sync before entitlement refresh failed:", error);
+                        logStoreError("subscription-refresh", error);
                     }
                 }
 
@@ -97,7 +98,7 @@ export const SubscriptionProvider: React.FC<ProviderProps> = ({ children }) => {
                     revenueCat = await verifySubscriptionStatusRevenueCat();
                 }
             } catch (error) {
-                console.warn("RevenueCat refresh failed:", error);
+                logStoreError("subscription-refresh-direct", error);
                 revenueCat = null;
             }
         }

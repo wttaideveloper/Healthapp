@@ -47,8 +47,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   );
 
   const getReportCount = async () => {
-    const status = await getDailyLimitStatus(Boolean(isSubscribed));
-    setCount(status.used);
+    try {
+      const status = await getDailyLimitStatus(Boolean(isSubscribed));
+      setCount(status.used);
+    } catch (error) {
+      console.warn("Failed to load daily report count:", error);
+      setCount(0);
+    }
   };
 
   useFocusEffect(

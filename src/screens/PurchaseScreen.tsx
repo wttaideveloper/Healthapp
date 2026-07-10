@@ -33,6 +33,8 @@ import {
   syncRevenueCatStatusToBackend,
   verifySubscriptionStatusBackend,
   verifySubscriptionStatusRevenueCat,
+  USER_FACING_SUBSCRIPTION_ERROR,
+  logStoreError,
   type RevenueCatPackageSummary,
 } from "../components/utils/purchase";
 import { PRIVACY_POLICY_URL, TERMS_OF_USE_URL } from "../components/utils/legal";
@@ -77,7 +79,13 @@ const PurchaseScreen: React.FC = () => {
       { text: "Cancel", style: "cancel" },
       {
         text: "Sign in",
-        onPress: () => navigation.navigate("SignIn"),
+        onPress: () => {
+          let rootNavigation: any = navigation;
+          while (rootNavigation?.getParent?.()) {
+            rootNavigation = rootNavigation.getParent();
+          }
+          rootNavigation?.navigate?.("SignIn");
+        },
       },
     ]);
   }, [navigation]);
@@ -211,7 +219,8 @@ const PurchaseScreen: React.FC = () => {
 
     const configError = getRevenueCatConfigurationError();
     if (configError) {
-      setStoreError(configError);
+      logStoreError("screen-config", configError);
+      setStoreError(USER_FACING_SUBSCRIPTION_ERROR);
       setAvailablePlans([]);
       setSelectedPackageIdentifier(null);
       return;
@@ -221,7 +230,8 @@ const PurchaseScreen: React.FC = () => {
       await initIAP();
       const summaries = await getSubscriptionSummaries();
       if (!summaries.length) {
-        setStoreError("Store plan unavailable right now. Please try again.");
+        logStoreError("screen-load", "No subscription summaries returned from store.");
+        setStoreError(USER_FACING_SUBSCRIPTION_ERROR);
         setAvailablePlans([]);
         setSelectedPackageIdentifier(null);
         return;
@@ -246,8 +256,8 @@ const PurchaseScreen: React.FC = () => {
         return annual?.identifier ?? summaries[0]?.identifier ?? null;
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unable to load plans from store.";
-      setStoreError(message);
+      logStoreError("screen-load", error);
+      setStoreError(USER_FACING_SUBSCRIPTION_ERROR);
       setAvailablePlans([]);
       setSelectedPackageIdentifier(null);
     }
@@ -313,7 +323,7 @@ const PurchaseScreen: React.FC = () => {
     }
 
     if (Platform.OS !== "web" && isNativeStorePurchaseEnabled() && storeError) {
-      Alert.alert("Store unavailable", storeError);
+      Alert.alert("Subscriptions unavailable", storeError);
       return;
     }
 
@@ -354,7 +364,11 @@ const PurchaseScreen: React.FC = () => {
       if (isPurchaseCancelledError(error)) {
         return;
       }
-      const message = error instanceof Error ? error.message : "Unable to subscribe";
+      logStoreError("subscribe", error);
+      const message =
+        error instanceof Error && error.message === USER_FACING_SUBSCRIPTION_ERROR
+          ? error.message
+          : USER_FACING_SUBSCRIPTION_ERROR;
       Alert.alert("Subscription failed", message);
     } finally {
       setActionLoading(false);
@@ -374,7 +388,7 @@ const PurchaseScreen: React.FC = () => {
     }
 
     if (storeError) {
-      Alert.alert("Store unavailable", storeError);
+      Alert.alert("Subscriptions unavailable", storeError);
       return;
     }
 
@@ -403,8 +417,8 @@ const PurchaseScreen: React.FC = () => {
         );
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unable to restore purchases";
-      Alert.alert("Restore failed", message);
+      logStoreError("restore", error);
+      Alert.alert("Restore failed", USER_FACING_SUBSCRIPTION_ERROR);
     } finally {
       setActionLoading(false);
     }
@@ -589,11 +603,11 @@ const PurchaseScreen: React.FC = () => {
 
             {Platform.OS !== "web" && storeError ? (
               <View style={styles.errorCard}>
-                <Text style={styles.errorTitle}>Store configuration required</Text>
+                <Text style={styles.errorTitle}>Subscriptions unavailable</Text>
                 <Text style={styles.errorBody}>{storeError}</Text>
                 <Button
                   style={styles.actionButton}
-                  title="Retry Store Load"
+                  title="Retry"
                   onPress={loadNativePlanOptions}
                   disabled={actionLoading}
                 />

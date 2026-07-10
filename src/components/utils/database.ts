@@ -1,12 +1,22 @@
 import * as SQLite from 'expo-sqlite';
 
-let db: SQLite.SQLiteDatabase;
+let db: SQLite.SQLiteDatabase | undefined;
+let dbInitPromise: Promise<SQLite.SQLiteDatabase> | null = null;
 
-export const initDatabase = async () => {
-  try {
-    db = await SQLite.openDatabaseAsync('health_reports.db');
-    
-    await db.execAsync(`
+export const initDatabase = async (): Promise<SQLite.SQLiteDatabase> => {
+  if (db) {
+    return db;
+  }
+
+  if (dbInitPromise) {
+    return dbInitPromise;
+  }
+
+  dbInitPromise = (async () => {
+    try {
+      db = await SQLite.openDatabaseAsync('health_reports.db');
+
+      await db.execAsync(`
       PRAGMA journal_mode = WAL;
       PRAGMA foreign_keys = ON;
       
@@ -46,14 +56,22 @@ export const initDatabase = async () => {
     -- Settings is a singleton record used by report branding/contact screens.
     INSERT OR IGNORE INTO settings (id) VALUES (1);
     `);
-    
-    console.log('Database initialized successfully');
-    return db;
-  } catch (error) {
-    console.error('Error initializing database:', error);
-    throw error;
-  }
+
+      console.log('Database initialized successfully');
+      return db;
+    } catch (error) {
+      dbInitPromise = null;
+      console.error('Error initializing database:', error);
+      throw error;
+    }
+  })();
+
+  return dbInitPromise;
 };
+
+export const waitForDatabase = async (): Promise<SQLite.SQLiteDatabase> => initDatabase();
+
+export const isDatabaseReady = (): boolean => Boolean(db);
 
 export const getDatabase = () => {
   if (!db) {

@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { apiRequest, getApiRoot } from "./api";
+import { apiRequest, ApiError, getApiRoot } from "./api";
 import { isValidName } from "./validation";
 
 export type AuthUser = {
@@ -99,6 +99,10 @@ const isValidEmail = (email: string): boolean => {
 };
 
 const normalizeAuthErrorMessage = (error: unknown): string => {
+  if (error instanceof ApiError) {
+    return error.message;
+  }
+
   const raw = error instanceof Error ? error.message : String(error ?? "");
   const normalized = raw.trim();
   const lower = normalized.toLowerCase();
@@ -115,7 +119,101 @@ const normalizeAuthErrorMessage = (error: unknown): string => {
     return "Password is required.";
   }
 
+  if (lower.includes("missing expo_public_api_base_url")) {
+    return "Sign-in is temporarily unavailable. Please try again later.";
+  }
+
+  if (
+    lower.includes("unable to reach") ||
+    lower.includes("timed out") ||
+    lower.includes("network request failed") ||
+    lower.includes("network error")
+  ) {
+    return "Unable to connect. Please check your internet connection and try again.";
+  }
+
+  if (
+    lower.includes("invalid sign-in response") ||
+    lower.includes("invalid sign-up response") ||
+    lower.includes("invalid user response")
+  ) {
+    return "Sign-in failed due to an unexpected server response. Please try again.";
+  }
+
+  if (lower.includes("invalid email or password") || lower.includes("unauthorized")) {
+    return "Invalid email or password.";
+  }
+
   return normalized || "Unable to sign in";
+};
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
+
+const unwrapPayload = (payload: unknown): Record<string, unknown> | null => {
+  if (!isRecord(payload)) {
+    return null;
+  }
+
+  if (isRecord(payload.data)) {
+    return payload.data;
+  }
+
+  if (isRecord(payload.result)) {
+    return payload.result;
+  }
+
+  return payload;
+};
+
+const parseNeedsVerificationEmail = (payload: unknown): string | null => {
+  const source = unwrapPayload(payload);
+  if (!source) {
+    return null;
+  }
+
+  const status = source.status ?? source.state;
+  const needsVerification =
+    status === "needs_verification" ||
+    status === "pending_verification" ||
+    status === "pending";
+
+  if (!needsVerification) {
+    return null;
+  }
+
+  if (typeof source.email === "string" && source.email.trim()) {
+    return source.email.trim();
+  }
+
+  const nestedUser = source.user;
+  if (isRecord(nestedUser) && typeof nestedUser.email === "string" && nestedUser.email.trim()) {
+    return nestedUser.email.trim();
+  }
+
+  return null;
+};
+
+const parseAuthenticatedAuthResponse = (
+  payload: unknown
+): { user: AuthUser; session: AuthSession } | null => {
+  const source = unwrapPayload(payload);
+  if (!source) {
+    return null;
+  }
+
+  const userRaw = source.user ?? source.profile ?? source.account;
+  const user = buildUserFromBackend(userRaw);
+  const session =
+    buildSessionFromBackend(source) ??
+    buildSessionFromBackend(source.session) ??
+    buildSessionFromBackend(payload);
+
+  if (!user || !session) {
+    return null;
+  }
+
+  return { user, session };
 };
 
 const getMockUsers = async (): Promise<StoredMockUser[]> => {
@@ -409,18 +507,24 @@ export const authService = {
         body: JSON.stringify({ email, password: input.password }),
       });
 
-      const source = payload as Record<string, unknown>;
-      const user = buildUserFromBackend(source?.user);
-      const session = buildSessionFromBackend(source);
+      const verificationEmail = parseNeedsVerificationEmail(payload);
+      if (verificationEmail) {
+        return {
+          status: "needs_verification",
+          email: verificationEmail,
+        };
+      }
 
-      if (!user || !session) {
+      const parsed = parseAuthenticatedAuthResponse(payload);
+      if (!parsed) {
+        console.error("[Auth] Unrecognized login response shape:", payload);
         throw new Error("Invalid sign-in response from server");
       }
 
       return {
         status: "authenticated",
-        user,
-        session,
+        user: parsed.user,
+        session: parsed.session,
       };
     } catch (error) {
       throw new Error(normalizeAuthErrorMessage(error));
@@ -452,13 +556,20 @@ export const authService = {
       body: JSON.stringify({ name: normalizedName, email, password: input.password }),
     });
 
-    const source = payload as Record<string, unknown>;
-    const user = buildUserFromBackend(source?.user);
-    const session = buildSessionFromBackend(source);
-    if (user && session) {
-      return { status: "authenticated", user, session };
+    const verificationEmail = parseNeedsVerificationEmail(payload);
+    if (verificationEmail) {
+      return {
+        status: "needs_verification",
+        email: verificationEmail,
+      };
     }
 
+    const parsed = parseAuthenticatedAuthResponse(payload);
+    if (parsed) {
+      return { status: "authenticated", user: parsed.user, session: parsed.session };
+    }
+
+    console.error("[Auth] Unrecognized sign-up response shape:", payload);
     throw new Error("Invalid sign-up response from server");
   },
 
@@ -527,9 +638,11 @@ export const authService = {
     }
 
     const payload = await apiRequest<unknown>("/auth/me", { method: "GET" }, accessToken);
-    const user = buildUserFromBackend(payload);
+    const source = unwrapPayload(payload);
+    const user = buildUserFromBackend(source?.user ?? source ?? payload);
 
     if (!user) {
+      console.error("[Auth] Unrecognized /auth/me response shape:", payload);
       throw new Error("Invalid user response from server");
     }
 

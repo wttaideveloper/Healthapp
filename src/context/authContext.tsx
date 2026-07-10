@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { ApiError } from "../components/utils/api";
 import {
   AuthUser,
   SignInInput,
@@ -85,6 +86,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             } as StoredAuthState)
           );
         } catch (error) {
+          const isUnauthorized =
+            error instanceof ApiError && (error.status === 401 || error.status === 403);
+          const isRecoverableNetwork =
+            error instanceof ApiError && (error.isNetworkError || error.isTimeout);
+
+          if (isUnauthorized) {
+            console.warn("Auth session expired, clearing session:", error);
+            await clearSession();
+            return;
+          }
+
+          if (isRecoverableNetwork) {
+            console.warn("Auth hydration using cached session due to network issue:", error);
+            setAccessToken(parsed.accessToken);
+            setUser(parsed.user);
+            return;
+          }
+
           console.warn("Auth session hydration failed, clearing session:", error);
           await clearSession();
         }

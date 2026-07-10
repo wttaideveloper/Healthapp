@@ -40,11 +40,19 @@ const AccountScreen: React.FC = () => {
   const [isRefreshingAccess, setIsRefreshingAccess] = React.useState(false);
 
   const navigateToSignIn = () => {
-    navigation.navigate("SignIn");
+    let rootNavigation: any = navigation;
+    while (rootNavigation?.getParent?.()) {
+      rootNavigation = rootNavigation.getParent();
+    }
+    rootNavigation?.navigate?.("SignIn");
   };
 
   const navigateToSignUp = () => {
-    navigation.navigate("SignUp");
+    let rootNavigation: any = navigation;
+    while (rootNavigation?.getParent?.()) {
+      rootNavigation = rootNavigation.getParent();
+    }
+    rootNavigation?.navigate?.("SignUp");
   };
 
   const handleLogout = async () => {

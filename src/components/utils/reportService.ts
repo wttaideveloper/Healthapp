@@ -1,4 +1,4 @@
-import { getDatabase, initDatabase } from './database';
+import { getDatabase, initDatabase, waitForDatabase } from './database';
 import { HealthReport, Group, HealthMetrics } from './types';
 import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -87,21 +87,21 @@ export const getTodayReportCount = async (): Promise<number> => {
     return webImpl().getTodayReportCount();
   }
   try {
+    await waitForDatabase();
     const db = getDatabase();
     const todayDate = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
-    
+
     const result = await db.getFirstAsync<{
       count: number;
     }>(
       `SELECT COUNT(*) as count FROM reports WHERE date = ?`,
       todayDate
     );
-    
+
     return result?.count || 0;
   } catch (error) {
-    // await initDatabase();
-    console.error('Error fetching today\'s report count:', error);
-    throw error;
+    console.warn('Error fetching today\'s report count:', error);
+    return 0;
   }
 };
 

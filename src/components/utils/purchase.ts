@@ -98,6 +98,20 @@ export type RevenueCatPackageSummary = {
   billingPeriod: string;
 };
 
+export const USER_FACING_SUBSCRIPTION_ERROR =
+  "Unable to load subscriptions. Please try again.";
+
+export const logStoreError = (context: string, error: unknown): void => {
+  const message =
+    error instanceof Error ? error.message : String(error ?? "Unknown store error");
+  console.warn(`[RevenueCat:${context}]`, message);
+};
+
+export const toUserFacingStoreError = (error: unknown): string => {
+  logStoreError("ui", error);
+  return USER_FACING_SUBSCRIPTION_ERROR;
+};
+
 const getRevenueCatConfig = (): RevenueCatRuntimeConfig => ({
   iosApiKey: REVENUECAT_IOS_API_KEY,
   androidApiKey: REVENUECAT_ANDROID_API_KEY,
@@ -440,12 +454,14 @@ export const initIAP = async (): Promise<void> => {
 
   const Purchases = getPurchases();
   if (!Purchases) {
-    throw new Error("RevenueCat native module is unavailable in this build.");
+    logStoreError("init", "RevenueCat native module is unavailable in this build.");
+    throw new Error(USER_FACING_SUBSCRIPTION_ERROR);
   }
 
   const configError = getRevenueCatConfigurationError();
   if (configError) {
-    throw new Error(configError);
+    logStoreError("init", configError);
+    throw new Error(USER_FACING_SUBSCRIPTION_ERROR);
   }
 
   if (configuredRevenueCat) {
@@ -459,8 +475,8 @@ export const initIAP = async (): Promise<void> => {
     Purchases.configure({ apiKey });
     configuredRevenueCat = true;
   } catch (error) {
-    const message = error instanceof Error ? error.message : "RevenueCat init failed.";
-    throw new Error(message);
+    logStoreError("configure", error);
+    throw new Error(USER_FACING_SUBSCRIPTION_ERROR);
   }
 };
 
@@ -606,43 +622,62 @@ export const getSubscriptions = async (): Promise<PurchasesPackage[]> => {
 
   const configError = getRevenueCatConfigurationError();
   if (configError) {
-    throw new Error(configError);
+    logStoreError("offerings", configError);
+    throw new Error(USER_FACING_SUBSCRIPTION_ERROR);
   }
 
   await initIAP();
   const Purchases = getPurchases();
   if (!Purchases) {
-    throw new Error("RevenueCat module is unavailable.");
+    logStoreError("offerings", "RevenueCat module is unavailable.");
+    throw new Error(USER_FACING_SUBSCRIPTION_ERROR);
   }
 
-  const config = getRevenueCatConfig();
-  const offerings = await Purchases.getOfferings();
-  const namedOffering = offerings?.all?.[config.offeringId] ?? null;
-  const currentOffering = offerings?.current ?? null;
-  const selectedOffering = namedOffering ?? currentOffering;
+  try {
+    const config = getRevenueCatConfig();
+    const offerings = await Purchases.getOfferings();
+    const namedOffering = offerings?.all?.[config.offeringId] ?? null;
+    const currentOffering = offerings?.current ?? null;
+    const selectedOffering = namedOffering ?? currentOffering;
 
-  if (!selectedOffering) {
-    throw new Error(
-      `No RevenueCat offering available. Expected offering '${config.offeringId}'.`
-    );
+    if (!selectedOffering) {
+      logStoreError(
+        "offerings",
+        `No offering available. Expected offering '${config.offeringId}'.`
+      );
+      throw new Error(USER_FACING_SUBSCRIPTION_ERROR);
+    }
+
+    const availablePackages = Array.isArray(selectedOffering?.availablePackages)
+      ? (selectedOffering.availablePackages as PurchasesPackage[])
+      : [];
+
+    if (availablePackages.length === 0) {
+      logStoreError(
+        "offerings",
+        `Offering '${selectedOffering?.identifier ?? config.offeringId}' has no packages.`
+      );
+      throw new Error(USER_FACING_SUBSCRIPTION_ERROR);
+    }
+
+    return availablePackages;
+  } catch (error) {
+    if (error instanceof Error && error.message === USER_FACING_SUBSCRIPTION_ERROR) {
+      throw error;
+    }
+    logStoreError("offerings", error);
+    throw new Error(USER_FACING_SUBSCRIPTION_ERROR);
   }
-
-  const availablePackages = Array.isArray(selectedOffering?.availablePackages)
-    ? (selectedOffering.availablePackages as PurchasesPackage[])
-    : [];
-
-  if (availablePackages.length === 0) {
-    throw new Error(
-      `RevenueCat offering '${selectedOffering?.identifier ?? config.offeringId}' has no available packages.`
-    );
-  }
-
-  return availablePackages;
 };
 
 export const getSubscriptionSummaries = async (): Promise<RevenueCatPackageSummary[]> => {
-  const packages = await getSubscriptions();
-  return packages.map(getPackageSummary);
+  try {
+    const packages = await getSubscriptions();
+    return packages.map(getPackageSummary);
+  } catch (error) {
+    logStoreError("summaries", error);
+    return [];
+  }
 };
 
 export const resolvePreferredPackage = (
@@ -698,25 +733,29 @@ export const purchaseSubscription = async (
 
   const configError = getRevenueCatConfigurationError();
   if (configError) {
-    throw new Error(configError);
+    logStoreError("purchase", configError);
+    throw new Error(USER_FACING_SUBSCRIPTION_ERROR);
   }
 
   await initIAP();
   const Purchases = getPurchases();
   if (!Purchases) {
-    throw new Error("RevenueCat is not available.");
+    logStoreError("purchase", "RevenueCat is not available.");
+    throw new Error(USER_FACING_SUBSCRIPTION_ERROR);
   }
 
   const pkg = resolvePreferredPackage(packages, selectedPackageIdentifier);
   if (!pkg) {
-    throw new Error("No subscription packages available to purchase.");
+    logStoreError("purchase", "No subscription packages available to purchase.");
+    throw new Error(USER_FACING_SUBSCRIPTION_ERROR);
   }
 
   try {
     const { customerInfo } = await Purchases.purchasePackage(pkg);
     const status = statusFromCustomerInfo(customerInfo, getRevenueCatConfig().entitlementId);
     if (!status) {
-      throw new Error("Purchase completed but status could not be determined.");
+      logStoreError("purchase", "Purchase completed but status could not be determined.");
+      throw new Error(USER_FACING_SUBSCRIPTION_ERROR);
     }
 
     return status;
@@ -725,9 +764,8 @@ export const purchaseSubscription = async (
       throw error;
     }
 
-    const message =
-      error instanceof Error ? error.message : "Unable to complete the App Store purchase.";
-    throw new Error(message);
+    logStoreError("purchase", error);
+    throw new Error(USER_FACING_SUBSCRIPTION_ERROR);
   }
 };
 
@@ -736,7 +774,8 @@ export const restorePurchases = async (): Promise<SubscriptionStatus | null> => 
 
   const configError = getRevenueCatConfigurationError();
   if (configError) {
-    throw new Error(configError);
+    logStoreError("restore", configError);
+    throw new Error(USER_FACING_SUBSCRIPTION_ERROR);
   }
 
   await initIAP();
