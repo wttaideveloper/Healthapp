@@ -31,8 +31,10 @@ const REVENUECAT_PRODUCT_IDS = (process.env.EXPO_PUBLIC_REVENUECAT_PRODUCT_IDS ?
   .split(",")
   .map((value) => value.trim())
   .filter(Boolean);
+// Mac App Store builds MUST use StoreKit via RevenueCat ("iap").
+// Stripe is only for non-store / direct Mac Catalyst distribution when explicitly set.
 const MAC_CATALYST_BILLING_MODE = (
-  process.env.EXPO_PUBLIC_MAC_CATALYST_BILLING_MODE ?? "stripe"
+  process.env.EXPO_PUBLIC_MAC_CATALYST_BILLING_MODE ?? "iap"
 ).trim().toLowerCase();
 const NATIVE_RETURN_SCHEME = (
   process.env.EXPO_PUBLIC_NATIVE_RETURN_SCHEME ?? "com.wtt.healthAge"
@@ -128,14 +130,37 @@ export const getRevenueCatTargetProductIds = (): string[] =>
 const isMacCatalyst = (): boolean =>
   Platform.OS === "ios" && Boolean((Platform as any)?.constants?.isMacCatalyst);
 
+/**
+ * Stripe on native is Mac Catalyst only, and only when billing mode is explicitly "stripe".
+ * Default / "iap" / any other value uses RevenueCat (StoreKit) — required for Mac App Store.
+ */
 const shouldUseStripeOnNative = (): boolean =>
-  isMacCatalyst() && MAC_CATALYST_BILLING_MODE !== "iap";
+  isMacCatalyst() && MAC_CATALYST_BILLING_MODE === "stripe";
 
 export const isNativeStorePurchaseEnabled = (): boolean =>
   Platform.OS !== "web" && !shouldUseStripeOnNative();
 
+const assertStripeAllowedOnCurrentPlatform = (): void => {
+  if (Platform.OS === "web") {
+    return;
+  }
+
+  if (isNativeStorePurchaseEnabled()) {
+    throw new Error(
+      "Stripe checkout is not available in App Store builds. Use In-App Purchase via RevenueCat."
+    );
+  }
+
+  if (!shouldUseStripeOnNative()) {
+    throw new Error(
+      "Stripe checkout is disabled on this platform. Set EXPO_PUBLIC_MAC_CATALYST_BILLING_MODE=stripe only for non-store Mac builds."
+    );
+  }
+};
+
 const getNativeBillingReturnUrls = (): { successUrl: string; cancelUrl: string; returnUrl: string } => {
-  if (isMacCatalyst()) {
+  // Only used when shouldUseStripeOnNative() is true (explicit Mac Catalyst stripe mode).
+  if (isMacCatalyst() && MAC_CATALYST_BILLING_MODE === "stripe") {
     return {
       successUrl: MAC_STRIPE_SUCCESS_URL,
       cancelUrl: MAC_STRIPE_CANCEL_URL,
@@ -896,6 +921,7 @@ export const cancelSubscription = async (): Promise<void> => {
   if (shouldUseStripeOnNative()) {
     throw new Error("Use billing portal for direct macOS distribution.");
   }
+  // Mac Catalyst (IAP) and iPhone/iPad share Platform.OS === "ios" → Apple subscription settings.
   const url =
     Platform.OS === "ios"
       ? "https://apps.apple.com/account/subscriptions"
@@ -904,6 +930,9 @@ export const cancelSubscription = async (): Promise<void> => {
 };
 
 export const startStripeCheckout = async (accessToken?: string | null): Promise<void> => {
+  // Hard block: never open Stripe/web checkout from App Store native builds (incl. Mac Catalyst IAP).
+  assertStripeAllowedOnCurrentPlatform();
+
   if (!getApiRoot()) {
     throw new Error("Billing is unavailable: API base URL is not configured.");
   }
@@ -943,6 +972,9 @@ export const startStripeCheckout = async (accessToken?: string | null): Promise<
 };
 
 export const startStripePortal = async (accessToken?: string | null): Promise<void> => {
+  // Hard block: never open Stripe portal from App Store native builds (incl. Mac Catalyst IAP).
+  assertStripeAllowedOnCurrentPlatform();
+
   if (!getApiRoot()) {
     throw new Error("Billing portal is unavailable: API base URL is not configured.");
   }

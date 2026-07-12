@@ -383,7 +383,10 @@ const PurchaseScreen: React.FC = () => {
     }
 
     if (Platform.OS === "web" || !isNativeStorePurchaseEnabled()) {
-      Alert.alert("Restore unavailable", "Restore purchases is only available in the iOS and Android apps.");
+      Alert.alert(
+        "Restore unavailable",
+        "Restore purchases is only available in App Store / Play Store builds that use In-App Purchase."
+      );
       return;
     }
 

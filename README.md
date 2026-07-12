@@ -69,7 +69,7 @@ Splash → Language Selection → Intro (3 screens) → Sign In / Sign Up
 | **Storage** | SQLite (`expo-sqlite`) on native; AsyncStorage on web |
 | **Auth** | Custom auth service with JWT + AsyncStorage persistence |
 | **i18n** | `i18next` + `react-i18next` (13 languages) |
-| **Payments** | RevenueCat (iOS/Android IAP) + Stripe (Web/Mac Catalyst) |
+| **Payments** | RevenueCat (iOS/Android/Mac App Store IAP) + Stripe (Web; optional non-store Mac via `EXPO_PUBLIC_MAC_CATALYST_BILLING_MODE=stripe`) |
 | **PDF** | `expo-print` + `react-native-html-to-pdf` (native); backend render fallback (web) |
 | **Excel** | `xlsx` + `expo-file-system` for loading `Health_Age_Table.xlsx` |
 | **Desktop** | Electron + electron-builder for Windows NSIS/AppX packaging |
@@ -185,8 +185,8 @@ EXPO_PUBLIC_REVENUECAT_OFFERING_ID=                # Offering identifier
 EXPO_PUBLIC_REVENUECAT_PACKAGE_ID=                 # Package identifier
 EXPO_PUBLIC_REVENUECAT_PRODUCT_IDS=                # Comma-separated product IDs
 EXPO_PUBLIC_REVENUECAT_SYNC_PATH=                  # Backend sync endpoint
-EXPO_PUBLIC_MAC_CATALYST_BILLING_MODE=             # stripe or iap (Mac only)
-EXPO_PUBLIC_MAC_STRIPE_SUCCESS_URL=                # Mac Stripe return URLs
+EXPO_PUBLIC_MAC_CATALYST_BILLING_MODE=iap           # REQUIRED: iap for Mac App Store; stripe only for non-store Mac
+EXPO_PUBLIC_MAC_STRIPE_SUCCESS_URL=                # Mac Stripe return URLs (mode=stripe only)
 EXPO_PUBLIC_MAC_STRIPE_CANCEL_URL=
 EXPO_PUBLIC_MAC_STRIPE_PORTAL_RETURN_URL=
 ```
