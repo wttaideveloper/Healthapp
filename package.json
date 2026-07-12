@@ -13,12 +13,13 @@
     "build:web": "expo export --platform web",
     "electron": "electron electron/main.cjs",
     "electron:preview": "npm run build:web && electron electron/main.cjs",
-    "dist:win:dir": "npm run build:web && electron-builder --win dir --x64",
-    "dist:win": "npm run build:web && electron-builder --win nsis --x64",
-    "dist:win:arm64": "npm run build:web && electron-builder --win nsis --arm64",
-    "dist:win:store": "npm run build:web && electron-builder --win appx --x64",
-    "dist:win:store:arm64": "npm run build:web && electron-builder --win appx --arm64",
-    "dist:win:all": "npm run build:web && electron-builder --win nsis appx --x64"
+    "generate:appx-assets": "node scripts/generate-appx-assets.js",
+    "dist:win:dir": "npm run generate:appx-assets && npm run build:web && electron-builder --win dir --x64",
+    "dist:win": "npm run generate:appx-assets && npm run build:web && electron-builder --win nsis --x64",
+    "dist:win:arm64": "npm run generate:appx-assets && npm run build:web && electron-builder --win nsis --arm64",
+    "dist:win:store": "npm run generate:appx-assets && npm run build:web && electron-builder --win appx --x64",
+    "dist:win:store:arm64": "npm run generate:appx-assets && npm run build:web && electron-builder --win appx --arm64",
+    "dist:win:all": "npm run generate:appx-assets && npm run build:web && electron-builder --win nsis appx --x64"
   },
   "dependencies": {
     "@expo/metro-runtime": "~5.0.5",
@@ -105,7 +106,7 @@
       "devDependencies": {}
     },
     "win": {
-      "icon": "assets/healthAge_Icon.png",
+      "icon": "build/icon.ico",
       "target": [
         "nsis"
       ]
