@@ -50,6 +50,16 @@ target 'HealthAge' do
       :ccache_enabled => podfile_properties['apple.ccacheEnabled'] == 'true',
     )
 
+    # Xcode 26+/Apple Clang 21: fmt 11.0.2 fails consteval checks under C++20.
+    # Force only the fmt pod to C++17 so FMT_USE_CONSTEVAL is disabled.
+    # iOS-only; does not affect Android.
+    installer.pods_project.targets.each do |target|
+      next unless target.name == 'fmt'
+      target.build_configurations.each do |config|
+        config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++17'
+      end
+    end
+
     # This is necessary for Xcode 14, because it signs resource bundles by default
     # when building for devices.
     installer.target_installation_results.pod_target_installation_results
