@@ -71,9 +71,9 @@ const LanguageScreen: React.FC<LanguageScreenProps> = ({ navigation }) => {
   }, []);
 
   if (isWebDesktop) {
-    const webLanguages = languages.slice(0, 10);
+    const webLanguages = languages;
     return (
-      <View style={styles.webRoot}>
+      <ScrollView style={styles.webScroll} contentContainerStyle={styles.webRoot}>
         <View style={styles.webContent}>
           <Text style={styles.webTitle}>{t("selectLanguage")}</Text>
 
@@ -117,7 +117,7 @@ const LanguageScreen: React.FC<LanguageScreenProps> = ({ navigation }) => {
             </LinearGradient>
           </TouchableOpacity>
         </View>
-      </View>
+      </ScrollView>
     );
   }
 
@@ -244,8 +244,12 @@ const styles = StyleSheet.create({
     color: "black",
     fontWeight: "regular",
   },
-  webRoot: {
+  webScroll: {
     flex: 1,
+    backgroundColor: "#F5F6F8",
+  },
+  webRoot: {
+    flexGrow: 1,
     backgroundColor: "#F5F6F8",
     alignItems: "center",
     justifyContent: "center",
