@@ -44,6 +44,10 @@ const languages = [
   { code: "tr", name: "Türkçe", letter: "A" }, // Turkish
   { code: "te", name: "తెలుగు", letter: "అ" }, // Telugu
   { code: "pa", name: "ਪੰਜਾਬੀ", letter: "ਪ" }, // Punjabi
+  // RTL languages - the app mirrors its layout for these via src/components/utils/rtl.ts
+  { code: "fa", name: "فارسی", letter: "ف" }, // Persian
+  { code: "ur", name: "اردو", letter: "ا" }, // Urdu
+  { code: "he", name: "עברית", letter: "ע" }, // Hebrew
 ];
 
 const ChangeLanguage: React.FC<ChangeLanguageProps> = ({ navigation }) => {

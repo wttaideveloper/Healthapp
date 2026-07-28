@@ -341,6 +341,10 @@ const WebShellHeader: React.FC<{
     { code: "tr", label: "Türkçe" },
     { code: "te", label: "తెలుగు" },
     { code: "pa", label: "ਪੰਜਾਬੀ" },
+    // RTL languages - the app mirrors its layout for these via src/components/utils/rtl.ts
+    { code: "fa", label: "فارسی" },
+    { code: "ur", label: "اردو" },
+    { code: "he", label: "עברית" },
   ];
 
   const goRoot = (name: string, params?: any) => {

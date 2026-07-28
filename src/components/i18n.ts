@@ -9560,10 +9560,10 @@ const resources = {
       progress: "ਤਰੱਕੀ",
     },
   },
-  // NOTE: fa / he / ur are RTL. Like the existing `ar` bundle, they are
-  // intentionally NOT listed in LanguageScreen, ChangesLanguage or the
-  // DrawerNavigator language menu, because the app has no RTL layout support.
-  // They are prepared here so they can be switched on once RTL lands.
+  // NOTE: fa / he / ur are RTL and are user-visible. They are listed in
+  // LanguageScreen, ChangesLanguage and the DrawerNavigator language menu, and
+  // the layout mirrors for them via src/components/utils/rtl.ts.
+  // The `ar` bundle stays hidden until it reaches full key parity.
   fa: {
     translation: {
       chooseLanguage: "انتخاب زبان",
