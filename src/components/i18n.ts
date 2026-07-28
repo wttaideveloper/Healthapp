@@ -7374,7 +7374,7 @@ const resources = {
       renew: "புதுப்பிக்கவும்",
       BloodPressure: "இரத்த அழுத்தம்",
       BloodGlucose: "இரத்த சர்க்கரை",
-      BMI: "உடல் массы குறியீடு",
+      BMI: "உடல் நிறை குறியீடு",
       PDFDonwload: "PDF பதிவிறக்கம் செய்யப்பட்டது!",
       PDFShared: "PDF பகிரப்பட்டது!",
       Error: "ஏதோ தவறு ஏற்பட்டது!",
