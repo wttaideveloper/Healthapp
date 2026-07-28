@@ -29,7 +29,7 @@ const REVENUECAT_PACKAGE_ID =
   (process.env.EXPO_PUBLIC_REVENUECAT_PACKAGE_ID ?? "").trim();
 const REVENUECAT_PRODUCT_IDS = (process.env.EXPO_PUBLIC_REVENUECAT_PRODUCT_IDS ?? "")
   .split(",")
-  .map((value) => value.trim())
+  .map((value: string) => value.trim())
   .filter(Boolean);
 // Mac App Store builds MUST use StoreKit via RevenueCat ("iap").
 // Stripe is only for non-store / direct Mac Catalyst distribution when explicitly set.
@@ -69,6 +69,7 @@ type PurchasesModule = {
   restorePurchases: () => Promise<CustomerInfo>;
   logIn?: (appUserId: string) => Promise<{ customerInfo: CustomerInfo; created: boolean }>;
   logOut?: () => Promise<CustomerInfo>;
+  isAnonymous?: () => Promise<boolean>;
 };
 
 export type SubscriptionStatus = {
@@ -543,6 +544,14 @@ export const syncRevenueCatUser = async (appUserId?: string | null): Promise<voi
   try {
     if (appUserId?.trim()) {
       await Purchases.logIn?.(appUserId.trim());
+      return;
+    }
+
+    // Signing out of an already-anonymous RevenueCat user is a no-op that the
+    // SDK logs as "Called logOut but the current user is anonymous." Skip it so
+    // the warning does not appear on every sign-out or anonymous app start.
+    const alreadyAnonymous = await Purchases.isAnonymous?.();
+    if (alreadyAnonymous === true) {
       return;
     }
 
