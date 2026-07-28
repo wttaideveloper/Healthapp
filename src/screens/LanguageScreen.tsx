@@ -38,6 +38,7 @@ const languages = [
   { code: "mg", name: "Malagasy", letter: "A" }, // Malagasy
   { code: "da", name: "Dansk", letter: "A" }, // Danish
   { code: "ta", name: "தமிழ்", letter: "அ" }, // Tamil
+  { code: "bn", name: "বাংলা", letter: "ব" }, // Bangla
 ];
 const LanguageScreen: React.FC<LanguageScreenProps> = ({ navigation }) => {
   const { t } = useTranslation();
