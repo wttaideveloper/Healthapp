@@ -365,12 +365,12 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center",
     },
-    organizationChevron: { color: "#64748B", fontSize: 12, fontWeight: "800", marginLeft: 10 },
+    organizationChevron: { color: "#64748B", fontSize: 12, fontWeight: "800", marginStart: 10 },
     cardTitle: { fontSize: 20, fontWeight: "700", color: "#0F172A", marginBottom: 20 },
     cardSub: { color: "#64748B", fontSize: 14, marginBottom: 15 },
 
     featureRow: { flexDirection: "row", marginBottom: 16, alignItems: "center" },
-    check: { color: "#10B981", fontWeight: "900", marginRight: 12 },
+    check: { color: "#10B981", fontWeight: "900", marginEnd: 12 },
     featureText: { color: "#475569", fontSize: 15 },
 
     price: { fontSize: 48, fontWeight: "800", color: "#0F172A" },

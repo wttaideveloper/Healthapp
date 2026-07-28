@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
 
   profileInfo: {
     flex: 1,
-    marginLeft: 14,
+    marginStart: 14,
   },
 
   nameText: {
@@ -362,7 +362,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#E8F7FD",
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 14,
+    marginEnd: 14,
   },
 
   subscriptionTitle: {
@@ -459,7 +459,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#EEF6FF",
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 12,
+    marginEnd: 12,
   },
 
   menuText: {

@@ -38,6 +38,7 @@ import { useTranslation } from "react-i18next";
 import { useSubscription } from "../context/subScriptionContext";
 import { isValidEmail, isValidName } from "../components/utils/validation";
 import { useAuth } from "../context/authContext";
+import { flipIcon, forwardIcon } from "../components/utils/rtl";
 import {
   FREE_DAILY_TASK_LIMIT,
   getDailyLimitStatus,
@@ -517,7 +518,7 @@ const InterestScreen: React.FC<InterestScreenProps> = ({
           }}
           style={styles.navBtn}
         >
-          <Image source={icons.Arrow} style={{ width: 10, height: 16  }}></Image>
+          <Image source={icons.Arrow} style={[{ width: 10, height: 16  }, flipIcon()]}></Image>
           <Font
             style={styles.navText}
             text="back"
@@ -535,7 +536,7 @@ const InterestScreen: React.FC<InterestScreenProps> = ({
           ></Font>
           <Image
             source={icons.Arrow}
-            style={{width: 10, height: 16 , transform: [{ scaleX: -1 }] }}
+            style={{width: 10, height: 16 , ...forwardIcon() }}
           ></Image>
         </TouchableOpacity>
       </View>
@@ -693,7 +694,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 10,
+    marginEnd: 10,
   },
   checkText: {
     color: "white",

@@ -997,7 +997,7 @@ const styles = StyleSheet.create({
     color: "#315E99",
     fontWeight: "600",
     fontSize: 12,
-    textAlign: "left",
+    textAlign: "auto",
     width: "100%",
   },
   workspaceMetaText: {
@@ -1005,7 +1005,7 @@ const styles = StyleSheet.create({
     color: "#315E99",
     fontSize: 12,
     fontWeight: "600",
-    textAlign: "left",
+    textAlign: "auto",
     width: "100%",
   },
   optionDebug: {

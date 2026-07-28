@@ -14,6 +14,7 @@ import VerifyEmailScreen from "../screens/VerifyEmailScreen";
 import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
 import { useAuth } from "../context/authContext";
 import i18n from "../components/i18n";
+import { applyDirection } from "../components/utils/rtl";
 import { useTranslation } from "react-i18next";
 
 export type RootStackParamList = {
@@ -60,6 +61,10 @@ const AppNavigator: React.FC = () => {
         if (language) {
           await i18n.changeLanguage(language);
         }
+
+        // Establish the writing direction before the first screen mounts, so an
+        // RTL language renders correctly from a cold start with no reload.
+        applyDirection(language);
 
         setStartupState({
           loaded: true,

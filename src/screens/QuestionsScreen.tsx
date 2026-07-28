@@ -22,6 +22,7 @@ import {
 } from "../components/utils/readExcel";
 import { calculateBMI } from "../components/utils/BmiCalculation";
 import { useTranslation } from "react-i18next";
+import { flipIcon, forwardIcon } from "../components/utils/rtl";
 
 type QuestionsProps = DrawerScreenProps<DrawerParamList, "QuestionsScreen">;
 
@@ -446,7 +447,7 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
           }}
           style={[styles.navBtn, isWebDesktop ? styles.webNavBtn : null]}
         >
-          <Image source={icons.Arrow} style={{ width: 10, height: 16 }}></Image>
+          <Image source={icons.Arrow} style={[{ width: 10, height: 16 }, flipIcon()]}></Image>
           <Font
             style={{ color: "#0C9FD5", ...(isWebDesktop ? styles.webNavText : styles.navText) }}
             text="back"
@@ -464,7 +465,7 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
           ></Font>
           <Image
             source={icons.Arrow}
-            style={{ width: 10, height: 16, transform: [{ scaleX: -1 }] }}
+            style={{ width: 10, height: 16, ...forwardIcon() }}
           ></Image>
         </TouchableOpacity>
       </View>

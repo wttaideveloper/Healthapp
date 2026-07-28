@@ -212,7 +212,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
               style={{
                 padding: 2, // Border thickness
                 borderRadius: 999999,
-                marginRight: 14,
+                marginEnd: 14,
                 width: "50%",
               }}
             >

@@ -29,6 +29,7 @@ import i18n from "../components/i18n";
 import CheckoutResultScreen from "../screens/CheckoutResultScreen";
 import { clearCachedSubscriptionStatus } from "../components/utils/purchase";
 import { useTranslation } from "react-i18next";
+import { applyDirection, flipIcon } from "../components/utils/rtl";
 
 export type DrawerParamList = {
   Main: undefined;
@@ -251,7 +252,7 @@ const HeaderRight = ({ navigation }) => {
             style={{
               padding: 2, // Border thickness
               borderRadius: 999999,
-              marginRight: 14,
+              marginEnd: 14,
             }}
           >
             {/* <Image
@@ -375,6 +376,7 @@ const WebShellHeader: React.FC<{
   const handleSelectLanguage = async (code: string) => {
     try {
       await i18n.changeLanguage(code);
+      applyDirection(code);
       await AsyncStorage.setItem("language", code);
       setCurrentLanguage(code);
       setLanguageOpen(false);
@@ -724,7 +726,7 @@ const DrawerScreens: React.FC = () => {
           //       style={{
           //         padding: 2, // Border thickness
           //         borderRadius: 999999,
-          //         marginRight: 14,
+          //         marginEnd: 14,
           //       }}
           //     >
           //       {/* <Image
@@ -992,7 +994,7 @@ const DrawerScreens: React.FC = () => {
                 }}
               >
                 <TouchableOpacity style={{padding:10}} onPress={() => navigation.goBack()}>
-                  <Image source={icons.Arrow} style={{ width: 10, height: 16 }}></Image>
+                  <Image source={icons.Arrow} style={[{ width: 10, height: 16 }, flipIcon()]}></Image>
                 </TouchableOpacity>
                 <Font onPress={() => navigation.goBack()} text={"aboutTheAppTitle"} style={{ fontSize: 16 ,fontWeight: 600,padding:10 }} />
               </View>

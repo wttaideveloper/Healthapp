@@ -14,6 +14,7 @@ import i18n from "../components/i18n";
 import Modal from "react-native-modal";
 import { useTranslation } from "react-i18next";
 import * as Sharing from "expo-sharing";
+import { forwardIcon } from "../components/utils/rtl";
 
 type PrintScreenProps = DrawerScreenProps<DrawerParamList, "PrintScreen">;
 type PaperSize = "A4_SIZE" | "US_LETTER";
@@ -517,7 +518,7 @@ const PrintScreen: React.FC<PrintScreenProps> = ({ navigation, route }) => {
             <Font text="a4Size" style={styles.optionText} />
             <Image
               source={icons.Arrow}
-              style={{ width: 10, height: 16, transform: [{ scaleX: -1 }] }}
+              style={{ width: 10, height: 16, ...forwardIcon() }}
             />
           </TouchableOpacity>
 
@@ -528,7 +529,7 @@ const PrintScreen: React.FC<PrintScreenProps> = ({ navigation, route }) => {
             <Font text="usLetter" style={styles.optionText} />
             <Image
               source={icons.Arrow}
-              style={{ width: 10, height: 16, transform: [{ scaleX: -1 }] }}
+              style={{ width: 10, height: 16, ...forwardIcon() }}
             />
           </TouchableOpacity>
         </View>

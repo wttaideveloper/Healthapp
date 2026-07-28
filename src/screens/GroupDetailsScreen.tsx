@@ -28,6 +28,7 @@ import FilterModal from "../components/filterModal";
 import { HealthReport } from "../components/utils/types";
 import CheckBox from "../components/checkbox";
 import { useTranslation } from "react-i18next";
+import { flipIcon, forwardIcon } from "../components/utils/rtl";
 
 const dummyArray = [
   {
@@ -221,7 +222,7 @@ const [isModalVisible, setModalVisible] = React.useState(false);
         onPress={() => navigation.goBack()}
         style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
       >
-        <Image source={icons.Arrow} style={{ width: 10, height: 16 }}></Image>
+        <Image source={icons.Arrow} style={[{ width: 10, height: 16 }, flipIcon()]}></Image>
         <Font
           text="Back"
           style={{ color: "#0C9FD5", fontWeight: 500, fontSize: 16 }}
@@ -556,7 +557,7 @@ const [isModalVisible, setModalVisible] = React.useState(false);
                       style={{
                         width: 10,
                         height: 16,
-                        transform: [{ scaleX: -1 }],
+                        ...forwardIcon(),
                       }}
                     ></Image>
                   </TouchableOpacity>

@@ -17,6 +17,7 @@ import i18n from "../components/i18n";
 import { LinearGradient } from "expo-linear-gradient";
 import Button from "../components/Button";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { applyDirection } from "../components/utils/rtl";
 
 type LanguageScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, "Language">;
@@ -62,6 +63,7 @@ const LanguageScreen: React.FC<LanguageScreenProps> = ({ navigation }) => {
 
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
+    applyDirection(lng);
     setLanguageToStore(lng);
     setLanguage(lng);
   };

@@ -28,6 +28,7 @@ import { DrawerParamList } from "../navigation/DrawerNavigator";
 import { useTranslation } from "react-i18next";
 import { Dimensions } from "react-native";
 import { isValidName } from "../components/utils/validation";
+import { flipIcon, forwardIcon } from "../components/utils/rtl";
 
 type HealthAgeTestProps = DrawerScreenProps<DrawerParamList, "healthAgeTest">;
 
@@ -1962,7 +1963,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
               ]}
             >
               <Image source={icons.bulb} style={{ width: 16, height: 16 }} />
-              <View style={{ flex: 1, paddingRight: 18 }}>
+              <View style={{ flex: 1, paddingEnd: 18 }}>
                 <Font text="getStarted" style={{ fontSize: 13, fontWeight: 400 }} />
               </View>
               <TouchableOpacity
@@ -2014,7 +2015,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
               isWebDesktop ? styles.webNavBtn : null,
             ]}
           >
-            <Image source={icons.Arrow} style={{ width: 10, height: 16 }} />
+            <Image source={icons.Arrow} style={[{ width: 10, height: 16 }, flipIcon()]} />
             <Font
               style={{
                 color: "#0C9FD5",
@@ -2115,7 +2116,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
               }}
               text={step >= 1 && step < 8 ? "next" : "start"}
             />
-            <Image source={icons.Arrow} style={{ width: 10, height: 16, transform: [{ scaleX: -1 }] }} />
+            <Image source={icons.Arrow} style={{ width: 10, height: 16, ...forwardIcon() }} />
           </TouchableOpacity>
         </View>
       </View>

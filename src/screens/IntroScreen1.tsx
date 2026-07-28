@@ -15,6 +15,7 @@ import { icons } from "../components/images";
 import Button from "../components/Button";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTranslation } from "react-i18next";
+import { flipIcon } from "../components/utils/rtl";
 
 const ONBOARDING_COMPLETED_KEY = "onboarding_completed";
 
@@ -77,7 +78,7 @@ const IntroScreen1: React.FC<IntroScreen1Props> = ({ navigation }) => {
           onPress={handleBackPress}
           style={[styles.backRow, isWeb && styles.backRowWeb]}
         >
-          <Image source={icons.Arrow} style={{ width: 10, height: 16 }}></Image>
+          <Image source={icons.Arrow} style={[{ width: 10, height: 16 }, flipIcon()]}></Image>
           <Font
             text="back"
             style={{ color: "#0C9FD5", fontWeight: "medium" }}

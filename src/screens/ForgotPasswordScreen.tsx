@@ -19,6 +19,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { icons } from "../components/images";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
+import { flipIcon } from "../components/utils/rtl";
 
 type ForgotPasswordScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, "ForgotPassword">;
@@ -238,7 +239,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
         <View style={styles.mobileTopBackRow}>
           <View style={styles.mobileTopBackInner}>
             <TouchableOpacity style={styles.mobileBackButton} onPress={backToSignIn}>
-              <Ionicons name="arrow-back" size={18} color="#475569" />
+              <Ionicons name="arrow-back" size={18} color="#475569" style={flipIcon()} />
             </TouchableOpacity>
           </View>
         </View>
@@ -426,7 +427,7 @@ const styles = StyleSheet.create({
   passwordToggle: {
     paddingVertical: 8,
     paddingHorizontal: 4,
-    marginLeft: 8,
+    marginStart: 8,
     alignItems: "center",
     justifyContent: "center",
     minWidth: 28,

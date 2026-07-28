@@ -19,6 +19,7 @@ import { icons } from "../components/images";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
+import { flipIcon } from "../components/utils/rtl";
 
 type SignInScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, "SignIn">;
@@ -206,7 +207,7 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ navigation }) => {
         <View style={styles.mobileTopBackRow}>
           <View style={styles.mobileTopBackInner}>
             <TouchableOpacity style={styles.mobileBackButton} onPress={backToApp}>
-              <Ionicons name="arrow-back" size={18} color="#475569" />
+              <Ionicons name="arrow-back" size={18} color="#475569" style={flipIcon()} />
             </TouchableOpacity>
           </View>
         </View>
@@ -397,7 +398,7 @@ const styles = StyleSheet.create({
   passwordToggle: {
     paddingVertical: 8,
     paddingHorizontal: 4,
-    marginLeft: 8,
+    marginStart: 8,
     alignItems: "center",
     justifyContent: "center",
     minWidth: 28,

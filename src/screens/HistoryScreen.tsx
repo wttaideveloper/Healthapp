@@ -43,6 +43,7 @@ import FilterModal from "../components/filterModal";
 import { useTranslation } from "react-i18next";
 import UpgradeModal from "../components/upgradeModal";
 import { verifySubscriptionStatus } from "../components/utils/purchase";
+import { forwardIcon } from "../components/utils/rtl";
 
 // type HistoryScreenProps = {navigation: DrawerScreenProps<DrawerParamList, "HistoryScreen">}
 type NavigationProps = StackNavigationProp<StackParamList, "HistoryScreen">;
@@ -798,7 +799,7 @@ const HistoryScreen: React.FC<NavigationProps> = () => {
                             style={{
                               width: 10,
                               height: 16,
-                              transform: [{ scaleX: -1 }],
+                              ...forwardIcon(),
                             }}
                           ></Image>
                         </TouchableOpacity>
@@ -973,7 +974,7 @@ const HistoryScreen: React.FC<NavigationProps> = () => {
                       style={{
                         width: 10,
                         height: 16,
-                        transform: [{ scaleX: -1 }],
+                        ...forwardIcon(),
                       }}
                     ></Image>
                   </TouchableOpacity>

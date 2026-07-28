@@ -1188,18 +1188,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1, // This ensures the title takes up available space but doesn't push the icon off-screen
-    marginRight: 10,
+    marginEnd: 10,
   },
   recommendationTitle: {
     fontSize: 15,
     fontWeight: 'bold',
     color: '#222',
-    marginLeft: 10, // Space between checkmark and text
+    marginStart: 10, // Space between checkmark and text
     flexShrink: 1, // Allows title to wrap if it's too long
   },
   citationButton: {
     padding: 4,
-    marginLeft: 2,
+    marginStart: 2,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 12,

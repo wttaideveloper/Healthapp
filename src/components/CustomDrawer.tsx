@@ -116,7 +116,7 @@ export const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (
             <View style={styles.separator} />
             {e?.subTabs
               ? e?.subTabs.map((ee, index) => (
-                  <View style={{ width: "90%", marginLeft: 30 }} key={index}>
+                  <View style={{ width: "90%", marginStart: 30 }} key={index}>
                     <TouchableOpacity
                       style={[
                         styles.drawerItem,
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
   },
   drawerText: {
     color: "black",
-    marginLeft: 10,
+    marginStart: 10,
     fontSize: 16,
     fontWeight: 500,
   },
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
   },
   logoutInlineText: {
     color: "#B42318",
-    marginLeft: 10,
+    marginStart: 10,
     fontSize: 16,
     fontWeight: "600",
   },
