@@ -30,6 +30,7 @@ type LanguageCode =
   | "ja"
   | "ko"
   | "mg"
+  | "pa"
   | "pt"
   | "ru"
   | "ta"
@@ -56,6 +57,7 @@ const SUPPORTED_LANGUAGES: LanguageCode[] = [
   "ja",
   "ko",
   "mg",
+  "pa",
   "pt",
   "ru",
   "ta",
@@ -84,6 +86,9 @@ const reportPreviewA4: Record<LanguageCode, number> = {
   // Interim: Telugu reuses the English preview thumbnail until a localized
   // Report_te.png is supplied. Preview is display-only.
   te: require("../../assets/files/Reports/A4_SIZE/Report_en.png"),
+  // Interim: Punjabi reuses the English preview thumbnail until a localized
+  // Report_pa.png is supplied. Preview is display-only.
+  pa: require("../../assets/files/Reports/A4_SIZE/Report_en.png"),
   da: require("../../assets/files/Reports/A4_SIZE/Report_da.png"),
   de: require("../../assets/files/Reports/A4_SIZE/Report_de.png"),
   en: require("../../assets/files/Reports/A4_SIZE/Report_en.png"),
@@ -114,6 +119,9 @@ const questionnairePreviewA4: Record<LanguageCode, number> = {
   // Interim: Telugu reuses the English preview thumbnail until a localized
   // Questionnaire_te.png is supplied. Preview is display-only.
   te: require("../../assets/files/Questionnaires/A4_SIZE/Questionnaire_en.png"),
+  // Interim: Punjabi reuses the English preview thumbnail until a localized
+  // Questionnaire_pa.png is supplied. Preview is display-only.
+  pa: require("../../assets/files/Questionnaires/A4_SIZE/Questionnaire_en.png"),
   da: require("../../assets/files/Questionnaires/A4_SIZE/Questionnaire_da.png"),
   de: require("../../assets/files/Questionnaires/A4_SIZE/Questionnaire_de.png"),
   en: require("../../assets/files/Questionnaires/A4_SIZE/Questionnaire_en.png"),
@@ -136,6 +144,7 @@ const reportTemplates: Record<PaperSize, Record<LanguageCode, number>> = {
     id: require("../../assets/files/Reports/A4_SIZE/REPORT A4 Indonesian.pdf"),
     tr: require("../../assets/files/Reports/A4_SIZE/REPORT A4 Turkish.pdf"),
     te: require("../../assets/files/Reports/A4_SIZE/REPORT A4 Telugu.pdf"),
+    pa: require("../../assets/files/Reports/A4_SIZE/REPORT A4 punjabi.pdf"),
     da: require("../../assets/files/Reports/A4_SIZE/da.pdf"),
     de: require("../../assets/files/Reports/A4_SIZE/de.pdf"),
     en: require("../../assets/files/Reports/A4_SIZE/en.pdf"),
@@ -156,6 +165,7 @@ const reportTemplates: Record<PaperSize, Record<LanguageCode, number>> = {
     id: require("../../assets/files/Reports/US_LETTER/REPORT US indonesion.pdf"),
     tr: require("../../assets/files/Reports/US_LETTER/REPORT US Turkish.pdf"),
     te: require("../../assets/files/Reports/US_LETTER/REPORT US Telugu.pdf"),
+    pa: require("../../assets/files/Reports/US_LETTER/REPORT US punjabi.pdf"),
     da: require("../../assets/files/Reports/US_LETTER/da.pdf"),
     de: require("../../assets/files/Reports/US_LETTER/de.pdf"),
     en: require("../../assets/files/Reports/US_LETTER/en.pdf"),
@@ -179,6 +189,7 @@ const questionnaireTemplates: Record<PaperSize, Record<LanguageCode, number>> = 
     id: require("../../assets/files/Questionnaires/A4_SIZE/Indonesian_A4.pdf"),
     tr: require("../../assets/files/Questionnaires/A4_SIZE/Turkish_A4.pdf"),
     te: require("../../assets/files/Questionnaires/A4_SIZE/Telugu_A4.pdf"),
+    pa: require("../../assets/files/Questionnaires/A4_SIZE/Punjabi_A4.pdf"),
     da: require("../../assets/files/Questionnaires/A4_SIZE/da.pdf"),
     de: require("../../assets/files/Questionnaires/A4_SIZE/de.pdf"),
     en: require("../../assets/files/Questionnaires/A4_SIZE/en.pdf"),
@@ -199,6 +210,7 @@ const questionnaireTemplates: Record<PaperSize, Record<LanguageCode, number>> = 
     id: require("../../assets/files/Questionnaires/US_LETTER/Indonesia_US Legal.pdf"),
     tr: require("../../assets/files/Questionnaires/US_LETTER/Turkish_US Legal.pdf"),
     te: require("../../assets/files/Questionnaires/US_LETTER/Telugu_US Legal.pdf"),
+    pa: require("../../assets/files/Questionnaires/US_LETTER/Punjabi_US Legal.pdf"),
     da: require("../../assets/files/Questionnaires/US_LETTER/da.pdf"),
     de: require("../../assets/files/Questionnaires/US_LETTER/de.pdf"),
     en: require("../../assets/files/Questionnaires/US_LETTER/en.pdf"),
