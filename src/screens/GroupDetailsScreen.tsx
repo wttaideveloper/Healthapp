@@ -224,7 +224,7 @@ const [isModalVisible, setModalVisible] = React.useState(false);
       >
         <Image source={icons.Arrow} style={[{ width: 10, height: 16 }, flipIcon()]}></Image>
         <Font
-          text="Back"
+          text="back"
           style={{ color: "#0C9FD5", fontWeight: 500, fontSize: 16 }}
         ></Font>
       </TouchableOpacity>
@@ -304,7 +304,7 @@ const [isModalVisible, setModalVisible] = React.useState(false);
             </LinearGradient>
 
             <View style={{ padding: 10 }}>
-              <Font text="Filter" style={{ color: "#262F40" }}></Font>
+              <Font text="Hs_Filter" style={{ color: "#262F40" }}></Font>
             </View>
           </TouchableOpacity>
         </View>
@@ -489,7 +489,7 @@ const [isModalVisible, setModalVisible] = React.useState(false);
                     style={{ flexDirection: "row", justifyContent: "center" }}
                   >
                     <Font
-                      text="Health Age"
+                      text="Rs_HealthAge"
                       style={{
                         color: "#274273",
                         fontWeight: 700,
@@ -545,7 +545,7 @@ const [isModalVisible, setModalVisible] = React.useState(false);
                     }}
                   >
                     <Font
-                      text="View"
+                      text="Hs_View"
                       style={{
                         color: "#0B9FD4",
                         fontWeight: 500,

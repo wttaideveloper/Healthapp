@@ -62,7 +62,7 @@ const FilterScreen: React.FC<FilterScreenProps> = ({ navigation, route }) => {
         }}
       >
         <Font
-          text="Filter by"
+          text="Fs_Filter"
           style={{ fontWeight: 700, fontSize: 20, color: "#262F40" }}
         ></Font>
         <TouchableOpacity
@@ -75,7 +75,7 @@ const FilterScreen: React.FC<FilterScreenProps> = ({ navigation, route }) => {
           }}
         >
           <Font
-            text="Close"
+            text="Fs_Close"
             style={{ fontWeight: 500, fontSize: 16, color: "#0C9FD5" }}
           ></Font>
           <Image
@@ -99,7 +99,7 @@ const FilterScreen: React.FC<FilterScreenProps> = ({ navigation, route }) => {
         }}
       >
         <Font
-          text="Name"
+          text="Is_Name"
           style={{ color: "#8d929d", fontSize: 12, fontWeight: 500 }}
         ></Font>
         <View
@@ -132,7 +132,7 @@ const FilterScreen: React.FC<FilterScreenProps> = ({ navigation, route }) => {
         }}
       >
         <Font
-          text="Date"
+          text="Fs_Date"
           style={{ color: "#8d929d", fontSize: 12, fontWeight: 500 }}
         ></Font>
         <View
@@ -239,7 +239,7 @@ const FilterScreen: React.FC<FilterScreenProps> = ({ navigation, route }) => {
         }}
       >
         <Font
-          text="Gender"
+          text="gender"
           style={{ color: "#8d929d", fontSize: 12, fontWeight: 500 }}
         ></Font>
         <View
@@ -256,7 +256,7 @@ const FilterScreen: React.FC<FilterScreenProps> = ({ navigation, route }) => {
               setFilterOptions((prev) => ({ ...prev, gender: "male" }))
             }
           ></CheckBox>
-          <Font text="Male" style={{ color: "#262F40", fontSize: 12 }}></Font>
+          <Font text="male" style={{ color: "#262F40", fontSize: 12 }}></Font>
         </View>
         <View
           style={{
@@ -272,7 +272,7 @@ const FilterScreen: React.FC<FilterScreenProps> = ({ navigation, route }) => {
               setFilterOptions((prev) => ({ ...prev, gender: "female" }))
             }
           ></CheckBox>
-          <Font text="Female" style={{ color: "#262F40", fontSize: 12 }}></Font>
+          <Font text="female" style={{ color: "#262F40", fontSize: 12 }}></Font>
         </View>
       </View>
       <TouchableOpacity
@@ -294,7 +294,7 @@ const FilterScreen: React.FC<FilterScreenProps> = ({ navigation, route }) => {
         }}
       >
         <Font
-          text="Clear all"
+          text="Fs_ClearAll"
           style={{ fontWeight: 500, fontSize: 16, color: "#0C9FD5" }}
         ></Font>
       </TouchableOpacity>

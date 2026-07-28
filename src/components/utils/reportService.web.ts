@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import i18n from "../i18n";
 
 // Web fallback implementation for reportService.
 // The native implementation uses SQLite. On web we use AsyncStorage for persistence and
@@ -254,7 +255,7 @@ const readReports = async (): Promise<StoredReport[]> => {
             user_id: String(payload.userId ?? payload.user_id ?? "web"),
             user_name: String(payload.userName ?? payload.user_name ?? payload.name ?? "NA"),
             user_email: typeof payload.userEmail === "string" ? payload.userEmail : payload.user_email,
-            title: String(payload.title ?? "Health Report"),
+            title: String(payload.title ?? i18n.t("healthReport")),
             answers: answersStr,
             report_data: reportDataStrFinal,
             date: item.date,

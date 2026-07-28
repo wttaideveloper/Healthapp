@@ -380,7 +380,7 @@ const HistoryScreen: React.FC<NavigationProps> = () => {
             </LinearGradient>
             <TextInput
               value={searchText}
-              placeholder={t("search")}
+              placeholder={t("Hs_Search")}
               placeholderTextColor={"#b2b2b2"}
               onChangeText={(val) => setSearchText(val)}
               style={{ padding: 10 }}
@@ -1293,7 +1293,7 @@ const HistoryScreen: React.FC<NavigationProps> = () => {
                           }}
                         ></Font>
                         <Font
-                          text="Reports"
+                          text="reports"
                           style={{
                             color: "#274273",
                             fontWeight: 700,

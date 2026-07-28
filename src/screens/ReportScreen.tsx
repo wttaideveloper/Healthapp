@@ -424,7 +424,7 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Health Report</title>
+        <title>${t("healthReport")}</title>
         <style>
             * {
                 margin: 0;
@@ -721,7 +721,7 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
     };
 
     if (nav.canShare?.({ files: [file] }) && nav.share) {
-      await nav.share({ files: [file], title: "Health Report" });
+      await nav.share({ files: [file], title: t("healthReport") });
       return;
     }
 

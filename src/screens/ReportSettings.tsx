@@ -183,7 +183,7 @@ const ReportSettings: React.FC<ReportScreenProps> = ({ navigation, route }) => {
               }}
             >
               <Font
-                text="Report Settings"
+                text="reportSetting"
                 style={{ fontWeight: 700, fontSize: 20, color: "#262F40" }}
               ></Font>
               <TouchableOpacity
@@ -196,7 +196,7 @@ const ReportSettings: React.FC<ReportScreenProps> = ({ navigation, route }) => {
                 }}
               >
                 <Font
-                  text="Close"
+                  text="Fs_Close"
                   style={{ fontWeight: 500, fontSize: 16, color: "#0C9FD5" }}
                 ></Font>
 
@@ -277,7 +277,7 @@ const ReportSettings: React.FC<ReportScreenProps> = ({ navigation, route }) => {
                             fontSize: 14,
                             fontWeight: 400,
                           }}
-                          text="Upload"
+                          text="upload"
                         ></Font>
                       </TouchableOpacity>
                     </View>
@@ -328,7 +328,7 @@ const ReportSettings: React.FC<ReportScreenProps> = ({ navigation, route }) => {
 
               <View style={{ marginVertical: 10 }}>
                 <Font
-                  text="Contact Details"
+                  text="contactDetails"
                   style={{ fontWeight: 700, fontSize: 18, color: "#262F40" }}
                 ></Font>
               </View>

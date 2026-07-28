@@ -11,7 +11,7 @@ const IntroScreen2: React.FC<IntroScreen2Props> = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Intro Screen 2</Text>
-      <Button title="Next" onPress={() => navigation.navigate('Intro3')} />
+      <Button title="next" onPress={() => navigation.navigate('Intro3')} />
     </View>
   );
 };

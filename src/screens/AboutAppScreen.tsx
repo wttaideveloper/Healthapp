@@ -24,7 +24,7 @@ const AboutAppScreen: React.FC<AboutAppScreenProps> = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/* <Font text="About the App" style={styles.title} /> */}
+        {/* <Font text="aboutTheAppTitle" style={styles.title} /> */}
         <Font text={"aboutTheAppDesc"} style={styles.content}>
           {/* This app helps to determine the “health age” of one's body according to an individual’s lifestyle practices. This app combines information from both the well-known Alameda County longevity studies and the new Adventist Health Studies. This app helps participants understand the strong correlation between one’s health habits and their risk of death. It provides an excellent basis for health counseling. */}
         </Font>

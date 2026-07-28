@@ -31,7 +31,7 @@ export const DeleteMessageModal: React.FC<DeleteMessageModalProps> = ({
               source={icons.deleteModal}
               style={{ width: 225, height: 150 }}
             ></Image>
-            <Font text="Item Deleted"></Font>
+            <Font text="Hs_Success"></Font>
           </View>
         </View>
       </TouchableWithoutFeedback>
