@@ -484,6 +484,7 @@ const resources = {
       filtersNotAvailableWeb: "Filters are not available on web yet.",
       filtersWebDesc: "This screen currently depends on native PDF/file modules. We can implement a web-friendly version next.",
       groupCreatedSuccessfully: "Group created successfully",
+      progress: "Progress",
     },
   },
   hi: {
@@ -959,6 +960,7 @@ const resources = {
       filtersNotAvailableWeb: "फ़िल्टर अभी वेब पर उपलब्ध नहीं हैं।",
       filtersWebDesc: "यह स्क्रीन फिलहाल नेटिव PDF/फ़ाइल मॉड्यूल पर निर्भर है। हम आगे इसका वेब-अनुकूल संस्करण लागू कर सकते हैं।",
       groupCreatedSuccessfully: "समूह सफलतापूर्वक बनाया गया",
+      progress: "प्रगति",
     },
   },
   es: {
@@ -1404,6 +1406,7 @@ const resources = {
       filtersNotAvailableWeb: "Los filtros aún no están disponibles en la web.",
       filtersWebDesc: "Esta pantalla depende actualmente de módulos nativos de PDF/archivos. Podemos implementar una versión compatible con la web más adelante.",
       groupCreatedSuccessfully: "Grupo creado correctamente",
+      progress: "Progreso",
     },
   },
   ja: {
@@ -1846,6 +1849,7 @@ const resources = {
       filtersNotAvailableWeb: "フィルターはまだウェブでご利用いただけません。",
       filtersWebDesc: "この画面は現在ネイティブのPDF/ファイルモジュールに依存しています。次にウェブ対応版を実装できます。",
       groupCreatedSuccessfully: "グループを作成しました",
+      progress: "進捗",
     },
   },
   fr: {
@@ -2329,6 +2333,7 @@ const resources = {
       filtersNotAvailableWeb: "Les filtres ne sont pas encore disponibles sur le web.",
       filtersWebDesc: "Cet écran dépend actuellement de modules PDF/fichiers natifs. Nous pourrons ensuite implémenter une version adaptée au web.",
       groupCreatedSuccessfully: "Groupe créé avec succès",
+      progress: "Progression",
     },
   },
   zh: {
@@ -2767,6 +2772,7 @@ const resources = {
       filtersNotAvailableWeb: "网页端暂无筛选功能。",
       filtersWebDesc: "此页面目前依赖原生 PDF/文件模块。我们接下来可以实现适配网页的版本。",
       groupCreatedSuccessfully: "群组创建成功",
+      progress: "进度",
     },
   },
   ar: {
@@ -3808,6 +3814,7 @@ const resources = {
       filtersNotAvailableWeb: "필터는 아직 웹에서 이용할 수 없습니다.",
       filtersWebDesc: "이 화면은 현재 네이티브 PDF/파일 모듈에 의존합니다. 다음 단계로 웹 친화적인 버전을 구현할 수 있습니다.",
       groupCreatedSuccessfully: "그룹이 생성되었습니다",
+      progress: "진행 상황",
     },
   },
   ru: {
@@ -4276,6 +4283,7 @@ const resources = {
       filtersNotAvailableWeb: "Фильтры пока недоступны в веб-версии.",
       filtersWebDesc: "Этот экран сейчас зависит от нативных модулей PDF/файлов. Далее мы можем реализовать веб-версию.",
       groupCreatedSuccessfully: "Группа успешно создана",
+      progress: "Прогресс",
     },
   },
   pt: {
@@ -4763,6 +4771,7 @@ const resources = {
       filtersNotAvailableWeb: "Os filtros ainda não estão disponíveis na web.",
       filtersWebDesc: "Esta tela depende atualmente de módulos nativos de PDF/arquivos. Podemos implementar uma versão compatível com a web em seguida.",
       groupCreatedSuccessfully: "Grupo criado com sucesso",
+      progress: "Progresso",
     },
   },
   de: {
@@ -5209,6 +5218,7 @@ const resources = {
       filtersNotAvailableWeb: "Filter sind im Web noch nicht verfügbar.",
       filtersWebDesc: "Dieser Bildschirm hängt derzeit von nativen PDF-/Dateimodulen ab. Als Nächstes können wir eine webfreundliche Version umsetzen.",
       groupCreatedSuccessfully: "Gruppe erfolgreich erstellt",
+      progress: "Fortschritt",
     },
   },
   pap: {
@@ -5980,6 +5990,7 @@ const resources = {
       filtersNotAvailableWeb: "Bộ lọc chưa khả dụng trên web.",
       filtersWebDesc: "Màn hình này hiện phụ thuộc vào các mô-đun PDF/tệp gốc. Chúng tôi có thể triển khai phiên bản phù hợp với web sau.",
       groupCreatedSuccessfully: "Đã tạo nhóm thành công",
+      progress: "Tiến độ",
     },
   },
   mg: {
@@ -6457,6 +6468,7 @@ const resources = {
       filtersNotAvailableWeb: "Mbola tsy misy amin'ny tranonkala ny sivana.",
       filtersWebDesc: "Miankina amin'ny modely PDF/rakitra native ity efijery ity amin'izao fotoana izao. Azontsika atao ny mamorona kinova mifanaraka amin'ny tranonkala manaraka.",
       groupCreatedSuccessfully: "Voaforona soa aman-tsara ny vondrona",
+      progress: "Fandrosoana",
     },
   },
   da: {
@@ -6894,6 +6906,7 @@ const resources = {
       filtersNotAvailableWeb: "Filtre er endnu ikke tilgængelige på nettet.",
       filtersWebDesc: "Denne skærm afhænger i øjeblikket af native PDF-/filmoduler. Vi kan implementere en webvenlig version som det næste.",
       groupCreatedSuccessfully: "Gruppen blev oprettet",
+      progress: "Fremgang",
     },
   },
   ta: {
@@ -7373,6 +7386,7 @@ const resources = {
       filtersNotAvailableWeb: "வடிப்பான்கள் இணையத்தில் இன்னும் கிடைக்கவில்லை.",
       filtersWebDesc: "இந்தத் திரை தற்போது நேட்டிவ் PDF/கோப்பு தொகுதிகளைச் சார்ந்துள்ளது. அடுத்ததாக இணையத்திற்கு ஏற்ற பதிப்பை நாம் உருவாக்கலாம்.",
       groupCreatedSuccessfully: "குழு வெற்றிகரமாக உருவாக்கப்பட்டது",
+      progress: "முன்னேற்றம்",
     },
   },
   bn: {
@@ -7806,6 +7820,7 @@ const resources = {
       filtersNotAvailableWeb: "ফিল্টার এখনও ওয়েবে উপলব্ধ নয়।",
       filtersWebDesc: "এই স্ক্রিনটি বর্তমানে নেটিভ PDF/ফাইল মডিউলের উপর নির্ভরশীল। আমরা পরবর্তীতে একটি ওয়েব-বান্ধব সংস্করণ তৈরি করতে পারি।",
       groupCreatedSuccessfully: "গ্রুপ সফলভাবে তৈরি হয়েছে",
+      progress: "অগ্রগতি",
     },
   },
   id: {
@@ -8240,6 +8255,7 @@ const resources = {
       filtersNotAvailableWeb: "Filter belum tersedia di web.",
       filtersWebDesc: "Layar ini saat ini bergantung pada modul PDF/berkas native. Kami dapat menerapkan versi ramah web berikutnya.",
       groupCreatedSuccessfully: "Grup berhasil dibuat",
+      progress: "Kemajuan",
     },
   },
   tr: {
@@ -8673,6 +8689,7 @@ const resources = {
       filtersNotAvailableWeb: "Filtreler web'de henüz kullanılamıyor.",
       filtersWebDesc: "Bu ekran şu anda yerel PDF/dosya modüllerine bağlıdır. Bir sonraki adımda web uyumlu bir sürüm uygulayabiliriz.",
       groupCreatedSuccessfully: "Grup başarıyla oluşturuldu",
+      progress: "İlerleme",
     },
   },
   te: {
@@ -9106,6 +9123,7 @@ const resources = {
       filtersNotAvailableWeb: "ఫిల్టర్లు వెబ్‌లో ఇంకా అందుబాటులో లేవు.",
       filtersWebDesc: "ఈ స్క్రీన్ ప్రస్తుతం స్థానిక PDF/ఫైల్ మాడ్యూల్‌లపై ఆధారపడి ఉంది. తదుపరి మేము వెబ్-అనుకూల సంస్కరణను అమలు చేయవచ్చు.",
       groupCreatedSuccessfully: "సమూహం విజయవంతంగా సృష్టించబడింది",
+      progress: "పురోగతి",
     },
   },
   pa: {
@@ -9539,6 +9557,7 @@ const resources = {
       filtersNotAvailableWeb: "ਫਿਲਟਰ ਅਜੇ ਵੈੱਬ 'ਤੇ ਉਪਲਬਧ ਨਹੀਂ ਹਨ।",
       filtersWebDesc: "ਇਹ ਸਕ੍ਰੀਨ ਇਸ ਵੇਲੇ ਨੇਟਿਵ PDF/ਫਾਈਲ ਮਾਡਿਊਲਾਂ 'ਤੇ ਨਿਰਭਰ ਹੈ। ਅਸੀਂ ਅੱਗੇ ਵੈੱਬ-ਅਨੁਕੂਲ ਸੰਸਕਰਣ ਲਾਗੂ ਕਰ ਸਕਦੇ ਹਾਂ।",
       groupCreatedSuccessfully: "ਗਰੁੱਪ ਸਫਲਤਾਪੂਰਵਕ ਬਣਾਇਆ ਗਿਆ",
+      progress: "ਤਰੱਕੀ",
     },
   },
   // NOTE: fa / he / ur are RTL. Like the existing `ar` bundle, they are
@@ -9976,6 +9995,7 @@ const resources = {
       filtersNotAvailableWeb: "فیلترها هنوز در وب در دسترس نیستند.",
       filtersWebDesc: "این صفحه در حال حاضر به ماژول‌های بومی PDF/فایل وابسته است. در گام بعد می‌توانیم نسخه سازگار با وب را پیاده‌سازی کنیم.",
       groupCreatedSuccessfully: "گروه با موفقیت ایجاد شد",
+      progress: "پیشرفت",
     },
   },
   ur: {
@@ -10409,6 +10429,7 @@ const resources = {
       filtersNotAvailableWeb: "فلٹرز ابھی ویب پر دستیاب نہیں ہیں۔",
       filtersWebDesc: "یہ اسکرین فی الحال نیٹو PDF/فائل ماڈیولز پر منحصر ہے۔ ہم اگلے مرحلے میں ویب کے موافق ورژن نافذ کر سکتے ہیں۔",
       groupCreatedSuccessfully: "گروپ کامیابی سے بن گیا",
+      progress: "پیش رفت",
     },
   },
   he: {
@@ -10843,6 +10864,7 @@ const resources = {
       filtersNotAvailableWeb: "המסננים אינם זמינים עדיין באינטרנט.",
       filtersWebDesc: "מסך זה תלוי כרגע במודולי PDF/קבצים מקוריים. נוכל לממש בהמשך גרסה מותאמת לאינטרנט.",
       groupCreatedSuccessfully: "הקבוצה נוצרה בהצלחה",
+      progress: "התקדמות",
     },
   },
 };

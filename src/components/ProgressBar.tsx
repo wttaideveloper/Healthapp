@@ -12,7 +12,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ progress }) => {
     <View style={{ width: "100%",flexDirection:"column",gap:5 }}>
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
         <Font
-          text="Progress"
+          text="progress"
           style={{ color: "black", fontSize: 12, fontWeight: 500 }}
         ></Font>
         <Font
