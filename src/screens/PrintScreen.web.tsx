@@ -7,6 +7,7 @@ import Font from "../components/CustomisedFont";
 import { icons } from "../components/images";
 import { DrawerParamList } from "../navigation/DrawerNavigator";
 import i18n from "../components/i18n";
+import { useTranslation } from "react-i18next";
 
 type PrintScreenProps = DrawerScreenProps<DrawerParamList, "PrintScreen">;
 type PaperSize = "A4_SIZE" | "US_LETTER";
@@ -269,6 +270,7 @@ const downloadAssetPdf = async (moduleId: number, fileName: string) => {
 };
 
 const PrintScreenWeb: React.FC<PrintScreenProps> = ({ navigation, route }) => {
+  const { t } = useTranslation();
   const docType: DocType = route.params.screen === "Report" ? "Report" : "Questionnaire";
   const language = normalizeLanguage(i18n?.language);
 
@@ -285,10 +287,10 @@ const PrintScreenWeb: React.FC<PrintScreenProps> = ({ navigation, route }) => {
       const template = getTemplateAsset(paperSize);
       const fileName = `${docType.toLowerCase()}_${paperSize.toLowerCase()}_${language}.pdf`;
       await downloadAssetPdf(template, fileName);
-      Alert.alert("Downloaded", fileName);
+      Alert.alert(t("downloaded"), fileName);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Download failed";
-      Alert.alert("Error", message);
+      Alert.alert(t("errorTitle"), message);
     }
   };
 
@@ -311,14 +313,12 @@ const PrintScreenWeb: React.FC<PrintScreenProps> = ({ navigation, route }) => {
 
       <Button title="Hs_Download" style={styles.primaryBtn} onPress={() => handleDownload("A4_SIZE")} />
       <Button
-        title="Download US Letter"
+        title="downloadUsLetter"
         style={styles.secondaryBtn}
         onPress={() => handleDownload("US_LETTER")}
       />
 
-      <Text style={styles.note}>
-        Web downloads use the built-in PDF templates (no logo/address customization on web yet).
-      </Text>
+      <Text style={styles.note}>{t("webDownloadTemplatesNote")}</Text>
     </View>
   );
 };

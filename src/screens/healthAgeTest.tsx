@@ -305,7 +305,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
 
   const showValidationError = (message: string) => {
     setStepError(message);
-    Alert.alert("Validation", message, [{ text: t("Fs_Close") }]);
+    Alert.alert(t("validation"), message, [{ text: t("Fs_Close") }]);
   };
 
   const renderItem = () => {

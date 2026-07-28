@@ -38,6 +38,7 @@ import {
   type RevenueCatPackageSummary,
 } from "../components/utils/purchase";
 import { PRIVACY_POLICY_URL, TERMS_OF_USE_URL } from "../components/utils/legal";
+import { useTranslation } from "react-i18next";
 
 const FALLBACK_PLAN_PRICE = "$49/year";
 const FALLBACK_PLAN_DESCRIPTION = "Annual Pro subscription";
@@ -52,6 +53,7 @@ const formatDate = (value: Date | null): string | null => {
 };
 
 const PurchaseScreen: React.FC = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
   const {
@@ -75,7 +77,7 @@ const PurchaseScreen: React.FC = () => {
   const [webNotice, setWebNotice] = useState<string | null>(null);
 
   const promptSignIn = React.useCallback((message: string) => {
-    Alert.alert("Sign in required", message, [
+    Alert.alert(t("signInRequired"), message, [
       { text: "Cancel", style: "cancel" },
       {
         text: "Sign in",
@@ -94,7 +96,7 @@ const PurchaseScreen: React.FC = () => {
     try {
       await Linking.openURL(url);
     } catch {
-      Alert.alert("Unable to open link", url);
+      Alert.alert(t("unableToOpenLink"), url);
     }
   }, []);
 
@@ -323,7 +325,7 @@ const PurchaseScreen: React.FC = () => {
     }
 
     if (Platform.OS !== "web" && isNativeStorePurchaseEnabled() && storeError) {
-      Alert.alert("Subscriptions unavailable", storeError);
+      Alert.alert(t("subscriptionsUnavailable"), storeError);
       return;
     }
 
@@ -341,13 +343,13 @@ const PurchaseScreen: React.FC = () => {
         await refreshSubscription(true);
         const backendStatus = await verifySubscriptionStatusBackend(accessToken);
         if (backendStatus?.isValid) {
-          Alert.alert("Subscription active", "Your Pro access is already active for this account.");
+          Alert.alert(t("subscriptionActive"), t("subscriptionActiveDesc"));
           return;
         }
 
         Alert.alert(
-          "Already subscribed on this Apple ID",
-          "This Apple ID already has an active subscription. Sign in with the app account that owns this purchase, or manage the subscription from your App Store settings."
+          t("alreadySubscribedAppleId"),
+          t("alreadySubscribedAppleIdDesc")
         );
         return;
       }
@@ -356,9 +358,9 @@ const PurchaseScreen: React.FC = () => {
       const syncedStatus = await syncRevenueCatStatusToBackend(accessToken, user?.id ?? null, "purchase");
       await refreshSubscription(true);
       if (syncedStatus?.isValid) {
-        Alert.alert("Upgrade complete", "Subscription is active. Pro features are unlocked.");
+        Alert.alert(t("UpgradeComplete"), t("subscriptionActiveUnlocked"));
       } else {
-        Alert.alert("Purchase synced", "Your purchase was sent to the backend. Refreshing access now.");
+        Alert.alert(t("purchaseSynced"), t("purchaseSyncedDesc"));
       }
     } catch (error) {
       if (isPurchaseCancelledError(error)) {
@@ -369,7 +371,7 @@ const PurchaseScreen: React.FC = () => {
         error instanceof Error && error.message === USER_FACING_SUBSCRIPTION_ERROR
           ? error.message
           : USER_FACING_SUBSCRIPTION_ERROR;
-      Alert.alert("Subscription failed", message);
+      Alert.alert(t("subscriptionFailed"), message);
     } finally {
       setActionLoading(false);
     }
@@ -384,14 +386,14 @@ const PurchaseScreen: React.FC = () => {
 
     if (Platform.OS === "web" || !isNativeStorePurchaseEnabled()) {
       Alert.alert(
-        "Restore unavailable",
-        "Restore purchases is only available in App Store / Play Store builds that use In-App Purchase."
+        t("restoreUnavailable"),
+        t("restoreUnavailableDesc")
       );
       return;
     }
 
     if (storeError) {
-      Alert.alert("Subscriptions unavailable", storeError);
+      Alert.alert(t("subscriptionsUnavailable"), storeError);
       return;
     }
 
@@ -400,7 +402,7 @@ const PurchaseScreen: React.FC = () => {
       await initIAP();
       const restoredStatus = await restorePurchases();
       if (!restoredStatus?.isValid) {
-        Alert.alert("No purchases found", "No active subscription was found for this Apple ID.");
+        Alert.alert(t("noPurchasesFound"), t("noPurchasesFoundDesc"));
         return;
       }
 
@@ -412,16 +414,16 @@ const PurchaseScreen: React.FC = () => {
       await refreshSubscription(true);
 
       if (syncedStatus?.isValid || restoredStatus.isValid) {
-        Alert.alert("Restore complete", "Your subscription has been restored.");
+        Alert.alert(t("restoreComplete"), t("restoreCompleteDesc"));
       } else {
         Alert.alert(
-          "Restore pending",
-          "A store subscription was found, but backend access could not be confirmed yet. Try Refresh Status."
+          t("restorePending"),
+          t("restorePendingDesc")
         );
       }
     } catch (error) {
       logStoreError("restore", error);
-      Alert.alert("Restore failed", USER_FACING_SUBSCRIPTION_ERROR);
+      Alert.alert(t("restoreFailed"), USER_FACING_SUBSCRIPTION_ERROR);
     } finally {
       setActionLoading(false);
     }
@@ -449,7 +451,7 @@ const PurchaseScreen: React.FC = () => {
         : Platform.OS === "web"
           ? "Unable to open billing portal"
           : "Unable to open subscription management";
-      Alert.alert("Action failed", message);
+      Alert.alert(t("actionFailed"), message);
     }
   };
 
@@ -462,11 +464,11 @@ const PurchaseScreen: React.FC = () => {
       }
       await refreshSubscription(true);
       if (__DEV__ && debugSubscriptionOverride !== null) {
-        Alert.alert("Status refreshed", "Live subscription status reloaded (DEV override cleared).");
+        Alert.alert(t("statusRefreshed"), "Live subscription status reloaded (DEV override cleared).");
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unable to refresh status";
-      Alert.alert("Refresh failed", message);
+      Alert.alert(t("refreshFailed"), message);
     } finally {
       setActionLoading(false);
     }
@@ -563,7 +565,7 @@ const PurchaseScreen: React.FC = () => {
                 <Button
                   type="intro"
                   style={{ padding: 10, marginTop: 12 }}
-                  title="Manage Subscription"
+                  title="manageSubscription"
                   onPress={handleManageSubscription}
                   disabled={actionLoading}
                 />
@@ -571,7 +573,7 @@ const PurchaseScreen: React.FC = () => {
             ) : canOpenStripeBilling ? (
               <Button
                 style={styles.actionButton}
-                title="Manage Billing"
+                title="manageBilling"
                 onPress={handleManageSubscription}
                 disabled={actionLoading}
               />
@@ -579,7 +581,7 @@ const PurchaseScreen: React.FC = () => {
             {showNativeStripeRefresh ? (
               <Button
                 style={styles.actionButtonSecondary}
-                title="Refresh Status"
+                title="refreshStatus"
                 onPress={handleManualStatusRefresh}
                 disabled={actionLoading}
               />
@@ -599,18 +601,15 @@ const PurchaseScreen: React.FC = () => {
               </View>
             ) : null}
             <Text style={styles.accessTitle}>Health Age Pro</Text>
-            <Text style={styles.accessSubtitle}>
-              Subscribe yearly for individual Pro access. Workspace access is applied automatically when your
-              organization invites the email address you use to sign in.
-            </Text>
+            <Text style={styles.accessSubtitle}>{t("subscribeYearlyDesc")}</Text>
 
             {Platform.OS !== "web" && storeError ? (
               <View style={styles.errorCard}>
-                <Text style={styles.errorTitle}>Subscriptions unavailable</Text>
+                <Text style={styles.errorTitle}>{t("subscriptionsUnavailable")}</Text>
                 <Text style={styles.errorBody}>{storeError}</Text>
                 <Button
                   style={styles.actionButton}
-                  title="Retry"
+                  title="retryLabel"
                   onPress={loadNativePlanOptions}
                   disabled={actionLoading}
                 />
@@ -620,7 +619,7 @@ const PurchaseScreen: React.FC = () => {
             <View style={styles.planCard}>
               <Text style={styles.planPrice}>{planPrice}</Text>
               <Text style={styles.planName}>{planTitle}</Text>
-              <Text style={styles.planMeta}>Recurring annual subscription. Cancel any time from your store settings.</Text>
+              <Text style={styles.planMeta}>{t("recurringAnnualNote")}</Text>
               {planPeriod ? <Text style={styles.planMeta}>{planPeriod}</Text> : null}
             </View>
 
@@ -675,7 +674,7 @@ const PurchaseScreen: React.FC = () => {
                 onPress={handleRestorePurchases}
                 disabled={actionLoading || Boolean(storeError)}
               >
-                <Text style={styles.refreshText}>Restore Purchases</Text>
+                <Text style={styles.refreshText}>{t("restorePurchases")}</Text>
               </TouchableOpacity>
             ) : null}
 
@@ -686,7 +685,7 @@ const PurchaseScreen: React.FC = () => {
                   onPress={handleManageSubscription}
                   disabled={actionLoading}
                 >
-                  <Text style={styles.refreshText}>Manage existing subscription</Text>
+                  <Text style={styles.refreshText}>{t("manageExistingSubscription")}</Text>
                 </TouchableOpacity>
                 {showNativeStripeRefresh ? (
                   <TouchableOpacity
@@ -694,7 +693,7 @@ const PurchaseScreen: React.FC = () => {
                     onPress={handleManualStatusRefresh}
                     disabled={actionLoading}
                   >
-                    <Text style={styles.refreshText}>Refresh status in app</Text>
+                    <Text style={styles.refreshText}>{t("refreshStatusInApp")}</Text>
                   </TouchableOpacity>
                 ) : null}
               </>
@@ -704,7 +703,7 @@ const PurchaseScreen: React.FC = () => {
                 onPress={handleManageSubscription}
                 disabled={actionLoading}
               >
-                <Text style={styles.refreshText}>Open Billing Portal</Text>
+                <Text style={styles.refreshText}>{t("openBillingPortal")}</Text>
               </TouchableOpacity>
             ) : null}
 
@@ -718,17 +717,15 @@ const PurchaseScreen: React.FC = () => {
               : `Health Age Pro is an auto-renewable annual subscription. Payment is charged through your ${Platform.OS === "ios" ? "Apple App Store" : "Google Play"} account.`}
           </Text>
           {Platform.OS !== "web" ? (
-            <Text style={styles.disclosureText}>
-              The subscription renews automatically unless canceled at least 24 hours before the current period ends.
-            </Text>
+            <Text style={styles.disclosureText}>{t("autoRenewNote")}</Text>
           ) : null}
           <View style={styles.legalLinkRow}>
             <TouchableOpacity onPress={() => openExternalUrl(TERMS_OF_USE_URL)}>
-              <Text style={styles.legalLink}>Terms of Use</Text>
+              <Text style={styles.legalLink}>{t("termsOfUse")}</Text>
             </TouchableOpacity>
             <Text style={styles.legalDivider}> • </Text>
             <TouchableOpacity onPress={() => openExternalUrl(PRIVACY_POLICY_URL)}>
-              <Text style={styles.legalLink}>Privacy Policy</Text>
+              <Text style={styles.legalLink}>{t("privacyPolicy")}</Text>
             </TouchableOpacity>
           </View>
         </View>

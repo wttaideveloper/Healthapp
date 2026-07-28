@@ -1,14 +1,13 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 const FilterScreenWeb: React.FC = () => {
+  const { t } = useTranslation();
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Filters are not available on web yet.</Text>
-      <Text style={styles.subtitle}>
-        This screen currently depends on native PDF/file modules. We can implement a web-friendly
-        version next.
-      </Text>
+      <Text style={styles.title}>{t("filtersNotAvailableWeb")}</Text>
+      <Text style={styles.subtitle}>{t("filtersWebDesc")}</Text>
     </View>
   );
 };

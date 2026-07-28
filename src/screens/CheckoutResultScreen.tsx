@@ -1,6 +1,7 @@
 import React from "react";
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSubscription } from "../context/subScriptionContext";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   navigation: any;
@@ -10,6 +11,7 @@ type Props = {
 };
 
 const CheckoutResultScreen: React.FC<Props> = ({ navigation, route }) => {
+  const { t } = useTranslation();
   const { isSubscribed, subscriptionSource, refreshSubscription } = useSubscription();
   const success = route?.name?.toLowerCase() === "success";
   const [isRefreshing, setIsRefreshing] = React.useState(false);
@@ -88,11 +90,11 @@ const CheckoutResultScreen: React.FC<Props> = ({ navigation, route }) => {
                 onPress={handleRefresh}
                 disabled={isRefreshing}
               >
-                <Text style={styles.webSecondaryText}>Refresh Access</Text>
+                <Text style={styles.webSecondaryText}>{t("refreshAccess")}</Text>
               </TouchableOpacity>
             ) : (
               <TouchableOpacity style={styles.webSecondaryBtn} onPress={() => navigation.navigate("Purchase")}>
-                <Text style={styles.webSecondaryText}>Try Again</Text>
+                <Text style={styles.webSecondaryText}>{t("tryAgain")}</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -115,7 +117,7 @@ const CheckoutResultScreen: React.FC<Props> = ({ navigation, route }) => {
         </Text>
         <View style={styles.actions}>
           <TouchableOpacity style={styles.primaryBtn} onPress={() => navigation.navigate("Main")}>
-            <Text style={styles.primaryText}>Go To Home</Text>
+            <Text style={styles.primaryText}>{t("goToHome")}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.secondaryBtn} onPress={() => navigation.navigate("Purchase")}>

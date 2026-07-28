@@ -183,7 +183,7 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
     await FileSystem.writeAsStringAsync(destinationUri, base64Pdf, {
       encoding: FileSystem.EncodingType.Base64,
     });
-    Alert.alert("Success", "PDF saved successfully.");
+    Alert.alert(t("success"), t("pdfSavedSuccessfully"));
   };
 
   const createReportPdfFile = React.useCallback(async (htmlContent: string, fileName: string) => {
@@ -646,7 +646,7 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
       }
     } catch (error) {
       console.error("Error downloading PDF:", error);
-      Alert.alert("Error", "Failed to download PDF");
+      Alert.alert(t("errorTitle"), t("failedToDownloadPdf"));
     }
   };
 
@@ -680,7 +680,7 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
   const printHtmlWeb = (html: string) => {
     const w = window.open("", "_blank");
     if (!w) {
-      Alert.alert("Popup blocked", "Please allow popups to download/print the report.");
+      Alert.alert(t("popupBlocked"), t("popupBlockedDesc"));
       return;
     }
     w.document.open();
@@ -736,7 +736,7 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
   // Back handler is registered via useFocusEffect above.
   const handleDeleteCurrentReport = React.useCallback(() => {
     if (!reportId) return;
-    Alert.alert("Delete report", "Are you sure you want to delete this report?", [
+    Alert.alert(t("deleteReport"), t("deleteReportConfirm"), [
       { text: t("Hs_Cancel"), style: "cancel" },
       {
         text: t("Hs_Delete"),
@@ -770,7 +770,7 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
               style={styles.deleteHeaderAction}
             >
               <Image source={icons.delete} style={{ width: 16, height: 16 }} />
-              <Text style={styles.deleteHeaderText}>Delete</Text>
+              <Text style={styles.deleteHeaderText}>{t("Hs_Delete")}</Text>
             </TouchableOpacity>
           ) : null}
           <TouchableOpacity
@@ -978,16 +978,14 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
           ))}
         </View>
         <View style={styles.legalSection}>
-          <Text style={styles.disclosureText}>
-            Health Age Pro is an auto-renewable subscription. Manage or cancel it from your App Store account settings.
-          </Text>
+          <Text style={styles.disclosureText}>{t("autoRenewableNote")}</Text>
           <View style={styles.linkRow}>
             <TouchableOpacity onPress={() => openExternalUrl(TERMS_OF_USE_URL)}>
-              <Text style={styles.legalLink}>Terms of Use</Text>
+              <Text style={styles.legalLink}>{t("termsOfUse")}</Text>
             </TouchableOpacity>
             <Text style={styles.linkSeparator}> • </Text>
             <TouchableOpacity onPress={() => openExternalUrl(PRIVACY_POLICY_URL)}>
-              <Text style={styles.legalLink}>Privacy Policy</Text>
+              <Text style={styles.legalLink}>{t("privacyPolicy")}</Text>
             </TouchableOpacity>
           </View>
         </View>

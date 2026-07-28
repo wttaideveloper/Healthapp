@@ -14,6 +14,7 @@ import Font from "../components/CustomisedFont";
 import { icons } from "../components/images";
 import Button from "../components/Button";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useTranslation } from "react-i18next";
 
 const ONBOARDING_COMPLETED_KEY = "onboarding_completed";
 
@@ -22,6 +23,7 @@ type IntroScreen1Props = {
 };
 
 const IntroScreen1: React.FC<IntroScreen1Props> = ({ navigation }) => {
+  const { t } = useTranslation();
   const [step, setStep] = React.useState(1);
   const { width } = useWindowDimensions();
   const isWebDesktop = width >= 760;
@@ -179,9 +181,7 @@ const IntroScreen1: React.FC<IntroScreen1Props> = ({ navigation }) => {
             style={styles.signInLink}
             onPress={() => navigation.replace("InitialScreen")}
           >
-            <Text style={{ color: "#0C9FD5", fontWeight: "500", fontSize: 13 }}>
-              Continue to app
-            </Text>
+            <Text style={{ color: "#0C9FD5", fontWeight: "500", fontSize: 13 }}>{t("continueToApp")}</Text>
           </TouchableOpacity>
         ) : null}
       </View>

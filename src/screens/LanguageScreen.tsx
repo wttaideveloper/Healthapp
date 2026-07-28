@@ -75,7 +75,7 @@ const LanguageScreen: React.FC<LanguageScreenProps> = ({ navigation }) => {
     return (
       <View style={styles.webRoot}>
         <View style={styles.webContent}>
-          <Text style={styles.webTitle}>Select language</Text>
+          <Text style={styles.webTitle}>{t("selectLanguage")}</Text>
 
           <View style={styles.webGrid}>
             {webLanguages.map((lang) => {
@@ -113,7 +113,7 @@ const LanguageScreen: React.FC<LanguageScreenProps> = ({ navigation }) => {
               end={{ x: 1, y: 1 }}
               style={styles.webNextButton}
             >
-              <Text style={styles.webNextText}>Next</Text>
+              <Text style={styles.webNextText}>{t("next")}</Text>
             </LinearGradient>
           </TouchableOpacity>
         </View>

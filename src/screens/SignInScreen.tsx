@@ -18,6 +18,7 @@ import { isValidEmail } from "../components/utils/validation";
 import { icons } from "../components/images";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 
 type SignInScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, "SignIn">;
@@ -29,6 +30,7 @@ type SignInFieldErrors = {
 };
 
 const SignInScreen: React.FC<SignInScreenProps> = ({ navigation }) => {
+  const { t } = useTranslation();
   const { signIn, isLoading, useMockAuth, isAuthenticated } = useAuth();
   const { width } = useWindowDimensions();
   const [email, setEmail] = useState("");
@@ -94,10 +96,10 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ navigation }) => {
 
   const cardContent = (
     <>
-      <Text style={[styles.title, isNativeMobile ? styles.mobileTitle : null]}>Sign in</Text>
-      <Text style={[styles.subtitle, isNativeMobile ? styles.mobileSubtitle : null]}>Continue with your account.</Text>
+      <Text style={[styles.title, isNativeMobile ? styles.mobileTitle : null]}>{t("signInTitle")}</Text>
+      <Text style={[styles.subtitle, isNativeMobile ? styles.mobileSubtitle : null]}>{t("continueWithAccount")}</Text>
 
-      <Text style={styles.label}>Email</Text>
+      <Text style={styles.label}>{t("Is_Email")}</Text>
       <TextInput
         style={[styles.input, fieldErrors.email ? styles.inputError : null]}
         value={email}
@@ -113,7 +115,7 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ navigation }) => {
       />
       {fieldErrors.email ? <Text style={styles.error}>{fieldErrors.email}</Text> : null}
 
-      <Text style={styles.label}>Password</Text>
+      <Text style={styles.label}>{t("password")}</Text>
       <View style={[styles.passwordRow, fieldErrors.password ? styles.inputError : null]}>
         <TextInput
           style={styles.passwordInput}
@@ -124,7 +126,7 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ navigation }) => {
             if (submitError) setSubmitError(null);
           }}
           secureTextEntry={!showPassword}
-          placeholder="Your password"
+          placeholder={t("yourPassword")}
           placeholderTextColor="#8b909b"
         />
         <TouchableOpacity
@@ -145,7 +147,7 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ navigation }) => {
         onPress={() => navigation.navigate("ForgotPassword")}
         disabled={isLoading}
       >
-        <Text style={styles.forgotButtonText}>Forgot password?</Text>
+        <Text style={styles.forgotButtonText}>{t("forgotPasswordQ")}</Text>
       </TouchableOpacity>
 
       {submitError ? <Text style={styles.error}>{submitError}</Text> : null}
@@ -160,7 +162,7 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ navigation }) => {
           end={{ x: 1, y: 1 }}
           style={styles.primaryButton}
         >
-          {isLoading ? <ActivityIndicator color="#ffffff" /> : <Text style={styles.primaryText}>Sign in</Text>}
+          {isLoading ? <ActivityIndicator color="#ffffff" /> : <Text style={styles.primaryText}>{t("signInTitle")}</Text>}
         </LinearGradient>
       </TouchableOpacity>
 
@@ -169,7 +171,7 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ navigation }) => {
         onPress={() => navigation.navigate("SignUp")}
         disabled={isLoading}
       >
-        <Text style={styles.secondaryText}>Create account</Text>
+        <Text style={styles.secondaryText}>{t("createAccountLink")}</Text>
       </TouchableOpacity>
     </>
   );
@@ -180,10 +182,8 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ navigation }) => {
         <View style={styles.webFrame}>
           <View style={styles.webHero}>
             <Image source={icons.menuLogo} style={styles.webLogo} />
-            <Text style={styles.webHeroTitle}>Welcome back</Text>
-            <Text style={styles.webHeroText}>
-              Sign in to continue your Health Age assessments, reports, and premium features.
-            </Text>
+            <Text style={styles.webHeroTitle}>{t("welcomeBack")}</Text>
+            <Text style={styles.webHeroText}>{t("signInHeroDesc")}</Text>
             <Image source={icons.login} style={styles.webHeroImage} />
           </View>
           <KeyboardAvoidingView

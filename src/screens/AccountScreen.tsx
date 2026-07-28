@@ -24,8 +24,10 @@ import {
 
 import { useAuth } from "../context/authContext";
 import { useSubscription } from "../context/subScriptionContext";
+import { useTranslation } from "react-i18next";
 
 const AccountScreen: React.FC = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<any>();
 
   const { isAuthenticated, user, signOut } = useAuth();
@@ -60,13 +62,11 @@ const AccountScreen: React.FC = () => {
       await signOut();
 
       Alert.alert(
-        "Signed out",
-        "You can continue using the app as guest."
+        t("signedOut"), t("signedOutDesc")
       );
     } catch (error) {
       Alert.alert(
-        "Error",
-        "Unable to sign out right now."
+        t("errorTitle"), t("unableToSignOut")
       );
     }
   };
@@ -79,10 +79,10 @@ const AccountScreen: React.FC = () => {
     try {
       setIsRefreshingAccess(true);
       await refreshSubscription(true);
-      Alert.alert("Access refreshed", "Your latest subscription and workspace access have been loaded.");
+      Alert.alert(t("accessRefreshed"), t("accessRefreshedDesc"));
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unable to refresh access right now.";
-      Alert.alert("Refresh failed", message);
+      Alert.alert(t("refreshFailed"), message);
     } finally {
       setIsRefreshingAccess(false);
     }
@@ -118,7 +118,7 @@ const AccountScreen: React.FC = () => {
 
     return (
       <View style={styles.freeBadge}>
-        <Text style={styles.freeBadgeText}>FREE</Text>
+        <Text style={styles.freeBadgeText}>{t("freeTier")}</Text>
       </View>
     );
   };
@@ -131,7 +131,7 @@ const AccountScreen: React.FC = () => {
       >
         {/* HEADER */}
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Account</Text>
+          <Text style={styles.headerTitle}>{t("account")}</Text>
         </View>
 
         {/* USER CARD */}
@@ -216,9 +216,7 @@ const AccountScreen: React.FC = () => {
             onPress={handleLogout}
           >
             <LogOut size={18} color="#EF4444" />
-            <Text style={styles.logoutText}>
-              Sign Out
-            </Text>
+            <Text style={styles.logoutText}>{t("signOut")}</Text>
           </TouchableOpacity>
         ) : (
           <View style={styles.authButtons}>
@@ -226,18 +224,14 @@ const AccountScreen: React.FC = () => {
               style={styles.primaryButton}
               onPress={navigateToSignIn}
             >
-              <Text style={styles.primaryButtonText}>
-                Sign In
-              </Text>
+              <Text style={styles.primaryButtonText}>{t("signIn")}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.secondaryButton}
               onPress={navigateToSignUp}
             >
-              <Text style={styles.secondaryButtonText}>
-                Create Account
-              </Text>
+              <Text style={styles.secondaryButtonText}>{t("createAccount")}</Text>
             </TouchableOpacity>
           </View>
         )}

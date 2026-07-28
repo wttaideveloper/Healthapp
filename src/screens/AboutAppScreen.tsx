@@ -17,7 +17,7 @@ const AboutAppScreen: React.FC<AboutAppScreenProps> = ({ navigation }) => {
     try {
       await Linking.openURL(url);
     } catch {
-      Alert.alert("Error", "Unable to open this source link.");
+      Alert.alert(t("errorTitle"), t("unableToOpenSourceLink"));
     }
   };
 
@@ -35,14 +35,14 @@ const AboutAppScreen: React.FC<AboutAppScreenProps> = ({ navigation }) => {
           </Text>
         </View>
         <View style={styles.legalContainer}>
-          <Text style={styles.legalTitle}>Legal</Text>
+          <Text style={styles.legalTitle}>{t("legal")}</Text>
           <View style={styles.legalLinksRow}>
             <TouchableOpacity onPress={() => openSource(TERMS_OF_USE_URL)}>
-              <Text style={styles.legalLink}>Terms of Use</Text>
+              <Text style={styles.legalLink}>{t("termsOfUse")}</Text>
             </TouchableOpacity>
             <Text style={styles.legalSeparator}> • </Text>
             <TouchableOpacity onPress={() => openSource(PRIVACY_POLICY_URL)}>
-              <Text style={styles.legalLink}>Privacy Policy</Text>
+              <Text style={styles.legalLink}>{t("privacyPolicy")}</Text>
             </TouchableOpacity>
           </View>
         </View>

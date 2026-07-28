@@ -242,7 +242,7 @@ const HistoryScreen: React.FC<NavigationProps> = () => {
     setIsSelectAll(false);
     setSelectedReportIds([]);
     setSelectedGroupIdsToDelete([]);
-    Alert.alert("Group created successfully", "", [
+    Alert.alert(t("groupCreatedSuccessfully"), "", [
       {
         text: t("Fs_Close"),
         onPress: () => null,
@@ -1324,7 +1324,7 @@ const HistoryScreen: React.FC<NavigationProps> = () => {
                   style={{ padding: 10 }}
                 ></Button>
                 <Button
-                  title="Save"
+                  title="Hs_save"
                   style={{ padding: 10 }}
                   onPress={() => {
                     addReportsToGroup(

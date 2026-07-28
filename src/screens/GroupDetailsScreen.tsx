@@ -27,6 +27,7 @@ import { deleteReportsFromGroup, getReportsByGroup } from "../components/utils/r
 import FilterModal from "../components/filterModal";
 import { HealthReport } from "../components/utils/types";
 import CheckBox from "../components/checkbox";
+import { useTranslation } from "react-i18next";
 
 const dummyArray = [
   {
@@ -102,6 +103,7 @@ type NavigationProps = StackNavigationProp<
 >;
 
 const GroupDetailsScreen: React.FC<NavigationProps> = () => {
+  const { t } = useTranslation();
   const route = useRoute();
   console.log(route.params.groupId, "g ID");
   const groupId = route.params.groupId;
@@ -267,7 +269,7 @@ const [isModalVisible, setModalVisible] = React.useState(false);
             </LinearGradient>
             <TextInput
               value={searchText}
-              placeholder={"Search"}
+              placeholder={t("Hs_Search")}
               placeholderTextColor={"#b2b2b2"}
               onChangeText={(val) => setSearchText(val)}
               style={{ padding: 10 }}

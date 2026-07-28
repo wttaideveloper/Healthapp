@@ -227,7 +227,7 @@ const ReportSettings: React.FC<ReportScreenProps> = ({ navigation, route }) => {
                 }}
               ></Image>
             </View>
-            {/* <Button title="Pick Logo" onPress={pickImage} /> */}
+            {/* <Button title="pickLogo" onPress={pickImage} /> */}
             <View style={{ flexDirection: "column", gap: 10 }}>
               {!logoUri && (
                 <View
@@ -315,7 +315,7 @@ const ReportSettings: React.FC<ReportScreenProps> = ({ navigation, route }) => {
                     }}
                   >
                     <Button
-                      title="Remove Logo"
+                      title="removeLogo"
                       onPress={() => {
                         UpdateTheImage();
                         setLogoUri("");
@@ -334,13 +334,13 @@ const ReportSettings: React.FC<ReportScreenProps> = ({ navigation, route }) => {
               </View>
 
               <CustomInput
-                title="Address"
+                title="Is_Address"
                 placeHolder="Enter Address"
                 value={addrDetails}
                 onChangeText={(val) => setAddrDetails(val)}
               ></CustomInput>
               <CustomInput
-                title="Phone"
+                title="Is_Phone"
                 type="phone-pad"
                 placeHolder="Enter Phone Number"
                 value={contactDetails}
@@ -348,7 +348,7 @@ const ReportSettings: React.FC<ReportScreenProps> = ({ navigation, route }) => {
               ></CustomInput>
             </View>
             <Button
-              title="Save"
+              title="Hs_save"
               style={{ padding: 10, marginTop: 40 }}
               onPress={saveReportSettings}
             />

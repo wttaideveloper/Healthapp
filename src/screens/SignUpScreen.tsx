@@ -18,6 +18,7 @@ import { isValidEmail, isValidName } from "../components/utils/validation";
 import { icons } from "../components/images";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 
 type SignUpScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, "SignUp">;
@@ -30,6 +31,7 @@ type SignUpFieldErrors = {
 };
 
 const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
+  const { t } = useTranslation();
   const { signUp, isLoading, isAuthenticated } = useAuth();
   const { width } = useWindowDimensions();
   const [name, setName] = useState("");
@@ -109,12 +111,10 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
 
   const cardContent = (
     <>
-      <Text style={[styles.title, isNativeMobile ? styles.mobileTitle : null]}>Sign up</Text>
-      <Text style={[styles.subtitle, isNativeMobile ? styles.mobileSubtitle : null]}>
-        Set up your account to continue using the app.
-      </Text>
+      <Text style={[styles.title, isNativeMobile ? styles.mobileTitle : null]}>{t("signUpTitle")}</Text>
+      <Text style={[styles.subtitle, isNativeMobile ? styles.mobileSubtitle : null]}>{t("signUpDesc")}</Text>
 
-      <Text style={styles.label}>Name</Text>
+      <Text style={styles.label}>{t("Is_Name")}</Text>
       <TextInput
         style={[styles.input, fieldErrors.name ? styles.inputError : null]}
         value={name}
@@ -123,12 +123,12 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
           clearFieldError("name");
           if (submitError) setSubmitError(null);
         }}
-        placeholder="Your name"
+        placeholder={t("yourName")}
         placeholderTextColor="#8b909b"
       />
       {fieldErrors.name ? <Text style={styles.error}>{fieldErrors.name}</Text> : null}
 
-      <Text style={styles.label}>Email</Text>
+      <Text style={styles.label}>{t("Is_Email")}</Text>
       <TextInput
         style={[styles.input, fieldErrors.email ? styles.inputError : null]}
         value={email}
@@ -144,7 +144,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
       />
       {fieldErrors.email ? <Text style={styles.error}>{fieldErrors.email}</Text> : null}
 
-      <Text style={styles.label}>Password</Text>
+      <Text style={styles.label}>{t("password")}</Text>
       <View style={[styles.passwordRow, fieldErrors.password ? styles.inputError : null]}>
         <TextInput
           style={styles.passwordInput}
@@ -155,7 +155,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
             if (submitError) setSubmitError(null);
           }}
           secureTextEntry={!showPassword}
-          placeholder="At least 6 characters"
+          placeholder={t("atLeast6Chars")}
           placeholderTextColor="#8b909b"
         />
         <TouchableOpacity
@@ -184,7 +184,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
           {isLoading ? (
             <ActivityIndicator color="#ffffff" />
           ) : (
-            <Text style={styles.primaryText}>Sign up and verify</Text>
+            <Text style={styles.primaryText}>{t("signUpAndVerify")}</Text>
           )}
         </LinearGradient>
       </TouchableOpacity>
@@ -194,7 +194,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
         onPress={backToSignIn}
         disabled={isLoading}
       >
-        <Text style={styles.secondaryText}>Back to sign in</Text>
+        <Text style={styles.secondaryText}>{t("backToSignIn")}</Text>
       </TouchableOpacity>
     </>
   );
@@ -205,10 +205,8 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
         <View style={styles.webFrame}>
           <View style={styles.webHero}>
             <Image source={icons.menuLogo} style={styles.webLogo} />
-            <Text style={styles.webHeroTitle}>Join Health Age</Text>
-            <Text style={styles.webHeroText}>
-              Create your account to save assessments, sync access status, and unlock Pro features.
-            </Text>
+            <Text style={styles.webHeroTitle}>{t("joinHealthAge")}</Text>
+            <Text style={styles.webHeroText}>{t("signUpHeroDesc")}</Text>
             <Image source={icons.signup} style={styles.webHeroImage} />
           </View>
           <KeyboardAvoidingView

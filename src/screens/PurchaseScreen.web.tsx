@@ -20,10 +20,12 @@ import {
     type SubscriptionStatus,
 } from "../components/utils/purchase";
 import { PRIVACY_POLICY_URL, TERMS_OF_USE_URL } from "../components/utils/legal";
+import { useTranslation } from "react-i18next";
 
 const PENDING_STRIPE_CHECKOUT_KEY = "pending_stripe_checkout_started_at";
 
 const PurchaseScreenWeb: React.FC = () => {
+  const { t } = useTranslation();
     const { width } = useWindowDimensions();
     const {
         isSubscribed,
@@ -46,7 +48,7 @@ const PurchaseScreenWeb: React.FC = () => {
         try {
             await Linking.openURL(url);
         } catch {
-            Alert.alert("Unable to open link", url);
+            Alert.alert(t("unableToOpenLink"), url);
         }
     };
 
@@ -157,20 +159,20 @@ const PurchaseScreenWeb: React.FC = () => {
     }, [pollStripeEntitlement]);
 
     const handleStripeSubscribe = async () => {
-        if (!accessToken) return Alert.alert("Login Required", "Please sign in to upgrade.");
+        if (!accessToken) return Alert.alert(t("loginRequired"), t("pleaseSignInToUpgrade"));
         setActionLoading(true);
         try {
             await startStripeCheckout(accessToken);
         } catch (e) {
             const message = e instanceof Error ? e.message : "Could not initiate checkout.";
-            Alert.alert("Error", message);
+            Alert.alert(t("errorTitle"), message);
         } finally {
             setActionLoading(false);
         }
     };
 
     const handleManageBilling = async () => {
-        if (!accessToken) return Alert.alert("Login Required", "Please sign in to manage billing.");
+        if (!accessToken) return Alert.alert(t("loginRequired"), t("pleaseSignInToManageBilling"));
         setActionLoading(true);
         try {
             if (subscriptionSource === "workspace") {
@@ -181,7 +183,7 @@ const PurchaseScreenWeb: React.FC = () => {
             await startStripePortal(accessToken);
         } catch (e) {
             const message = e instanceof Error ? e.message : "Could not open billing portal.";
-            Alert.alert("Error", message);
+            Alert.alert(t("errorTitle"), message);
         } finally {
             setActionLoading(false);
         }
@@ -194,7 +196,7 @@ const PurchaseScreenWeb: React.FC = () => {
             setNotice(describeEntitlement(status));
         } catch (e) {
             const message = e instanceof Error ? e.message : "Could not refresh access.";
-            Alert.alert("Error", message);
+            Alert.alert(t("errorTitle"), message);
         } finally {
             setActionLoading(false);
         }
@@ -212,39 +214,39 @@ const PurchaseScreenWeb: React.FC = () => {
         <ScrollView style={styles.container} contentContainerStyle={styles.content}>
             {/* Header Section */}
             <View style={styles.header}>
-                <Text style={styles.preHeading}>UPGRADE YOUR EXPERIENCE</Text>
+                <Text style={styles.preHeading}>{t("upgradeYourExperience")}</Text>
                 <Text style={styles.mainHeading}>Health Age <Text style={styles.blue}>Pro</Text></Text>
-                <Text style={styles.subHeading}>Unlock clinical-grade insights and unlimited health assessments.</Text>
+                <Text style={styles.subHeading}>{t("unlockClinicalInsights")}</Text>
             </View>
 
             <View style={[styles.grid, isDesktop ? styles.row : styles.column]}>
 
                 {/* Left Column: Benefits (The "Why") */}
                 <View style={styles.card}>
-                    <Text style={styles.cardTitle}>Pro Features</Text>
+                    <Text style={styles.cardTitle}>{t("proFeatures")}</Text>
                     <View style={styles.featureRow}>
                         <Text style={styles.check}>✓</Text>
-                        <Text style={styles.featureText}>Unlimited Daily Assessments</Text>
+                        <Text style={styles.featureText}>{t("unlimitedDailyAssessments")}</Text>
                     </View>
                     <View style={styles.featureRow}>
                         <Text style={styles.check}>✓</Text>
-                        <Text style={styles.featureText}>Detailed Biomarker Analysis</Text>
+                        <Text style={styles.featureText}>{t("detailedBiomarkerAnalysis")}</Text>
                     </View>
                     <View style={styles.featureRow}>
                         <Text style={styles.check}>✓</Text>
-                        <Text style={styles.featureText}>PDF Report Exports</Text>
+                        <Text style={styles.featureText}>{t("pdfReportExports")}</Text>
                     </View>
                     <View style={styles.featureRow}>
                         <Text style={styles.check}>✓</Text>
-                        <Text style={styles.featureText}>Priority Support</Text>
+                        <Text style={styles.featureText}>{t("prioritySupport")}</Text>
                     </View>
                 </View>
 
                 {/* Middle Column: Subscription (The "Action") */}
                 <View style={[styles.card, styles.highlightCard]}>
-                    <View style={styles.bestValueTag}><Text style={styles.tagText}>POPULAR</Text></View>
-                    <Text style={styles.cardTitle}>Annual Plan</Text>
-                    <Text style={styles.price}>$49<Text style={styles.period}>/year</Text></Text>
+                    <View style={styles.bestValueTag}><Text style={styles.tagText}>{t("popular")}</Text></View>
+                    <Text style={styles.cardTitle}>{t("annualPlan")}</Text>
+                    <Text style={styles.price}>$49<Text style={styles.period}>{t("perYear")}</Text></Text>
                     {notice ? (
                         <View style={styles.noticeBox}>
                             <Text style={styles.noticeText}>{notice}</Text>
@@ -279,7 +281,7 @@ const PurchaseScreenWeb: React.FC = () => {
                     ) : isPollingStripe ? (
                         <View style={styles.pendingContainer}>
                             <ActivityIndicator size="small" color="#3B82F6" />
-                            <Text style={styles.pendingText}>Confirming payment with Stripe</Text>
+                            <Text style={styles.pendingText}>{t("confirmingPaymentStripe")}</Text>
                         </View>
                     ) : (
                         <>
@@ -297,14 +299,14 @@ const PurchaseScreenWeb: React.FC = () => {
                                 onPress={handleRefreshAccess}
                                 disabled={actionLoading}
                             >
-                                <Text style={styles.refreshLink}>Refresh access</Text>
+                                <Text style={styles.refreshLink}>{t("refreshAccess")}</Text>
                             </TouchableOpacity>
                         </>
                     )}
                     {subscriptionSource === "workspace" ? (
-                        <Text style={styles.secureText}>No individual checkout is needed for workspace access.</Text>
+                        <Text style={styles.secureText}>{t("noIndividualCheckoutNeeded")}</Text>
                     ) : (
-                        <Text style={styles.secureText}>Secure checkout via Stripe</Text>
+                        <Text style={styles.secureText}>{t("secureCheckoutStripe")}</Text>
                     )}
                 </View>
 
@@ -312,16 +314,14 @@ const PurchaseScreenWeb: React.FC = () => {
 
             {/* Footer Legal */}
             <View style={styles.footer}>
-                <Text style={styles.footerText}>
-                    Web subscriptions are processed by Stripe. Workspace members do not need to purchase an individual web subscription.
-                </Text>
+                <Text style={styles.footerText}>{t("webSubscriptionsNote")}</Text>
                 <View style={styles.footerLinks}>
                     <TouchableOpacity onPress={() => openExternalUrl(TERMS_OF_USE_URL)}>
-                        <Text style={styles.footerLink}>Terms of Use</Text>
+                        <Text style={styles.footerLink}>{t("termsOfUse")}</Text>
                     </TouchableOpacity>
                     <Text style={styles.footerText}> • </Text>
                     <TouchableOpacity onPress={() => openExternalUrl(PRIVACY_POLICY_URL)}>
-                        <Text style={styles.footerLink}>Privacy Policy</Text>
+                        <Text style={styles.footerLink}>{t("privacyPolicy")}</Text>
                     </TouchableOpacity>
                 </View>
             </View>

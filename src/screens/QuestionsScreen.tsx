@@ -207,7 +207,7 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
       const message = "Please select an option to continue.";
       setQuestionError(message);
       if (Platform.OS !== "web") {
-        Alert.alert("Validation", message, [{ text: t("Fs_Close") }]);
+        Alert.alert(t("validation"), message, [{ text: t("Fs_Close") }]);
       }
       return;
     }
@@ -216,7 +216,7 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
         const message = "Please complete all questions before proceeding.";
         setQuestionError(message);
         if (Platform.OS !== "web") {
-          Alert.alert("Validation", message, [{ text: t("Fs_Close") }]);
+          Alert.alert(t("validation"), message, [{ text: t("Fs_Close") }]);
         }
         return;
       }

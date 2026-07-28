@@ -9,8 +9,10 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Platform, Text, View, ActivityIndicator } from "react-native";
 import ErrorBoundary from "./src/components/ErrorBoundary";
 import WebPreloader from "./src/components/WebPreloader";
+import { useTranslation } from "react-i18next";
 
 const App: React.FC = () => {
+  const { t } = useTranslation();
   const [fatalError, setFatalError] = React.useState<string | null>(null);
   const [isBootReady, setIsBootReady] = React.useState(false);
   const [isNavReady, setIsNavReady] = React.useState(false);
@@ -151,7 +153,7 @@ const App: React.FC = () => {
         <SafeAreaProvider>
           <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#ffffff" }}>
             <ActivityIndicator size="large" color="#0B9FD4" />
-            <Text style={{ marginTop: 10, color: "#475569" }}>Loading...</Text>
+            <Text style={{ marginTop: 10, color: "#475569" }}>{t("loading")}</Text>
           </View>
         </SafeAreaProvider>
       </GestureHandlerRootView>

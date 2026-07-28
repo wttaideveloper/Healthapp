@@ -28,6 +28,7 @@ import { useAuth } from "../context/authContext";
 import i18n from "../components/i18n";
 import CheckoutResultScreen from "../screens/CheckoutResultScreen";
 import { clearCachedSubscriptionStatus } from "../components/utils/purchase";
+import { useTranslation } from "react-i18next";
 
 export type DrawerParamList = {
   Main: undefined;
@@ -295,6 +296,7 @@ const WebShellHeader: React.FC<{
   hasPremium: boolean;
   onRequireUpgrade: () => void;
 }> = ({ navigation, hasPremium, onRequireUpgrade }) => {
+  const { t } = useTranslation();
   const { user, signOut, isAuthenticated } = useAuth();
   const initial = (user?.name?.trim()?.[0] ?? user?.email?.trim()?.[0] ?? "A").toUpperCase();
   const [currentLanguage, setCurrentLanguage] = React.useState(
@@ -428,13 +430,13 @@ const WebShellHeader: React.FC<{
             style={[webStyles.linkBtn, isHomeActive ? webStyles.linkBtnActive : null]}
             onPress={() => goRoot("Main")}
           >
-            <Text style={[webStyles.linkText, isHomeActive ? webStyles.linkTextActive : null]}>Home</Text>
+            <Text style={[webStyles.linkText, isHomeActive ? webStyles.linkTextActive : null]}>{t("home")}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[webStyles.linkBtn, isPurchaseActive ? webStyles.linkBtnActive : null]}
             onPress={() => goRoot("Purchase")}
           >
-            <Text style={[webStyles.linkText, isPurchaseActive ? webStyles.linkTextActive : null]}>Purchase</Text>
+            <Text style={[webStyles.linkText, isPurchaseActive ? webStyles.linkTextActive : null]}>{t("purchase")}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[webStyles.linkBtn, isHistoryActive ? webStyles.linkBtnActive : null]}
@@ -446,13 +448,13 @@ const WebShellHeader: React.FC<{
               }
             }}
           >
-            <Text style={[webStyles.linkText, isHistoryActive ? webStyles.linkTextActive : null]}>History</Text>
+            <Text style={[webStyles.linkText, isHistoryActive ? webStyles.linkTextActive : null]}>{t("history")}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[webStyles.linkBtn, isAboutActive ? webStyles.linkBtnActive : null]}
             onPress={() => goRoot("AboutAppScreen")}
           >
-            <Text style={[webStyles.linkText, isAboutActive ? webStyles.linkTextActive : null]}>About</Text>
+            <Text style={[webStyles.linkText, isAboutActive ? webStyles.linkTextActive : null]}>{t("about")}</Text>
           </TouchableOpacity>
 
           <View style={webStyles.dropdownWrap as any}>
@@ -463,7 +465,7 @@ const WebShellHeader: React.FC<{
                 setReportsOpen((v) => !v);
               }}
             >
-              <Text style={[webStyles.linkText, isReportsActive ? webStyles.linkTextActive : null]}>Reports</Text>
+              <Text style={[webStyles.linkText, isReportsActive ? webStyles.linkTextActive : null]}>{t("reports")}</Text>
               <Text style={webStyles.caret}>▼</Text>
             </TouchableOpacity>
             {reportsOpen ? (
@@ -472,7 +474,7 @@ const WebShellHeader: React.FC<{
                   style={webStyles.dropdownItem}
                   onPress={() => goReports("PrintScreen", { screen: "Questionnaire" })}
                 >
-                  <Text style={webStyles.dropdownText}>Print Questionnaire</Text>
+                  <Text style={webStyles.dropdownText}>{t("PrintQuestion")}</Text>
                   {!hasPremium ? (
                     <Image source={icons.proSymbol} style={webStyles.proPill} />
                   ) : null}
@@ -481,7 +483,7 @@ const WebShellHeader: React.FC<{
                   style={webStyles.dropdownItem}
                   onPress={() => goReports("PrintScreen", { screen: "Report" })}
                 >
-                  <Text style={webStyles.dropdownText}>Print Report</Text>
+                  <Text style={webStyles.dropdownText}>{t("printReportLabel")}</Text>
                   {!hasPremium ? (
                     <Image source={icons.proSymbol} style={webStyles.proPill} />
                   ) : null}
@@ -490,7 +492,7 @@ const WebShellHeader: React.FC<{
                   style={webStyles.dropdownItem}
                   onPress={() => goReports("ReportSettings")}
                 >
-                  <Text style={webStyles.dropdownText}>Report Settings</Text>
+                  <Text style={webStyles.dropdownText}>{t("reportSetting")}</Text>
                   {!hasPremium ? (
                     <Image source={icons.proSymbol} style={webStyles.proPill} />
                   ) : null}
@@ -541,7 +543,7 @@ const WebShellHeader: React.FC<{
 
           {!hasPremium ? (
             <TouchableOpacity style={webStyles.upgradeBtn} onPress={() => goRoot("Purchase")}>
-              <Text style={webStyles.upgradeText}>UPGRADE TO</Text>
+              <Text style={webStyles.upgradeText}>{t("UpgradeTo")}</Text>
               <Image source={icons.proSymbol} style={webStyles.upgradeProIcon} />
             </TouchableOpacity>
           ) : null}
@@ -1028,6 +1030,7 @@ const DrawerScreens: React.FC = () => {
   );
 };
 const DrawerNavigator: React.FC = () => {
+  const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const WEB_DESKTOP_MIN_WIDTH = 900;
 

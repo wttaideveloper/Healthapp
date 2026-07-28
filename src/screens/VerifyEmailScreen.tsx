@@ -13,6 +13,7 @@ import { RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { useAuth } from "../context/authContext";
+import { useTranslation } from "react-i18next";
 
 type VerifyEmailRouteProp = RouteProp<RootStackParamList, "VerifyEmail">;
 type VerifyEmailNavigationProp = StackNavigationProp<RootStackParamList, "VerifyEmail">;
@@ -23,6 +24,7 @@ type VerifyEmailProps = {
 };
 
 const VerifyEmailScreen: React.FC<VerifyEmailProps> = ({ route, navigation }) => {
+  const { t } = useTranslation();
   const { verifyEmail, resendVerification, isLoading, pendingVerificationEmail, isAuthenticated } = useAuth();
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -74,15 +76,15 @@ const VerifyEmailScreen: React.FC<VerifyEmailProps> = ({ route, navigation }) =>
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <View style={styles.card}>
-        <Text style={styles.title}>Verify email</Text>
+        <Text style={styles.title}>{t("verifyEmail")}</Text>
         <Text style={styles.subtitle}>Enter the code sent to {targetEmail}.</Text>
 
-        <Text style={styles.label}>Verification code</Text>
+        <Text style={styles.label}>{t("verificationCode")}</Text>
         <TextInput
           style={styles.input}
           value={code}
           onChangeText={setCode}
-          placeholder="6-digit code"
+          placeholder={t("sixDigitCode")}
           placeholderTextColor="#8b909b"
           keyboardType="number-pad"
         />
@@ -90,11 +92,11 @@ const VerifyEmailScreen: React.FC<VerifyEmailProps> = ({ route, navigation }) =>
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
         <TouchableOpacity style={styles.primaryButton} onPress={onVerify} disabled={isLoading}>
-          {isLoading ? <ActivityIndicator color="#ffffff" /> : <Text style={styles.primaryText}>Verify and continue</Text>}
+          {isLoading ? <ActivityIndicator color="#ffffff" /> : <Text style={styles.primaryText}>{t("verifyAndContinue")}</Text>}
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.secondaryButton} onPress={onResend} disabled={isLoading}>
-          <Text style={styles.secondaryText}>Resend code</Text>
+          <Text style={styles.secondaryText}>{t("resendCode")}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -102,7 +104,7 @@ const VerifyEmailScreen: React.FC<VerifyEmailProps> = ({ route, navigation }) =>
           onPress={() => navigation.replace("SignIn")}
           disabled={isLoading}
         >
-          <Text style={styles.secondaryText}>Back to sign in</Text>
+          <Text style={styles.secondaryText}>{t("backToSignIn")}</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>

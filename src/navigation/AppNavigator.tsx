@@ -14,6 +14,7 @@ import VerifyEmailScreen from "../screens/VerifyEmailScreen";
 import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
 import { useAuth } from "../context/authContext";
 import i18n from "../components/i18n";
+import { useTranslation } from "react-i18next";
 
 export type RootStackParamList = {
   Splash: undefined;
@@ -40,6 +41,7 @@ type StartupState = {
 };
 
 const AppNavigator: React.FC = () => {
+  const { t } = useTranslation();
   const { isHydrated } = useAuth();
   const [startupState, setStartupState] = React.useState<StartupState>({
     loaded: false,
@@ -81,7 +83,7 @@ const AppNavigator: React.FC = () => {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator />
-        <Text style={{ marginTop: 10, color: "#475569" }}>Loading...</Text>
+        <Text style={{ marginTop: 10, color: "#475569" }}>{t("loading")}</Text>
       </View>
     );
   }

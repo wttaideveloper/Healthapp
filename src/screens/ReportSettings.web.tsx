@@ -13,6 +13,7 @@ import {
 import { useFocusEffect } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { getSettings, saveSettings } from "../components/utils/reportService";
+import { useTranslation } from "react-i18next";
 
 type SettingsShape = {
   image?: string | null;
@@ -21,6 +22,7 @@ type SettingsShape = {
 };
 
 const ReportSettingsWeb: React.FC = () => {
+  const { t } = useTranslation();
   const [logoUri, setLogoUri] = useState<string | null>(null);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState("");
@@ -85,40 +87,38 @@ const ReportSettingsWeb: React.FC = () => {
   return (
     <ScrollView contentContainerStyle={styles.page}>
       <View style={styles.card}>
-        <Text style={styles.title}>Report Settings</Text>
-        <Text style={styles.subtitle}>
-          Update the logo and contact details that appear in exported reports.
-        </Text>
+        <Text style={styles.title}>{t("reportSetting")}</Text>
+        <Text style={styles.subtitle}>{t("updateLogoContactDesc")}</Text>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Logo</Text>
+          <Text style={styles.sectionTitle}>{t("logo")}</Text>
 
           {logoUri ? (
             <View style={styles.logoBlock}>
               <Image source={{ uri: logoUri }} style={styles.logoPreview} />
               <TouchableOpacity onPress={clearLogo} style={styles.ghostButton}>
-                <Text style={styles.ghostButtonText}>Remove logo</Text>
+                <Text style={styles.ghostButtonText}>{t("removeLogo")}</Text>
               </TouchableOpacity>
             </View>
           ) : (
             <TouchableOpacity onPress={pickLogo} style={styles.uploadButton}>
-              <Text style={styles.uploadButtonText}>Upload logo</Text>
+              <Text style={styles.uploadButtonText}>{t("uploadLogoAction")}</Text>
             </TouchableOpacity>
           )}
 
           {logoUri ? (
             <TouchableOpacity onPress={pickLogo} style={styles.secondaryAction}>
-              <Text style={styles.secondaryActionText}>Replace logo</Text>
+              <Text style={styles.secondaryActionText}>{t("replaceLogo")}</Text>
             </TouchableOpacity>
           ) : null}
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Address</Text>
+          <Text style={styles.sectionTitle}>{t("Is_Address")}</Text>
           <TextInput
             value={address}
             onChangeText={setAddress}
-            placeholder="Enter address"
+            placeholder={t("enterAddress")}
             placeholderTextColor="#8b909b"
             style={[styles.input, styles.multilineInput]}
             multiline
@@ -126,11 +126,11 @@ const ReportSettingsWeb: React.FC = () => {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Phone</Text>
+          <Text style={styles.sectionTitle}>{t("Is_Phone")}</Text>
           <TextInput
             value={phoneNumber}
             onChangeText={setPhoneNumber}
-            placeholder="Enter phone number"
+            placeholder={t("enterPhone")}
             placeholderTextColor="#8b909b"
             style={styles.input}
           />

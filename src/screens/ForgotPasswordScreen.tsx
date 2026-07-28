@@ -18,12 +18,14 @@ import { isValidEmail } from "../components/utils/validation";
 import { Ionicons } from "@expo/vector-icons";
 import { icons } from "../components/images";
 import { LinearGradient } from "expo-linear-gradient";
+import { useTranslation } from "react-i18next";
 
 type ForgotPasswordScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, "ForgotPassword">;
 };
 
 const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation }) => {
+  const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
@@ -106,12 +108,10 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
 
   const cardContent = (
     <>
-      <Text style={[styles.title, isNativeMobile ? styles.mobileTitle : null]}>Forgot password</Text>
-      <Text style={[styles.subtitle, isNativeMobile ? styles.mobileSubtitle : null]}>
-        Request an OTP and reset your password securely.
-      </Text>
+      <Text style={[styles.title, isNativeMobile ? styles.mobileTitle : null]}>{t("forgotPasswordTitle")}</Text>
+      <Text style={[styles.subtitle, isNativeMobile ? styles.mobileSubtitle : null]}>{t("forgotPasswordDesc")}</Text>
 
-      <Text style={styles.label}>Email</Text>
+      <Text style={styles.label}>{t("Is_Email")}</Text>
       <TextInput
         style={styles.input}
         value={email}
@@ -133,12 +133,12 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
             end={{ x: 1, y: 1 }}
             style={styles.primaryButton}
           >
-            {isLoading ? <ActivityIndicator color="#ffffff" /> : <Text style={styles.primaryText}>Send OTP</Text>}
+            {isLoading ? <ActivityIndicator color="#ffffff" /> : <Text style={styles.primaryText}>{t("sendOtp")}</Text>}
           </LinearGradient>
         </TouchableOpacity>
       ) : (
         <>
-          <Text style={styles.label}>OTP</Text>
+          <Text style={styles.label}>{t("otp")}</Text>
           <TextInput
             style={styles.input}
             value={otp}
@@ -147,12 +147,12 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
               if (error) setError(null);
             }}
             keyboardType="number-pad"
-            placeholder="6-digit OTP"
+            placeholder={t("sixDigitOtp")}
             placeholderTextColor="#8b909b"
             maxLength={6}
           />
 
-          <Text style={styles.label}>New password</Text>
+          <Text style={styles.label}>{t("newPassword")}</Text>
           <View style={styles.passwordRow}>
             <TextInput
               style={styles.passwordInput}
@@ -162,7 +162,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
                 if (error) setError(null);
               }}
               secureTextEntry={!showPassword}
-              placeholder="At least 8 characters"
+              placeholder={t("atLeast8Chars")}
               placeholderTextColor="#8b909b"
             />
             <TouchableOpacity
@@ -184,13 +184,13 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
               {isLoading ? (
                 <ActivityIndicator color="#ffffff" />
               ) : (
-                <Text style={styles.primaryText}>Reset password</Text>
+                <Text style={styles.primaryText}>{t("resetPassword")}</Text>
               )}
             </LinearGradient>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.secondaryButton} onPress={onRequestOtp} disabled={isLoading}>
-            <Text style={styles.secondaryText}>Resend OTP</Text>
+            <Text style={styles.secondaryText}>{t("resendOtp")}</Text>
           </TouchableOpacity>
         </>
       )}
@@ -203,7 +203,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
         onPress={backToSignIn}
         disabled={isLoading}
       >
-        <Text style={styles.secondaryText}>Back to sign in</Text>
+        <Text style={styles.secondaryText}>{t("backToSignIn")}</Text>
       </TouchableOpacity>
     </>
   );
@@ -214,10 +214,8 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
         <View style={styles.webFrame}>
           <View style={styles.webHero}>
             <Image source={icons.menuLogo} style={styles.webLogo} />
-            <Text style={styles.webHeroTitle}>Reset your password</Text>
-            <Text style={styles.webHeroText}>
-              Enter your email to receive an OTP, then set a new secure password.
-            </Text>
+            <Text style={styles.webHeroTitle}>{t("resetYourPassword")}</Text>
+            <Text style={styles.webHeroText}>{t("resetPasswordHeroDesc")}</Text>
             <Image source={icons.forgotPassword} style={styles.webHeroImage} />
           </View>
           <KeyboardAvoidingView

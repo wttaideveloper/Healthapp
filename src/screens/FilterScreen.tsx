@@ -24,10 +24,12 @@ import CustomInput from "../components/CustomInput";
 import CheckBox from "../components/checkbox";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTranslation } from "react-i18next";
 
 type FilterScreenProps = DrawerScreenProps<DrawerParamList, "FilterScreen">;
 
 const FilterScreen: React.FC<FilterScreenProps> = ({ navigation, route }) => {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const [filterOption, setFilterOptions] = React.useState({
     name: "",
@@ -114,7 +116,7 @@ const FilterScreen: React.FC<FilterScreenProps> = ({ navigation, route }) => {
             onChangeText={(val) =>
               setFilterOptions((prev) => ({ ...prev, name: val }))
             }
-            placeholder="Enter name"
+            placeholder={t("enterName")}
             placeholderTextColor={"#8d929d"}
           ></TextInput>
         </View>
@@ -297,7 +299,7 @@ const FilterScreen: React.FC<FilterScreenProps> = ({ navigation, route }) => {
         ></Font>
       </TouchableOpacity>
       {/* </View> */}
-      <Button title="Show results" style={{ padding: 10 }} />
+      <Button title="Fs_ShowResults" style={{ padding: 10 }} />
       </ScrollView>
     </KeyboardAvoidingView>
   );
