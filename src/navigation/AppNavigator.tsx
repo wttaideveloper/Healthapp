@@ -13,6 +13,7 @@ import SignUpScreen from "../screens/SignUpScreen";
 import VerifyEmailScreen from "../screens/VerifyEmailScreen";
 import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
 import { useAuth } from "../context/authContext";
+import i18n from "../components/i18n";
 
 export type RootStackParamList = {
   Splash: undefined;
@@ -53,6 +54,10 @@ const AppNavigator: React.FC = () => {
           AsyncStorage.getItem(LANGUAGE_KEY),
           AsyncStorage.getItem(ONBOARDING_COMPLETED_KEY),
         ]);
+
+        if (language) {
+          await i18n.changeLanguage(language);
+        }
 
         setStartupState({
           loaded: true,
