@@ -39,6 +39,7 @@ const languages = [
   { code: "da", name: "Dansk", letter: "A" }, // Danish
   { code: "ta", name: "தமிழ்", letter: "அ" }, // Tamil
   { code: "bn", name: "বাংলা", letter: "ব" }, // Bangla
+  { code: "id", name: "Bahasa Indonesia", letter: "A" }, // Indonesian
 ];
 const LanguageScreen: React.FC<LanguageScreenProps> = ({ navigation }) => {
   const { t } = useTranslation();
