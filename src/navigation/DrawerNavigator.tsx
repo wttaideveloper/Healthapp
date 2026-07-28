@@ -335,6 +335,7 @@ const WebShellHeader: React.FC<{
     { code: "ta", label: "தமிழ்" },
     { code: "bn", label: "বাংলা" },
     { code: "id", label: "Bahasa Indonesia" },
+    { code: "tr", label: "Türkçe" },
   ];
 
   const goRoot = (name: string, params?: any) => {

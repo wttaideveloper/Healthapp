@@ -40,6 +40,7 @@ const languages = [
   { code: "ta", name: "தமிழ்", letter: "அ" }, // Tamil
   { code: "bn", name: "বাংলা", letter: "ব" }, // Bangla
   { code: "id", name: "Bahasa Indonesia", letter: "A" }, // Indonesian
+  { code: "tr", name: "Türkçe", letter: "A" }, // Turkish
 ];
 
 const ChangeLanguage: React.FC<ChangeLanguageProps> = ({ navigation }) => {

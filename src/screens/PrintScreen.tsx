@@ -33,6 +33,7 @@ type LanguageCode =
   | "pt"
   | "ru"
   | "ta"
+  | "tr"
   | "vi"
   | "zh";
 
@@ -57,6 +58,7 @@ const SUPPORTED_LANGUAGES: LanguageCode[] = [
   "pt",
   "ru",
   "ta",
+  "tr",
   "vi",
   "zh",
 ];
@@ -74,6 +76,9 @@ const reportPreviewA4: Record<LanguageCode, number> = {
   // Interim: Indonesian reuses the English preview thumbnail until a localized
   // Report_id.png is supplied. Preview is display-only.
   id: require("../../assets/files/Reports/A4_SIZE/Report_en.png"),
+  // Interim: Turkish reuses the English preview thumbnail until a localized
+  // Report_tr.png is supplied. Preview is display-only.
+  tr: require("../../assets/files/Reports/A4_SIZE/Report_en.png"),
   da: require("../../assets/files/Reports/A4_SIZE/Report_da.png"),
   de: require("../../assets/files/Reports/A4_SIZE/Report_de.png"),
   en: require("../../assets/files/Reports/A4_SIZE/Report_en.png"),
@@ -98,6 +103,9 @@ const questionnairePreviewA4: Record<LanguageCode, number> = {
   // Interim: Indonesian reuses the English preview thumbnail until a localized
   // Questionnaire_id.png is supplied. Preview is display-only.
   id: require("../../assets/files/Questionnaires/A4_SIZE/Questionnaire_en.png"),
+  // Interim: Turkish reuses the English preview thumbnail until a localized
+  // Questionnaire_tr.png is supplied. Preview is display-only.
+  tr: require("../../assets/files/Questionnaires/A4_SIZE/Questionnaire_en.png"),
   da: require("../../assets/files/Questionnaires/A4_SIZE/Questionnaire_da.png"),
   de: require("../../assets/files/Questionnaires/A4_SIZE/Questionnaire_de.png"),
   en: require("../../assets/files/Questionnaires/A4_SIZE/Questionnaire_en.png"),
@@ -118,6 +126,7 @@ const reportTemplates: Record<PaperSize, Record<LanguageCode, number>> = {
   A4_SIZE: {
     bn: require("../../assets/files/Reports/A4_SIZE/REPORT A4 bangla.pdf"),
     id: require("../../assets/files/Reports/A4_SIZE/REPORT A4 Indonesian.pdf"),
+    tr: require("../../assets/files/Reports/A4_SIZE/REPORT A4 Turkish.pdf"),
     da: require("../../assets/files/Reports/A4_SIZE/da.pdf"),
     de: require("../../assets/files/Reports/A4_SIZE/de.pdf"),
     en: require("../../assets/files/Reports/A4_SIZE/en.pdf"),
@@ -136,6 +145,7 @@ const reportTemplates: Record<PaperSize, Record<LanguageCode, number>> = {
   US_LETTER: {
     bn: require("../../assets/files/Reports/US_LETTER/REPORT US bangla.pdf"),
     id: require("../../assets/files/Reports/US_LETTER/REPORT US indonesion.pdf"),
+    tr: require("../../assets/files/Reports/US_LETTER/REPORT US Turkish.pdf"),
     da: require("../../assets/files/Reports/US_LETTER/da.pdf"),
     de: require("../../assets/files/Reports/US_LETTER/de.pdf"),
     en: require("../../assets/files/Reports/US_LETTER/en.pdf"),
@@ -157,6 +167,7 @@ const questionnaireTemplates: Record<PaperSize, Record<LanguageCode, number>> = 
   A4_SIZE: {
     bn: require("../../assets/files/Questionnaires/A4_SIZE/Bangla_A4.pdf"),
     id: require("../../assets/files/Questionnaires/A4_SIZE/Indonesian_A4.pdf"),
+    tr: require("../../assets/files/Questionnaires/A4_SIZE/Turkish_A4.pdf"),
     da: require("../../assets/files/Questionnaires/A4_SIZE/da.pdf"),
     de: require("../../assets/files/Questionnaires/A4_SIZE/de.pdf"),
     en: require("../../assets/files/Questionnaires/A4_SIZE/en.pdf"),
@@ -175,6 +186,7 @@ const questionnaireTemplates: Record<PaperSize, Record<LanguageCode, number>> = 
   US_LETTER: {
     bn: require("../../assets/files/Questionnaires/US_LETTER/Bangla_US Legal.pdf"),
     id: require("../../assets/files/Questionnaires/US_LETTER/Indonesia_US Legal.pdf"),
+    tr: require("../../assets/files/Questionnaires/US_LETTER/Turkish_US Legal.pdf"),
     da: require("../../assets/files/Questionnaires/US_LETTER/da.pdf"),
     de: require("../../assets/files/Questionnaires/US_LETTER/de.pdf"),
     en: require("../../assets/files/Questionnaires/US_LETTER/en.pdf"),
