@@ -16,7 +16,7 @@ import i18n from "../components/i18n";
 import { LinearGradient } from "expo-linear-gradient";
 import Button from "../components/Button";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { applyDirection } from "../components/utils/rtl";
+import { switchLanguage } from "../components/utils/rtl";
 
 type LanguageScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, "Language">;
@@ -66,10 +66,10 @@ const LanguageScreen: React.FC<LanguageScreenProps> = ({ navigation }) => {
   };
 
   const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
-    applyDirection(lng);
-    setLanguageToStore(lng);
+    // switchLanguage persists language + direction, swaps translations, and
+    // prompts for a restart only when the writing direction actually flips.
     setLanguage(lng);
+    void switchLanguage(lng);
   };
 
   React.useEffect(() => {

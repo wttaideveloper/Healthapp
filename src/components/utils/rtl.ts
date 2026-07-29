@@ -1,4 +1,5 @@
-import { I18nManager, Platform } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Alert, I18nManager, Platform } from "react-native";
 import type { ImageStyle, TextStyle, ViewStyle } from "react-native";
 
 /**
@@ -7,6 +8,13 @@ import type { ImageStyle, TextStyle, ViewStyle } from "react-native";
  * because the directional glyphs are a mix of <Image> and vector icons.
  */
 type MirrorStyle = Pick<ImageStyle, "transform">;
+
+/**
+ * `left`/`right` are shared by ViewStyle, TextStyle and ImageStyle, so a value of
+ * this shape can be applied to any of them. startEnd() returns it because the
+ * elements it anchors are a mix of <View>, <Image> and <TouchableOpacity>.
+ */
+type InsetStyle = Pick<ImageStyle, "left" | "right">;
 import { useTranslation } from "react-i18next";
 import i18n from "../i18n";
 
@@ -112,12 +120,12 @@ export const forwardIcon = (language?: string | null): MirrorStyle => ({
 export const startEnd = (
   offsets: { start?: number | string; end?: number | string },
   language?: string | null
-): ViewStyle => {
+): InsetStyle => {
   const rtl = isRTL(language);
   const out: Record<string, number | string> = {};
   if (offsets.start !== undefined) out[rtl ? "right" : "left"] = offsets.start;
   if (offsets.end !== undefined) out[rtl ? "left" : "right"] = offsets.end;
-  return out as ViewStyle;
+  return out as InsetStyle;
 };
 
 /* ------------------------------------------------------------------ *
@@ -145,6 +153,177 @@ export const useDirection = () => {
   };
 };
 
+/* ------------------------------------------------------------------ *
+ * Language switching + restart orchestration
+ *
+ * React Native cannot re-mirror a running app: I18nManager.forceRTL() only
+ * takes effect on the next process start. Rather than hot-patching layouts
+ * (which is what leaves half-open drawers and stale geometry behind), a
+ * direction change is treated as an explicit, user-confirmed restart.
+ * ------------------------------------------------------------------ */
+
+export const LANGUAGE_STORAGE_KEY = "language";
+export const DIRECTION_STORAGE_KEY = "layout_direction";
+
+/** Persisted so the boot path can detect a direction mismatch before first paint. */
+export const persistDirection = async (language?: string | null): Promise<void> => {
+  try {
+    await AsyncStorage.setItem(DIRECTION_STORAGE_KEY, getDirection(language));
+  } catch {
+    // Non-fatal: direction is re-derived from the stored language at boot.
+  }
+};
+
+export const getPersistedDirection = async (): Promise<Direction | null> => {
+  try {
+    const value = await AsyncStorage.getItem(DIRECTION_STORAGE_KEY);
+    return value === "rtl" || value === "ltr" ? value : null;
+  } catch {
+    return null;
+  }
+};
+
+/**
+ * Restart the app using whatever mechanism this project actually supports.
+ * Returns false when no mechanism is available, so the caller can fall back to
+ * asking the user to relaunch manually instead of silently doing nothing.
+ */
+export const restartApp = async (): Promise<boolean> => {
+  if (Platform.OS === "web") {
+    if (typeof window !== "undefined" && window.location) {
+      window.location.reload();
+      return true;
+    }
+    return false;
+  }
+
+  // expo-updates is the production-grade reload. Optional: resolved at runtime so
+  // the app still builds when the package is not installed.
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const Updates = require("expo-updates");
+    if (Updates?.reloadAsync) {
+      await Updates.reloadAsync();
+      return true;
+    }
+  } catch {
+    // not installed - fall through
+  }
+
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const RNRestart = require("react-native-restart");
+    const restart = RNRestart?.default?.Restart ?? RNRestart?.Restart;
+    if (restart) {
+      restart();
+      return true;
+    }
+  } catch {
+    // not installed - fall through
+  }
+
+  try {
+    // Development builds only; a no-op in release.
+    const { DevSettings } = require("react-native");
+    if (__DEV__ && DevSettings?.reload) {
+      DevSettings.reload();
+      return true;
+    }
+  } catch {
+    // fall through
+  }
+
+  return false;
+};
+
+export type LanguageChangeResult = {
+  /** true when the writing direction flipped (LTR <-> RTL). */
+  directionChanged: boolean;
+  /** true when the app was actually restarted. */
+  restarted: boolean;
+};
+
+/**
+ * Single entry point for changing language, used by every picker so the four
+ * cases behave identically everywhere:
+ *
+ *   LTR -> LTR  and  RTL -> RTL : translations swap instantly, no restart.
+ *   LTR -> RTL  and  RTL -> LTR : language + direction persisted, flag applied,
+ *                                 then `onRequireRestart` decides when to reload.
+ *
+ * The language and direction are written to storage *before* any restart, so the
+ * app comes back up in the new direction with no intermediate broken state.
+ */
+export const changeAppLanguage = async (
+  language: string,
+  options?: { onRequireRestart?: () => void | Promise<void> }
+): Promise<LanguageChangeResult> => {
+  const previouslyRTL = isRTL(i18n.language);
+  const nextRTL = isRTL(language);
+  const directionChanged = previouslyRTL !== nextRTL;
+
+  // Persist first: a restart must never lose the user's choice.
+  try {
+    await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+  } catch {
+    // Non-fatal - the in-memory change below still applies for this session.
+  }
+  await persistDirection(language);
+
+  await i18n.changeLanguage(language);
+  applyDirection(language);
+
+  if (!directionChanged) {
+    // Cases 1 and 2: same direction, nothing to rebuild.
+    return { directionChanged: false, restarted: false };
+  }
+
+  // Cases 3 and 4: the native layout engine only mirrors on next launch.
+  if (options?.onRequireRestart) {
+    await options.onRequireRestart();
+  }
+  return { directionChanged: true, restarted: false };
+};
+
+/**
+ * The function every language picker should call.
+ *
+ * Same-direction switches apply instantly. A direction flip persists everything
+ * first, then asks the user to restart — the dialog is shown in the language they
+ * just chose, because i18n has already switched by that point.
+ */
+export const switchLanguage = async (language: string): Promise<LanguageChangeResult> => {
+  const result = await changeAppLanguage(language);
+  if (!result.directionChanged) {
+    return result;
+  }
+
+  return new Promise<LanguageChangeResult>((resolve) => {
+    Alert.alert(
+      i18n.t("restartRequiredTitle"),
+      i18n.t("restartRequiredMessage"),
+      [
+        {
+          text: i18n.t("restartNow"),
+          onPress: async () => {
+            const restarted = await restartApp();
+            if (!restarted) {
+              // No reload mechanism in this build - tell the user plainly rather
+              // than leaving them in a half-mirrored UI with no explanation.
+              Alert.alert(
+                i18n.t("restartRequiredTitle"),
+                i18n.t("restartManuallyMessage")
+              );
+            }
+            resolve({ directionChanged: true, restarted });
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  });
+};
+
 export default {
   RTL_LANGUAGES,
   isRTL,
@@ -155,4 +334,8 @@ export default {
   writingDirection,
   flipIcon,
   startEnd,
+  restartApp,
+  changeAppLanguage,
+  persistDirection,
+  getPersistedDirection,
 };

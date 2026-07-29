@@ -14,7 +14,7 @@ import VerifyEmailScreen from "../screens/VerifyEmailScreen";
 import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
 import { useAuth } from "../context/authContext";
 import i18n from "../components/i18n";
-import { applyDirection } from "../components/utils/rtl";
+import { applyDirection, useDirection } from "../components/utils/rtl";
 import { useTranslation } from "react-i18next";
 
 export type RootStackParamList = {
@@ -44,6 +44,8 @@ type StartupState = {
 const AppNavigator: React.FC = () => {
   const { t } = useTranslation();
   const { isHydrated } = useAuth();
+  // Re-renders on language change, so `direction` is always current.
+  const { direction } = useDirection();
   const [startupState, setStartupState] = React.useState<StartupState>({
     loaded: false,
     hasLanguage: false,
@@ -109,7 +111,11 @@ const AppNavigator: React.FC = () => {
   return (
     <Stack.Navigator
       id="RootStack"
-      key={phase}
+      // Remount the whole tree when the writing direction changes. Views laid out
+      // under the previous direction keep their old geometry (forceRTL cannot
+      // re-layout a running app), which is what leaves half-open drawers and
+      // mirrored-margin artifacts behind after switching languages.
+      key={`${phase}-${direction}`}
       initialRouteName={initialRouteName}
       screenOptions={{ headerShown: false }}
     >

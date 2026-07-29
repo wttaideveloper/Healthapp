@@ -28,7 +28,7 @@ import { DrawerParamList } from "../navigation/DrawerNavigator";
 import { useTranslation } from "react-i18next";
 import { Dimensions } from "react-native";
 import { isValidName } from "../components/utils/validation";
-import { flipIcon, forwardIcon } from "../components/utils/rtl";
+import { flipIcon, forwardIcon, startEnd } from "../components/utils/rtl";
 
 type HealthAgeTestProps = DrawerScreenProps<DrawerParamList, "healthAgeTest">;
 
@@ -1972,7 +1972,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
                 style={{
                   position: "absolute",
                   top: 8,
-                  right: 10,
+                  ...startEnd({ end: 10 }),
                   width: 24,
                   height: 24,
                   borderRadius: 12,

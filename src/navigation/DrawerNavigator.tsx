@@ -29,7 +29,7 @@ import i18n from "../components/i18n";
 import CheckoutResultScreen from "../screens/CheckoutResultScreen";
 import { clearCachedSubscriptionStatus } from "../components/utils/purchase";
 import { useTranslation } from "react-i18next";
-import { applyDirection, flipIcon } from "../components/utils/rtl";
+import { flipIcon, startEnd, switchLanguage, useDirection } from "../components/utils/rtl";
 
 export type DrawerParamList = {
   Main: undefined;
@@ -376,11 +376,13 @@ const WebShellHeader: React.FC<{
 
   const handleSelectLanguage = async (code: string) => {
     try {
-      await i18n.changeLanguage(code);
-      applyDirection(code);
-      await AsyncStorage.setItem("language", code);
       setCurrentLanguage(code);
+      // Close the menu before any restart prompt so the drawer never restarts
+      // while it is still open - that is what left it partially visible before.
       setLanguageOpen(false);
+      // Persists language + direction, then prompts for a restart only on an
+      // LTR <-> RTL flip.
+      await switchLanguage(code);
     } catch (error) {
       console.error("Language change failed:", error);
     }
@@ -472,7 +474,7 @@ const WebShellHeader: React.FC<{
               <Text style={webStyles.caret}>▼</Text>
             </TouchableOpacity>
             {reportsOpen ? (
-              <View style={webStyles.dropdown as any}>
+              <View style={[webStyles.dropdown as any, startEnd({ start: 0 })]}>
                 <TouchableOpacity
                   style={webStyles.dropdownItem}
                   onPress={() => goReports("PrintScreen", { screen: "Questionnaire" })}
@@ -525,7 +527,7 @@ const WebShellHeader: React.FC<{
               <Text style={webStyles.caret}>▼</Text>
             </TouchableOpacity>
             {languageOpen ? (
-              <View style={[webStyles.dropdown as any, webStyles.languageDropdown]}>
+              <View style={[webStyles.dropdown as any, webStyles.languageDropdown, startEnd({ end: 0 })]}>
                 {languageOptions.map((option) => {
                   const active = option.code === languageCode;
                   return (
@@ -646,9 +648,17 @@ const WebNavigator: React.FC = () => {
 };
 
 const DrawerScreens: React.FC = () => {
+  // React Navigation defaults drawerPosition to I18nManager.isRTL, which it reads
+  // once when the navigator mounts. Because forceRTL() cannot re-layout a running
+  // app, that default goes stale the moment the language changes and the drawer
+  // stays on the old side (or half-open). Driving it from the reactive helper
+  // keeps the side correct without waiting for a restart.
+  const { isRTL: isRtl } = useDirection();
+
   return (
     <Drawer.Navigator
       id={undefined}
+      screenOptions={{ drawerPosition: isRtl ? "right" : "left" }}
       drawerContent={(props) => <CustomDrawerContent {...props} />}
       initialRouteName="Main"
     >
@@ -1165,7 +1175,7 @@ const webStyles = StyleSheet.create({
   dropdown: {
     position: "absolute",
     top: 40,
-    left: 0,
+    // Horizontal anchor applied inline via startEnd() so it mirrors in RTL.
     width: 220,
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
@@ -1190,8 +1200,7 @@ const webStyles = StyleSheet.create({
   proPill: { width: 48, height: 18, resizeMode: "contain" },
   languageDropdown: {
     width: 190,
-    left: "auto",
-    right: 0,
+    // Anchored to the inline-end edge via startEnd() at the usage site.
     maxHeight: 320,
     overflowY: "auto" as any,
   },

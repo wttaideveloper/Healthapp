@@ -80,6 +80,14 @@ const styles = StyleSheet.create({
     height: 120,
     zIndex: 2,
   },
+  // RTL AUDIT - intentionally physical (not mirrored). These two bubbles are
+  // empty decorative Views: no text, no children, no interaction. They bleed
+  // off-canvas (negative insets) and are clipped by the parent's
+  // overflow:"hidden", so they hold no alignment relationship with content.
+  // Together they form a symmetric diagonal wash; mirroring both would yield the
+  // same composition reflected, with no reading-order meaning. WebPreloader is
+  // also web-only and paints during boot, before applyDirection() has resolved
+  // the language, so a direction-aware value here would be non-deterministic.
   topRightBubble: {
     position: "absolute",
     top: -90,

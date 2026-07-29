@@ -16,7 +16,7 @@ import i18n from "../components/i18n";
 import { LinearGradient } from "expo-linear-gradient";
 import Button from "../components/Button";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { applyDirection } from "../components/utils/rtl";
+import { switchLanguage } from "../components/utils/rtl";
 
 type ChangeLanguageProps = {
   navigation: StackNavigationProp<RootStackParamList, "ChangeLanguage">;
@@ -65,10 +65,10 @@ const ChangeLanguage: React.FC<ChangeLanguageProps> = ({ navigation }) => {
     }
   };
   const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
-    applyDirection(lng);
+    // switchLanguage persists language + direction, swaps translations, and
+    // prompts for a restart only when the writing direction actually flips.
     setLanguage(lng);
-    setLanguageToStore(lng);
+    void switchLanguage(lng);
   };
 
   if (isWebDesktop) {

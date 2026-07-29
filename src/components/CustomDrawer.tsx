@@ -14,6 +14,7 @@ import UpgradeModal from "./upgradeModal";
 import { useSubscription } from "../context/subScriptionContext";
 import { useAuth } from "../context/authContext";
 import { clearCachedSubscriptionStatus } from "./utils/purchase";
+import { startEnd } from "./utils/rtl";
 
 export const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (
   props
@@ -85,8 +86,8 @@ export const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (
           source={icons.drawerBg}
           style={{ width: "100%", height: "100%" }}
         ></Image>
-        <Image source={icons.drawerLogo} style={styles.overlayImage} />
-        <TouchableOpacity style={styles.headerLogoutBtn} onPress={handleLogout}>
+        <Image source={icons.drawerLogo} style={[styles.overlayImage, startEnd({ start: 30 })]} />
+        <TouchableOpacity style={[styles.headerLogoutBtn, startEnd({ end: 14 })]} onPress={handleLogout}>
           <Text style={styles.headerLogoutText}>{isAuthenticated ? "Logout" : "Login"}</Text>
         </TouchableOpacity>
       </View>
@@ -213,7 +214,7 @@ const styles = StyleSheet.create({
   overlayImage: {
     position: "absolute",
     bottom: 30, // Adjust positioning from bottom
-    left: 30, // Adjust positioning from left
+    // Horizontal anchor applied inline via startEnd() so it mirrors in RTL.
     width: 127, // Adjust size as needed
     height: 40,
     resizeMode: "contain",
@@ -221,7 +222,7 @@ const styles = StyleSheet.create({
   headerLogoutBtn: {
     position: "absolute",
     top: 16,
-    right: 14,
+    // Horizontal anchor applied inline via startEnd() so it mirrors in RTL.
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.9)",
     borderRadius: 999,
