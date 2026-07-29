@@ -15,7 +15,6 @@ import Font from "../components/CustomisedFont";
 import i18n from "../components/i18n";
 import { LinearGradient } from "expo-linear-gradient";
 import Button from "../components/Button";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { switchLanguage } from "../components/utils/rtl";
 
 type LanguageScreenProps = {
@@ -57,14 +56,6 @@ const LanguageScreen: React.FC<LanguageScreenProps> = ({ navigation }) => {
   const itemWidth = width / 4; // Adjust column width
   const isWebDesktop = width >= 760;
 
-  const setLanguageToStore = async (lang: string) => {
-    try {
-      await AsyncStorage.setItem("language", lang);
-    } catch (e) {
-      console.error("Failed to save language", e);
-    }
-  };
-
   const changeLanguage = (lng: string) => {
     // switchLanguage persists language + direction, swaps translations, and
     // prompts for a restart only when the writing direction actually flips.
@@ -72,9 +63,11 @@ const LanguageScreen: React.FC<LanguageScreenProps> = ({ navigation }) => {
     void switchLanguage(lng);
   };
 
-  React.useEffect(() => {
-    setLanguageToStore(i18n.language);
-  }, []);
+  // NOTE: this screen deliberately does NOT persist a language on mount.
+  // Writing i18n's default ("en") to storage as soon as the screen appeared made
+  // AppNavigator treat the app as already-configured on the next launch, so the
+  // first-run language gate was skipped permanently after one cold start.
+  // The language is persisted only when the user actually picks one.
 
   if (isWebDesktop) {
     const webLanguages = languages;
@@ -128,7 +121,11 @@ const LanguageScreen: React.FC<LanguageScreenProps> = ({ navigation }) => {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.screen}
+      contentContainerStyle={styles.container}
+      keyboardShouldPersistTaps="handled"
+    >
       <View
         style={{
           justifyContent: "center",
@@ -137,9 +134,7 @@ const LanguageScreen: React.FC<LanguageScreenProps> = ({ navigation }) => {
         }}
       >
         <Font text="chooseLanguage" fontFamily="Roboto" style={styles.title} />
-        <ScrollView
-          contentContainerStyle={{ alignItems: "center", paddingBottom: 100 }}
-        >
+        <View style={{ alignItems: "center", paddingBottom: 100, width: "100%" }}>
           <View
             style={{
               flexDirection: "row",
@@ -199,7 +194,7 @@ const LanguageScreen: React.FC<LanguageScreenProps> = ({ navigation }) => {
               </TouchableOpacity>
             ))}
           </View>
-        </ScrollView>
+        </View>
       </View>
 {/* <View style={{height:150,}}> */}
 
@@ -222,17 +217,22 @@ const LanguageScreen: React.FC<LanguageScreenProps> = ({ navigation }) => {
         }}
         ></Button>
         {/* </View> */}
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
+    backgroundColor: "#ffffff",
+  },
+  container: {
+    flexGrow: 1,
     flexDirection: "column",
     justifyContent: "center",
     backgroundColor: "#ffffff",
     paddingHorizontal: 20,
+    paddingBottom: 24,
   },
   title: {
     fontSize: 24,
