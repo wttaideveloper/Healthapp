@@ -60,3 +60,8 @@ android/.gradle/
 android/local.properties
 ios/build/
 ios/Pods/
+ios/DerivedData/
+coverage/
+*.ipa
+*.apk
+*.aab
