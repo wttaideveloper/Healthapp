@@ -328,7 +328,8 @@ const styles = StyleSheet.create({
     marginTop: 18,
   },
   webCardWrap: {
-    width: 560,
+    width: "100%",
+    maxWidth: 560,
     justifyContent: "center",
     paddingHorizontal: 30,
   },

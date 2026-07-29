@@ -38,7 +38,8 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const isWebDesktop = width >= 760;
-  const fullPickerWidth = isWebDesktop ? 560 : Dimensions.get("window").width;
+  // `width` comes from useWindowDimensions, so the picker resizes with the window.
+  const fullPickerWidth = isWebDesktop ? 560 : width;
   const confirmExit = () => {
     Alert.alert(
       t("leavePage"),

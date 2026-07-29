@@ -329,8 +329,9 @@ const styles = StyleSheet.create({
     marginTop: -4,
   },
   webImage: {
-    width: 560,
-    height: 420,
+    width: "100%",
+    maxWidth: 560,
+    aspectRatio: 560 / 420,
     resizeMode: "contain",
   },
   webCtaRow: {
@@ -358,8 +359,9 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   mobileHeroImage: {
-    width: 320,
-    height: 270,
+    width: "100%",
+    maxWidth: 320,
+    aspectRatio: 320 / 270,
     resizeMode: "contain",
     marginTop: 8,
   },

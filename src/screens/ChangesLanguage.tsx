@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Dimensions,
   Platform,
   useWindowDimensions,
 } from "react-native";
@@ -54,8 +53,9 @@ const ChangeLanguage: React.FC<ChangeLanguageProps> = ({ navigation }) => {
   const { t } = useTranslation();
   const [language, setLanguage] = React.useState(i18n.language);
   const { width } = useWindowDimensions();
-  const screenWidth = Dimensions.get("window").width;
-  const itemWidth = screenWidth / 4; // Adjust column width
+  // Derived from useWindowDimensions so the grid reflows on rotation,
+  // window resize, split-screen and foldable unfold.
+  const itemWidth = width / 4; // Adjust column width
   const isWebDesktop = width >= 760;
   const setLanguageToStore = async (lang: string) => {
     try {
