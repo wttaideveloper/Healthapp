@@ -64,8 +64,6 @@ const PurchaseScreen: React.FC = () => {
     providerStatus,
     workspace,
     refreshSubscription,
-    setDebugSubscriptionOverride,
-    debugSubscriptionOverride,
   } = useSubscription();
   const { accessToken, user } = useAuth();
 
@@ -304,19 +302,6 @@ const PurchaseScreen: React.FC = () => {
     }, [loadNativePlanOptions])
   );
 
-  const handleDevSubscriptionToggle = async () => {
-    if (!__DEV__ || actionLoading) return;
-
-    setActionLoading(true);
-    try {
-      await setDebugSubscriptionOverride(!isSubscribed);
-    } catch {
-      Alert.alert("Dev Error", "Failed to toggle");
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
   const handleSubscribe = async () => {
     if (actionLoading) return;
     if (!accessToken) {
@@ -331,7 +316,6 @@ const PurchaseScreen: React.FC = () => {
 
     setActionLoading(true);
     try {
-      await setDebugSubscriptionOverride(null);
       if (Platform.OS === "web" || !isNativeStorePurchaseEnabled()) {
         await startStripeCheckout(accessToken);
         return;
@@ -459,13 +443,7 @@ const PurchaseScreen: React.FC = () => {
     if (actionLoading) return;
     setActionLoading(true);
     try {
-      if (__DEV__ && debugSubscriptionOverride !== null) {
-        await setDebugSubscriptionOverride(null);
-      }
       await refreshSubscription(true);
-      if (__DEV__ && debugSubscriptionOverride !== null) {
-        Alert.alert(t("statusRefreshed"), "Live subscription status reloaded (DEV override cleared).");
-      }
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unable to refresh status";
       Alert.alert(t("refreshFailed"), message);
@@ -498,7 +476,6 @@ const PurchaseScreen: React.FC = () => {
   const planPrice = selectedPlan?.priceString || FALLBACK_PLAN_PRICE;
   const planTitle = selectedPlan?.title || selectedPlan?.description || FALLBACK_PLAN_DESCRIPTION;
   const planPeriod = selectedPlan?.billingPeriod ? `Billing period: ${selectedPlan.billingPeriod}` : "";
-  const showPlanOptions = Platform.OS !== "web" && __DEV__;
   const sourceLabel =
     subscriptionSource === "iap"
       ? "In-app purchase"
@@ -623,37 +600,6 @@ const PurchaseScreen: React.FC = () => {
               {planPeriod ? <Text style={styles.planMeta}>{planPeriod}</Text> : null}
             </View>
 
-            {/* {showPlanOptions ? (
-              <View style={styles.optionsWrap}>
-                {availablePlans.map((plan) => {
-                  const active = plan.identifier === selectedPlan?.identifier;
-                  const optionTitle =
-                    plan.title ||
-                    plan.description ||
-                    (__DEV__ ? plan.identifier : "Annual Plan");
-                  return (
-                    <TouchableOpacity
-                      key={plan.identifier}
-                      style={[styles.optionCard, active ? styles.optionCardActive : null]}
-                      onPress={() => setSelectedPackageIdentifier(plan.identifier)}
-                      disabled={actionLoading}
-                    >
-                      <Text style={[styles.optionTitle, active ? styles.optionTitleActive : null]}>
-                        {optionTitle}
-                      </Text>
-                      <Text style={[styles.optionPrice, active ? styles.optionTitleActive : null]}>
-                        {plan.priceString || planPrice}
-                      </Text>
-                      {__DEV__ ? (
-                        <Text style={[styles.optionDebug, active ? styles.optionTitleActive : null]}>
-                          {plan.identifier}
-                        </Text>
-                      ) : null}
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            ) : null} */}
 
             <Button
               type="intro"
@@ -730,17 +676,6 @@ const PurchaseScreen: React.FC = () => {
           </View>
         </View>
 
-        {__DEV__ ? (
-          <Button
-            style={{
-              ...styles.actionButton,
-              ...(webContentWidthStyle ?? {}),
-            }}
-            title={isSubscribed ? "DEV: Disable Subscription" : "DEV: Enable Subscription"}
-            onPress={handleDevSubscriptionToggle}
-            disabled={actionLoading}
-          />
-        ) : null}
       </ScrollView>
 
       {!isSubscribed && actionLoading ? (
@@ -890,35 +825,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     lineHeight: 18,
   },
-  optionsWrap: {
-    marginBottom: 12,
-    gap: 8,
-  },
-  optionCard: {
-    borderWidth: 1,
-    borderColor: "#D8DEEA",
-    borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    backgroundColor: "#FBFCFE",
-  },
-  optionCardActive: {
-    borderColor: "#1663d6",
-    backgroundColor: "#EEF5FF",
-  },
-  optionTitle: {
-    color: "#1B2F54",
-    fontSize: 13,
-    fontWeight: "600",
-  },
-  optionTitleActive: {
-    color: "#0C3E8A",
-  },
-  optionPrice: {
-    color: "#5D6980",
-    marginTop: 4,
-    fontSize: 13,
-  },
   refreshText: {
     color: "#1663d6",
     textDecorationLine: "underline",
@@ -1007,11 +913,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     textAlign: "auto",
     width: "100%",
-  },
-  optionDebug: {
-    marginTop: 4,
-    fontSize: 11,
-    color: "#516280",
   },
   bottomLoaderContainer: { position: "absolute", bottom: 30, left: 20, right: 20 },
 });

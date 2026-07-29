@@ -16,16 +16,13 @@ import { LinearGradient } from "expo-linear-gradient";
 import Button from "../components/Button";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
 import { DrawerParamList } from "../navigation/DrawerNavigator";
-import { CommonActions, useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 import { useSubscription } from "../context/subScriptionContext";
 import {
   FREE_DAILY_TASK_LIMIT,
   getDailyLimitStatus,
 } from "../components/utils/usageLimit";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useAuth } from "../context/authContext";
-import i18n from "../components/i18n";
 
 type HomeScreenProps = {
   navigation: DrawerNavigationProp<DrawerParamList, "Main">;
@@ -36,7 +33,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const { width } = useWindowDimensions();
   const { t } = useTranslation();
   const { isSubscribed } = useSubscription();
-  const { signOut } = useAuth();
   const hasPremium = isSubscribed;
   const isWebDesktop = width >= 760;
 
@@ -81,41 +77,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       return () => backHandler.remove(); // Cleanup
     }, [])
   );
-
-  const navigateToRootLanguage = () => {
-    let parentNavigator: any = navigation;
-    while (parentNavigator?.getParent?.()) {
-      parentNavigator = parentNavigator.getParent();
-    }
-
-    parentNavigator?.dispatch(
-      CommonActions.reset({
-        index: 0,
-        routes: [{ name: "Language" }],
-      })
-    );
-  };
-
-  const handleDevResetAppData = () => {
-    Alert.alert("Reset app data", "This will clear local app data and restart onboarding.", [
-      { text: t("Hs_Cancel"), style: "cancel" },
-      {
-        text: "Reset",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            await signOut();
-            await AsyncStorage.clear();
-            await i18n.changeLanguage("en");
-            navigateToRootLanguage();
-          } catch (error) {
-            console.error("Failed to reset app data:", error);
-            Alert.alert("Error", "Unable to reset app data.");
-          }
-        },
-      },
-    ]);
-  };
 
   const onStartAssessment = () => {
     if (hasPremium) {
@@ -281,11 +242,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             ></Image> */}
           </View>
         </View>
-        {__DEV__ && Platform.OS !== "web" && (
-          <TouchableOpacity style={styles.devResetButton} onPress={handleDevResetAppData}>
-            <Text style={styles.devResetText}>Reset App Data (DEV)</Text>
-          </TouchableOpacity>
-        )}
       </View>
       <Button
         type="intro"
@@ -321,21 +277,6 @@ const styles = StyleSheet.create({
   subText: {
     fontSize: 18,
     color: "gray",
-  },
-  devResetButton: {
-    marginTop: 6,
-    borderWidth: 1,
-    borderColor: "#ef4444",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    alignSelf: "flex-start",
-    backgroundColor: "#fff5f5",
-  },
-  devResetText: {
-    color: "#b91c1c",
-    fontSize: 12,
-    fontWeight: "600",
   },
   webContainer: {
     flex: 1,

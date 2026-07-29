@@ -14,9 +14,6 @@ import UpgradeModal from "./upgradeModal";
 import { useSubscription } from "../context/subScriptionContext";
 import { useAuth } from "../context/authContext";
 import { clearCachedSubscriptionStatus } from "./utils/purchase";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
-const DEBUG_SUB_OVERRIDE_KEY = "debug_subscription_override";
 
 export const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (
   props
@@ -35,7 +32,6 @@ export const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (
     }
     await signOut();
     await clearCachedSubscriptionStatus();
-    await AsyncStorage.removeItem(DEBUG_SUB_OVERRIDE_KEY);
     props.navigation.closeDrawer();
     props.navigation.navigate("Main");
   };

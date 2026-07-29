@@ -290,8 +290,6 @@ const HeaderRight = ({ navigation }) => {
 const Stack = createStackNavigator<StackParamList>();
 const Drawer = createDrawerNavigator<DrawerParamList>();
 const WebStack = createStackNavigator<DrawerParamList>();
-const DEBUG_SUB_OVERRIDE_KEY = "debug_subscription_override";
-
 const WebShellHeader: React.FC<{
   navigation: any;
   hasPremium: boolean;
@@ -370,7 +368,6 @@ const WebShellHeader: React.FC<{
     try {
       await signOut();
       await clearCachedSubscriptionStatus();
-      await AsyncStorage.removeItem(DEBUG_SUB_OVERRIDE_KEY);
       goRoot("Main");
     } catch (error) {
       console.error("Web logout failed:", error);
