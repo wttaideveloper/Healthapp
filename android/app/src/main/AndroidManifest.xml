@@ -1,27 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
-  <!-- Permissions the app genuinely requires. -->
   <uses-permission android:name="android.permission.INTERNET"/>
   <uses-permission android:name="com.android.vending.BILLING"/>
-
-  <!--
-    Removed to comply with the Google Play Photo & Video Permissions policy.
-    Dependencies declare these in their own manifests, so the merger would pull
-    them in even though this app never uses them:
-
-      READ_MEDIA_*        - were injected by expo-media-library (now uninstalled;
-                            these removals keep them out if it returns transitively).
-      CAMERA              - injected by expo-image-picker. The app only picks an
-                            existing image (launchImageLibraryAsync); it never
-                            calls launchCameraAsync.
-      READ/WRITE_EXTERNAL_STORAGE
-                          - injected by expo-image-picker. Not needed: image
-                            selection uses the Android Photo Picker
-                            (ActivityResultContracts.PickVisualMedia), file writes
-                            use app-scoped FileSystem.documentDirectory, and PDF
-                            export uses the Storage Access Framework - none of
-                            which require a manifest permission. Both are also
-                            ignored at our target SDK (33+/30+ respectively).
-  -->
   <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" tools:node="remove"/>
   <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" tools:node="remove"/>
   <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" tools:node="remove"/>
@@ -29,8 +8,6 @@
   <uses-permission android:name="android.permission.CAMERA" tools:node="remove"/>
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" tools:node="remove"/>
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="remove"/>
-  <!-- VIBRATE is injected by expo-haptics (a transitive dependency). The app has
-       no Haptics/Vibration call sites, so it is stripped as well. -->
   <uses-permission android:name="android.permission.VIBRATE" tools:node="remove"/>
   <queries>
     <intent>
