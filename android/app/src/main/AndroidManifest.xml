@@ -1,11 +1,37 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
+  <!-- Permissions the app genuinely requires. -->
   <uses-permission android:name="android.permission.INTERNET"/>
-  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-  <uses-permission android:name="android.permission.RECORD_AUDIO"/>
-  <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
-  <uses-permission android:name="android.permission.VIBRATE"/>
-  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
   <uses-permission android:name="com.android.vending.BILLING"/>
+
+  <!--
+    Removed to comply with the Google Play Photo & Video Permissions policy.
+    Dependencies declare these in their own manifests, so the merger would pull
+    them in even though this app never uses them:
+
+      READ_MEDIA_*        - were injected by expo-media-library (now uninstalled;
+                            these removals keep them out if it returns transitively).
+      CAMERA              - injected by expo-image-picker. The app only picks an
+                            existing image (launchImageLibraryAsync); it never
+                            calls launchCameraAsync.
+      READ/WRITE_EXTERNAL_STORAGE
+                          - injected by expo-image-picker. Not needed: image
+                            selection uses the Android Photo Picker
+                            (ActivityResultContracts.PickVisualMedia), file writes
+                            use app-scoped FileSystem.documentDirectory, and PDF
+                            export uses the Storage Access Framework - none of
+                            which require a manifest permission. Both are also
+                            ignored at our target SDK (33+/30+ respectively).
+  -->
+  <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" tools:node="remove"/>
+  <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" tools:node="remove"/>
+  <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" tools:node="remove"/>
+  <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" tools:node="remove"/>
+  <uses-permission android:name="android.permission.CAMERA" tools:node="remove"/>
+  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" tools:node="remove"/>
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="remove"/>
+  <!-- VIBRATE is injected by expo-haptics (a transitive dependency). The app has
+       no Haptics/Vibration call sites, so it is stripped as well. -->
+  <uses-permission android:name="android.permission.VIBRATE" tools:node="remove"/>
   <queries>
     <intent>
       <action android:name="android.intent.action.VIEW"/>
@@ -13,7 +39,7 @@
       <data android:scheme="https"/>
     </intent>
   </queries>
-  <application android:name=".MainApplication" android:label="@string/app_name" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher_round" android:allowBackup="true" android:theme="@style/AppTheme" android:supportsRtl="true" android:requestLegacyExternalStorage="true">
+  <application android:name=".MainApplication" android:label="@string/app_name" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher_round" android:allowBackup="true" android:theme="@style/AppTheme" android:supportsRtl="true">
     <meta-data android:name="expo.modules.updates.ENABLED" android:value="false"/>
     <meta-data android:name="expo.modules.updates.EXPO_UPDATES_CHECK_ON_LAUNCH" android:value="ALWAYS"/>
     <meta-data android:name="expo.modules.updates.EXPO_UPDATES_LAUNCH_WAIT_MS" android:value="0"/>
