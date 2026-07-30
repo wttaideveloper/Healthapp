@@ -3,8 +3,10 @@ import {
   BackHandler,
   FlatList,
   Image,
+  Linking,
   Platform,
   StyleSheet,
+  Text,
   TouchableOpacity,
   useWindowDimensions,
   View,
@@ -23,6 +25,7 @@ import {
 import { calculateBMI } from "../components/utils/BmiCalculation";
 import { useTranslation } from "react-i18next";
 import { flipIcon, forwardIcon } from "../components/utils/rtl";
+import { getQuestionSourceUrl } from "../components/utils/medicalSources";
 
 type QuestionsProps = DrawerScreenProps<DrawerParamList, "QuestionsScreen">;
 
@@ -150,6 +153,10 @@ const questionsData = [
 
 const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
   const { t } = useTranslation();
+
+  const openSource = React.useCallback((url: string) => {
+    Linking.openURL(url).catch(() => undefined);
+  }, []);
   const { width } = useWindowDimensions();
   const isWebDesktop = width >= 760;
   const [currentIndex, setCurrentIndex] = React.useState(0);
@@ -157,6 +164,11 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
     { questionId: number; text: string; points: number }[]
   >([]);
   const [questionError, setQuestionError] = React.useState<string | null>(null);
+
+  // Citation backing the medical guidance behind the current question.
+  const questionSourceUrl = getQuestionSourceUrl(
+    questionsData[currentIndex].question
+  );
   console.log(
     route.params.heightValue,
     route.params.weightValue,
@@ -405,6 +417,24 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
           style={styles.subQuestion}
         ></Font>
         {questionError ? <Font text={questionError} style={styles.errorText} /> : null}
+
+        {/*
+          Apple Guideline 1.4.1: every question that carries medical guidance
+          shows its source inline. The weight question is auto-classified from
+          the user's BMI, so its citation (CDC adult BMI categories) is the one
+          Apple specifically asked for in the profile-creation flow.
+        */}
+        {questionSourceUrl ? (
+          <TouchableOpacity
+            onPress={() => openSource(questionSourceUrl)}
+            style={styles.sourceRow}
+          >
+            <Text style={styles.sourceLabel}>{t("Rs_Source")}: </Text>
+            <Text style={styles.sourceLink} numberOfLines={2}>
+              {questionSourceUrl}
+            </Text>
+          </TouchableOpacity>
+        ) : null}
       </View>
 
       <FlatList
@@ -477,6 +507,22 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
 export default QuestionsScreen;
 
 const styles = StyleSheet.create({
+  sourceRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    marginTop: 8,
+  },
+  sourceLabel: {
+    fontSize: 11,
+    color: "#6B7A90",
+  },
+  sourceLink: {
+    flex: 1,
+    fontSize: 11,
+    color: "#0B9FD5",
+    textDecorationLine: "underline",
+  },
   screen: {
     flex: 1,
     backgroundColor: "#FFFFFF",

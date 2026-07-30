@@ -37,6 +37,36 @@ export const CORE_MEDICAL_SOURCES: MedicalSource[] = [
   },
 ];
 
+/**
+ * Maps each assessment question to the citation that backs the guidance behind
+ * it. Apple Guideline 1.4.1 requires medical information to carry sources that
+ * are easy for the user to find, including in the profile-creation flow where
+ * the weight question is auto-classified from the user's BMI.
+ *
+ * Every URL here is reused from REPORT_SOURCE_BY_TOPIC below - no new or
+ * invented references.
+ */
+export const QUESTION_SOURCE_BY_KEY: Record<string, keyof typeof REPORT_SOURCE_BY_TOPIC> = {
+  howOftenEatBreakfast: "breakfast",
+  howOftenSnack: "snacking",
+  howManyFruitsVeggies: "fruitsVegetables",
+  howManyWholeGrains: "wholeGrains",
+  howManyNutsSeeds: "nuts",
+  howOftenRedMeat: "redMeat",
+  howOftenExercise: "exercise",
+  howIsWeight: "weight",
+  howOftenSleep: "sleep",
+  whatIsTobaccoHistory: "tobacco",
+  howManyAlcohol: "alcohol",
+  howRateSpirituality: "spirituality",
+};
+
+/** Citation for a question key, or null when the question has no medical claim. */
+export const getQuestionSourceUrl = (questionKey: string): string | null => {
+  const topic = QUESTION_SOURCE_BY_KEY[questionKey];
+  return topic ? REPORT_SOURCE_BY_TOPIC[topic] : null;
+};
+
 export const REPORT_SOURCE_BY_TOPIC = {
   breakfast: "https://www.cdc.gov/healthy-weight-growth/be-sugar-smart/index.html",
   snacking: "https://pubmed.ncbi.nlm.nih.gov/34144310/",

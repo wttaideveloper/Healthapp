@@ -489,6 +489,8 @@ const resources = {
       restartRequiredMessage: "The application needs to restart to apply the new layout direction.",
       restartNow: "Restart Now",
       restartManuallyMessage: "Please close and reopen the application to apply the new layout direction.",
+      syncAccountPrompt: "Create an account to sync your subscription across all of your devices. You can also continue without creating an account.",
+      continueWithoutAccount: "Continue without account",
     },
   },
   hi: {
@@ -969,6 +971,8 @@ const resources = {
       restartRequiredMessage: "नई लेआउट दिशा लागू करने के लिए एप्लिकेशन को पुनः आरंभ करना होगा।",
       restartNow: "अभी पुनः आरंभ करें",
       restartManuallyMessage: "कृपया नई लेआउट दिशा लागू करने के लिए एप्लिकेशन को बंद करके फिर से खोलें।",
+      syncAccountPrompt: "अपनी सदस्यता को अपने सभी डिवाइस पर सिंक करने के लिए खाता बनाएं। आप बिना खाता बनाए भी जारी रख सकते हैं।",
+      continueWithoutAccount: "बिना खाते के जारी रखें",
     },
   },
   es: {
@@ -1419,6 +1423,8 @@ const resources = {
       restartRequiredMessage: "La aplicación debe reiniciarse para aplicar la nueva dirección de diseño.",
       restartNow: "Reiniciar ahora",
       restartManuallyMessage: "Cierra y vuelve a abrir la aplicación para aplicar la nueva dirección de diseño.",
+      syncAccountPrompt: "Crea una cuenta para sincronizar tu suscripción en todos tus dispositivos. También puedes continuar sin crear una cuenta.",
+      continueWithoutAccount: "Continuar sin cuenta",
     },
   },
   ja: {
@@ -1866,6 +1872,8 @@ const resources = {
       restartRequiredMessage: "新しいレイアウト方向を適用するにはアプリを再起動する必要があります。",
       restartNow: "今すぐ再起動",
       restartManuallyMessage: "新しいレイアウト方向を適用するには、アプリを終了してから再度開いてください。",
+      syncAccountPrompt: "すべてのデバイスでサブスクリプションを同期するにはアカウントを作成してください。アカウントを作成せずに続けることもできます。",
+      continueWithoutAccount: "アカウントなしで続ける",
     },
   },
   fr: {
@@ -2354,6 +2362,8 @@ const resources = {
       restartRequiredMessage: "L'application doit redémarrer pour appliquer la nouvelle direction de mise en page.",
       restartNow: "Redémarrer maintenant",
       restartManuallyMessage: "Veuillez fermer puis rouvrir l'application pour appliquer la nouvelle direction de mise en page.",
+      syncAccountPrompt: "Créez un compte pour synchroniser votre abonnement sur tous vos appareils. Vous pouvez aussi continuer sans créer de compte.",
+      continueWithoutAccount: "Continuer sans compte",
     },
   },
   zh: {
@@ -2797,6 +2807,8 @@ const resources = {
       restartRequiredMessage: "应用需要重启以应用新的布局方向。",
       restartNow: "立即重启",
       restartManuallyMessage: "请关闭并重新打开应用以应用新的布局方向。",
+      syncAccountPrompt: "创建账户即可在您的所有设备上同步订阅。您也可以不创建账户继续使用。",
+      continueWithoutAccount: "不创建账户继续",
     },
   },
   ar: {
@@ -3843,6 +3855,8 @@ const resources = {
       restartRequiredMessage: "새로운 레이아웃 방향을 적용하려면 앱을 다시 시작해야 합니다.",
       restartNow: "지금 다시 시작",
       restartManuallyMessage: "새로운 레이아웃 방향을 적용하려면 앱을 종료한 후 다시 열어 주세요.",
+      syncAccountPrompt: "모든 기기에서 구독을 동기화하려면 계정을 만드세요. 계정을 만들지 않고 계속할 수도 있습니다.",
+      continueWithoutAccount: "계정 없이 계속",
     },
   },
   ru: {
@@ -4316,6 +4330,8 @@ const resources = {
       restartRequiredMessage: "Чтобы применить новое направление разметки, приложение нужно перезапустить.",
       restartNow: "Перезапустить сейчас",
       restartManuallyMessage: "Закройте и снова откройте приложение, чтобы применить новое направление разметки.",
+      syncAccountPrompt: "Создайте учётную запись, чтобы синхронизировать подписку на всех устройствах. Можно продолжить и без создания учётной записи.",
+      continueWithoutAccount: "Продолжить без учётной записи",
     },
   },
   pt: {
@@ -4808,6 +4824,8 @@ const resources = {
       restartRequiredMessage: "O aplicativo precisa reiniciar para aplicar a nova direção do layout.",
       restartNow: "Reiniciar agora",
       restartManuallyMessage: "Feche e abra novamente o aplicativo para aplicar a nova direção do layout.",
+      syncAccountPrompt: "Crie uma conta para sincronizar sua assinatura em todos os seus dispositivos. Você também pode continuar sem criar uma conta.",
+      continueWithoutAccount: "Continuar sem conta",
     },
   },
   de: {
@@ -5259,6 +5277,8 @@ const resources = {
       restartRequiredMessage: "Die App muss neu gestartet werden, um die neue Layoutrichtung anzuwenden.",
       restartNow: "Jetzt neu starten",
       restartManuallyMessage: "Bitte schließen und öffnen Sie die App erneut, um die neue Layoutrichtung anzuwenden.",
+      syncAccountPrompt: "Erstellen Sie ein Konto, um Ihr Abonnement auf allen Geräten zu synchronisieren. Sie können auch ohne Konto fortfahren.",
+      continueWithoutAccount: "Ohne Konto fortfahren",
     },
   },
   pap: {
@@ -6035,6 +6055,8 @@ const resources = {
       restartRequiredMessage: "Ứng dụng cần khởi động lại để áp dụng hướng bố cục mới.",
       restartNow: "Khởi động lại ngay",
       restartManuallyMessage: "Vui lòng đóng và mở lại ứng dụng để áp dụng hướng bố cục mới.",
+      syncAccountPrompt: "Tạo tài khoản để đồng bộ gói đăng ký trên tất cả thiết bị của bạn. Bạn cũng có thể tiếp tục mà không cần tạo tài khoản.",
+      continueWithoutAccount: "Tiếp tục không cần tài khoản",
     },
   },
   mg: {
@@ -6517,6 +6539,8 @@ const resources = {
       restartRequiredMessage: "Mila averina ny fampiharana mba hampiharana ny lalan'ny endrika vaovao.",
       restartNow: "Avereno izao",
       restartManuallyMessage: "Azafady akatona ary sokafy indray ny fampiharana mba hampiharana ny lalan'ny endrika vaovao.",
+      syncAccountPrompt: "Mamorona kaonty mba hampifanaraka ny famandrihanao amin'ny fitaovanao rehetra. Azonao atao ihany koa ny manohy tsy mamorona kaonty.",
+      continueWithoutAccount: "Tohizo tsy misy kaonty",
     },
   },
   da: {
@@ -6959,6 +6983,8 @@ const resources = {
       restartRequiredMessage: "Appen skal genstartes for at anvende den nye layoutretning.",
       restartNow: "Genstart nu",
       restartManuallyMessage: "Luk og åbn appen igen for at anvende den nye layoutretning.",
+      syncAccountPrompt: "Opret en konto for at synkronisere dit abonnement på alle dine enheder. Du kan også fortsætte uden at oprette en konto.",
+      continueWithoutAccount: "Fortsæt uden konto",
     },
   },
   ta: {
@@ -7443,6 +7469,8 @@ const resources = {
       restartRequiredMessage: "புதிய தளவமைப்பு திசையைப் பயன்படுத்த செயலியை மறுதொடக்கம் செய்ய வேண்டும்.",
       restartNow: "இப்போது மறுதொடக்கம்",
       restartManuallyMessage: "புதிய தளவமைப்பு திசையைப் பயன்படுத்த செயலியை மூடி மீண்டும் திறக்கவும்.",
+      syncAccountPrompt: "உங்கள் எல்லா சாதனங்களிலும் சந்தாவை ஒத்திசைக்க கணக்கை உருவாக்கவும். கணக்கை உருவாக்காமலும் தொடரலாம்.",
+      continueWithoutAccount: "கணக்கு இல்லாமல் தொடரவும்",
     },
   },
   bn: {
@@ -7881,6 +7909,8 @@ const resources = {
       restartRequiredMessage: "নতুন লেআউট দিক প্রয়োগ করতে অ্যাপটি পুনরায় চালু করতে হবে।",
       restartNow: "এখনই পুনরায় চালু করুন",
       restartManuallyMessage: "নতুন লেআউট দিক প্রয়োগ করতে অ্যাপটি বন্ধ করে আবার খুলুন।",
+      syncAccountPrompt: "আপনার সব ডিভাইসে সাবস্ক্রিপশন সিঙ্ক করতে একটি অ্যাকাউন্ট তৈরি করুন। অ্যাকাউন্ট তৈরি না করেও চালিয়ে যেতে পারেন।",
+      continueWithoutAccount: "অ্যাকাউন্ট ছাড়া চালিয়ে যান",
     },
   },
   id: {
@@ -8320,6 +8350,8 @@ const resources = {
       restartRequiredMessage: "Aplikasi perlu dimulai ulang untuk menerapkan arah tata letak baru.",
       restartNow: "Mulai Ulang Sekarang",
       restartManuallyMessage: "Silakan tutup dan buka kembali aplikasi untuk menerapkan arah tata letak baru.",
+      syncAccountPrompt: "Buat akun untuk menyinkronkan langganan Anda di semua perangkat. Anda juga dapat melanjutkan tanpa membuat akun.",
+      continueWithoutAccount: "Lanjutkan tanpa akun",
     },
   },
   tr: {
@@ -8758,6 +8790,8 @@ const resources = {
       restartRequiredMessage: "Yeni yerleşim yönünü uygulamak için uygulamanın yeniden başlatılması gerekiyor.",
       restartNow: "Şimdi Yeniden Başlat",
       restartManuallyMessage: "Yeni yerleşim yönünü uygulamak için lütfen uygulamayı kapatıp yeniden açın.",
+      syncAccountPrompt: "Aboneliğinizi tüm cihazlarınızda eşitlemek için bir hesap oluşturun. Hesap oluşturmadan da devam edebilirsiniz.",
+      continueWithoutAccount: "Hesapsız devam et",
     },
   },
   te: {
@@ -9196,6 +9230,8 @@ const resources = {
       restartRequiredMessage: "కొత్త లేఅవుట్ దిశను వర్తింపజేయడానికి యాప్‌ను పునఃప్రారంభించాలి.",
       restartNow: "ఇప్పుడే పునఃప్రారంభించండి",
       restartManuallyMessage: "కొత్త లేఅవుట్ దిశను వర్తింపజేయడానికి దయచేసి యాప్‌ను మూసివేసి మళ్లీ తెరవండి.",
+      syncAccountPrompt: "మీ అన్ని పరికరాల్లో సబ్‌స్క్రిప్షన్‌ను సమకాలీకరించడానికి ఖాతా సృష్టించండి. ఖాతా సృష్టించకుండా కూడా కొనసాగవచ్చు.",
+      continueWithoutAccount: "ఖాతా లేకుండా కొనసాగండి",
     },
   },
   pa: {
@@ -9634,6 +9670,8 @@ const resources = {
       restartRequiredMessage: "ਨਵੀਂ ਲੇਆਉਟ ਦਿਸ਼ਾ ਲਾਗੂ ਕਰਨ ਲਈ ਐਪ ਨੂੰ ਮੁੜ ਚਾਲੂ ਕਰਨਾ ਪਵੇਗਾ।",
       restartNow: "ਹੁਣੇ ਮੁੜ ਚਾਲੂ ਕਰੋ",
       restartManuallyMessage: "ਨਵੀਂ ਲੇਆਉਟ ਦਿਸ਼ਾ ਲਾਗੂ ਕਰਨ ਲਈ ਕਿਰਪਾ ਕਰਕੇ ਐਪ ਬੰਦ ਕਰਕੇ ਦੁਬਾਰਾ ਖੋਲ੍ਹੋ।",
+      syncAccountPrompt: "ਆਪਣੀ ਸਬਸਕ੍ਰਿਪਸ਼ਨ ਨੂੰ ਆਪਣੇ ਸਾਰੇ ਡਿਵਾਈਸਾਂ 'ਤੇ ਸਿੰਕ ਕਰਨ ਲਈ ਖਾਤਾ ਬਣਾਓ। ਤੁਸੀਂ ਖਾਤਾ ਬਣਾਏ ਬਿਨਾਂ ਵੀ ਜਾਰੀ ਰੱਖ ਸਕਦੇ ਹੋ।",
+      continueWithoutAccount: "ਖਾਤੇ ਤੋਂ ਬਿਨਾਂ ਜਾਰੀ ਰੱਖੋ",
     },
   },
   // NOTE: fa / he / ur are RTL and are user-visible. They are listed in
@@ -10076,6 +10114,8 @@ const resources = {
       restartRequiredMessage: "برنامه باید برای اعمال جهت جدید چیدمان دوباره راه‌اندازی شود.",
       restartNow: "اکنون راه‌اندازی مجدد",
       restartManuallyMessage: "لطفاً برنامه را ببندید و دوباره باز کنید تا جهت جدید چیدمان اعمال شود.",
+      syncAccountPrompt: "برای همگام‌سازی اشتراک خود در همه دستگاه‌ها یک حساب بسازید. می‌توانید بدون ساخت حساب نیز ادامه دهید.",
+      continueWithoutAccount: "ادامه بدون حساب",
     },
   },
   ur: {
@@ -10514,6 +10554,8 @@ const resources = {
       restartRequiredMessage: "نئی لے آؤٹ سمت لاگو کرنے کے لیے ایپ کو دوبارہ شروع کرنا ہوگا۔",
       restartNow: "ابھی دوبارہ شروع کریں",
       restartManuallyMessage: "براہ کرم نئی لے آؤٹ سمت لاگو کرنے کے لیے ایپ بند کر کے دوبارہ کھولیں۔",
+      syncAccountPrompt: "اپنی سبسکرپشن کو اپنے تمام آلات پر ہم آہنگ کرنے کے لیے اکاؤنٹ بنائیں۔ آپ اکاؤنٹ بنائے بغیر بھی جاری رکھ سکتے ہیں۔",
+      continueWithoutAccount: "اکاؤنٹ کے بغیر جاری رکھیں",
     },
   },
   he: {
@@ -10953,6 +10995,8 @@ const resources = {
       restartRequiredMessage: "יש להפעיל מחדש את האפליקציה כדי להחיל את כיוון הפריסה החדש.",
       restartNow: "הפעל מחדש עכשיו",
       restartManuallyMessage: "סגור ופתח מחדש את האפליקציה כדי להחיל את כיוון הפריסה החדש.",
+      syncAccountPrompt: "צור חשבון כדי לסנכרן את המנוי שלך בכל המכשירים שלך. אפשר גם להמשיך בלי ליצור חשבון.",
+      continueWithoutAccount: "המשך ללא חשבון",
     },
   },
 };

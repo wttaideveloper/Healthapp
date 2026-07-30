@@ -74,21 +74,20 @@ const PurchaseScreen: React.FC = () => {
   const [storeError, setStoreError] = useState<string | null>(null);
   const [webNotice, setWebNotice] = useState<string | null>(null);
 
+  const rootNavigate = React.useCallback((routeName: string) => {
+    let rootNavigation: any = navigation;
+    while (rootNavigation?.getParent?.()) {
+      rootNavigation = rootNavigation.getParent();
+    }
+    rootNavigation?.navigate?.(routeName);
+  }, [navigation]);
+
   const promptSignIn = React.useCallback((message: string) => {
     Alert.alert(t("signInRequired"), message, [
       { text: "Cancel", style: "cancel" },
-      {
-        text: "Sign in",
-        onPress: () => {
-          let rootNavigation: any = navigation;
-          while (rootNavigation?.getParent?.()) {
-            rootNavigation = rootNavigation.getParent();
-          }
-          rootNavigation?.navigate?.("SignIn");
-        },
-      },
+      { text: "Sign in", onPress: () => rootNavigate("SignIn") },
     ]);
-  }, [navigation]);
+  }, [rootNavigate]);
 
   const openExternalUrl = React.useCallback(async (url: string) => {
     try {
@@ -304,7 +303,12 @@ const PurchaseScreen: React.FC = () => {
 
   const handleSubscribe = async () => {
     if (actionLoading) return;
-    if (!accessToken) {
+
+    // Apple Guideline 5.1.1(v): an In-App Purchase that is not account-based must
+    // not require registration. Native store purchases therefore run anonymously
+    // through RevenueCat. Stripe (web) still needs a signed-in session because the
+    // backend creates the checkout against a user record.
+    if (!usesNativeStorePurchase && !accessToken) {
       promptSignIn("Please sign in before starting a subscription.");
       return;
     }
@@ -325,8 +329,12 @@ const PurchaseScreen: React.FC = () => {
       const existingStoreStatus = await verifySubscriptionStatusRevenueCat();
       if (existingStoreStatus?.isValid) {
         await refreshSubscription(true);
-        const backendStatus = await verifySubscriptionStatusBackend(accessToken);
-        if (backendStatus?.isValid) {
+        // Anonymous buyers have no backend record to consult; the store
+        // entitlement alone already unlocks Pro.
+        const backendStatus = accessToken
+          ? await verifySubscriptionStatusBackend(accessToken)
+          : null;
+        if (backendStatus?.isValid || (!accessToken && existingStoreStatus.isValid)) {
           Alert.alert(t("subscriptionActive"), t("subscriptionActiveDesc"));
           return;
         }
@@ -339,9 +347,13 @@ const PurchaseScreen: React.FC = () => {
       }
       const packages = await getSubscriptions();
       await purchaseSubscription(packages, selectedPackageIdentifier);
-      const syncedStatus = await syncRevenueCatStatusToBackend(accessToken, user?.id ?? null, "purchase");
+      // Only signed-in users have a backend entitlement to sync to. Anonymous
+      // purchases are carried by RevenueCat and picked up by refreshSubscription.
+      const syncedStatus = accessToken
+        ? await syncRevenueCatStatusToBackend(accessToken, user?.id ?? null, "purchase")
+        : null;
       await refreshSubscription(true);
-      if (syncedStatus?.isValid) {
+      if (syncedStatus?.isValid || !accessToken) {
         Alert.alert(t("UpgradeComplete"), t("subscriptionActiveUnlocked"));
       } else {
         Alert.alert(t("purchaseSynced"), t("purchaseSyncedDesc"));
@@ -363,11 +375,10 @@ const PurchaseScreen: React.FC = () => {
 
   const handleRestorePurchases = async () => {
     if (actionLoading) return;
-    if (!accessToken) {
-      promptSignIn("Please sign in before restoring purchases.");
-      return;
-    }
 
+    // Restore is scoped to the store account (Apple ID / Google account), not to
+    // an app account, so it must work without registration - Apple requires the
+    // Restore path to be reachable for anonymous buyers.
     if (Platform.OS === "web" || !isNativeStorePurchaseEnabled()) {
       Alert.alert(
         t("restoreUnavailable"),
@@ -390,11 +401,9 @@ const PurchaseScreen: React.FC = () => {
         return;
       }
 
-      const syncedStatus = await syncRevenueCatStatusToBackend(
-        accessToken,
-        user?.id ?? null,
-        "restore"
-      );
+      const syncedStatus = accessToken
+        ? await syncRevenueCatStatusToBackend(accessToken, user?.id ?? null, "restore")
+        : null;
       await refreshSubscription(true);
 
       if (syncedStatus?.isValid || restoredStatus.isValid) {
@@ -414,18 +423,21 @@ const PurchaseScreen: React.FC = () => {
   };
 
   const handleManageSubscription = async () => {
-    if (!accessToken) {
+    // Native store subscriptions are managed in the Apple/Google account
+    // settings, which needs no app account. Only the Stripe billing portal does,
+    // because the backend builds the portal session from a user record.
+    if (!usesNativeStorePurchase && !accessToken) {
       promptSignIn("Please sign in before opening billing or subscription settings.");
       return;
     }
     try {
       if (Platform.OS === "web") {
-        await startStripePortal(accessToken);
+        await startStripePortal(accessToken as string);
         return;
       }
 
       if (!isNativeStorePurchaseEnabled()) {
-        await startStripePortal(accessToken);
+        await startStripePortal(accessToken as string);
         return;
       }
       await cancelSubscription();
@@ -472,6 +484,13 @@ const PurchaseScreen: React.FC = () => {
       </View>
     );
   }
+
+  // True when this build buys through the native store (RevenueCat/StoreKit or
+  // Play Billing). Those purchases are anonymous-capable, so Apple Guideline
+  // 5.1.1(v) forbids gating them behind registration.
+  const usesNativeStorePurchase = Platform.OS !== "web" && isNativeStorePurchaseEnabled();
+  // Offer account creation only as an optional benefit, after the paywall.
+  const showOptionalAccountPrompt = usesNativeStorePurchase && !accessToken;
 
   const planPrice = selectedPlan?.priceString || FALLBACK_PLAN_PRICE;
   const planTitle = selectedPlan?.title || selectedPlan?.description || FALLBACK_PLAN_DESCRIPTION;
@@ -656,6 +675,32 @@ const PurchaseScreen: React.FC = () => {
           </View>
         )}
 
+        {/*
+          Apple Guideline 5.1.1(v): account creation is offered only as an
+          optional convenience for syncing across devices, never as a gate in
+          front of the purchase. Shown to anonymous users on native only.
+        */}
+        {showOptionalAccountPrompt ? (
+          <View style={[styles.accountPromptCard, webContentWidthStyle ?? undefined]}>
+            <Text style={styles.accountPromptText}>{t("syncAccountPrompt")}</Text>
+            <View style={styles.accountPromptRow}>
+              <TouchableOpacity
+                style={styles.accountPromptBtn}
+                onPress={() => rootNavigate("SignIn")}
+              >
+                <Text style={styles.accountPromptBtnText}>{t("signIn")}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.accountPromptBtn}
+                onPress={() => rootNavigate("SignUp")}
+              >
+                <Text style={styles.accountPromptBtnText}>{t("createAccount")}</Text>
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.accountPromptHint}>{t("continueWithoutAccount")}</Text>
+          </View>
+        ) : null}
+
         <View style={styles.legalSection}>
           <Text style={styles.disclosureText}>
             {Platform.OS === "web"
@@ -700,6 +745,49 @@ const styles = StyleSheet.create({
   },
   actionButtonSecondary: {
     marginTop: 6,
+  },
+  // Optional account-sync prompt (Apple Guideline 5.1.1(v)).
+  accountPromptCard: {
+    width: "100%",
+    marginTop: 18,
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#DCE7F5",
+    backgroundColor: "#F6FAFF",
+  },
+  accountPromptText: {
+    fontSize: 13,
+    lineHeight: 19,
+    color: "#33415C",
+    textAlign: "center",
+  },
+  accountPromptRow: {
+    marginTop: 12,
+    flexDirection: "row",
+    justifyContent: "center",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+  accountPromptBtn: {
+    paddingVertical: 9,
+    paddingHorizontal: 18,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: "#0F9AD1",
+    minWidth: 120,
+    alignItems: "center",
+  },
+  accountPromptBtnText: {
+    color: "#0F4FA8",
+    fontWeight: "600",
+    fontSize: 13,
+  },
+  accountPromptHint: {
+    marginTop: 10,
+    fontSize: 12,
+    color: "#6B7A90",
+    textAlign: "center",
   },
   webActionRow: {
     marginTop: 12,

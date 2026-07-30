@@ -37,9 +37,28 @@ export const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (
     props.navigation.navigate("Main");
   };
 
-  const drawerContent = [
+  const drawerContent: Array<{
+    name: string;
+    iconKey: keyof typeof icons;
+    navigateLocation?: string;
+    subTabs?: Array<{
+      name: string;
+      iconKey: keyof typeof icons;
+      navigateLocation: string;
+      screen?: string;
+      pro: boolean;
+    }>;
+  }> = [
     {
       name: "aboutTheApp",
+      iconKey: "book",
+      navigateLocation: "AboutAppScreen",
+    },
+    {
+      // Apple Guideline 1.4.1: medical citations must be easy to find. This is a
+      // permanent, one-tap entry point to the source list already rendered by
+      // AboutAppScreen from medicalSources.ts - no data or citations duplicated.
+      name: "Rs_MedicalSources",
       iconKey: "book",
       navigateLocation: "AboutAppScreen",
     },
@@ -99,9 +118,9 @@ export const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (
             <TouchableOpacity
               style={styles.drawerItem}
               onPress={() => {
-                e?.name === "reports"
-                  ? null
-                  : props.navigation.navigate(e.navigateLocation);
+                if (e.navigateLocation) {
+                  props.navigation.navigate(e.navigateLocation);
+                }
               }}
             >
               <Image
