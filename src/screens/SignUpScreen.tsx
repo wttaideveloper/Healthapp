@@ -19,16 +19,17 @@ import { icons } from "../components/images";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
-import { flipIcon } from "../components/utils/rtl";
+import { flipIcon, textAlign } from "../components/utils/rtl";
+import { type ValidationError } from "../components/utils/localizedValidation";
 
 type SignUpScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, "SignUp">;
 };
 
 type SignUpFieldErrors = {
-  name?: string;
-  email?: string;
-  password?: string;
+  name?: ValidationError;
+  email?: ValidationError;
+  password?: ValidationError;
 };
 
 const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
@@ -70,21 +71,21 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
     const nextErrors: SignUpFieldErrors = {};
 
     if (!normalizedName) {
-      nextErrors.name = "Name is required";
+      nextErrors.name = { key: "validation.nameRequired" };
     } else if (!isValidName(normalizedName)) {
-      nextErrors.name = "Name must start with a letter and cannot be numbers only";
+      nextErrors.name = { key: "validation.nameInvalid" };
     }
 
     if (!normalizedEmail) {
-      nextErrors.email = "Email is required";
+      nextErrors.email = { key: "validation.emailRequired" };
     } else if (!isValidEmail(normalizedEmail)) {
-      nextErrors.email = "Please enter a valid email address";
+      nextErrors.email = { key: "validation.emailInvalid" };
     }
 
     if (!password) {
-      nextErrors.password = "Password is required";
+      nextErrors.password = { key: "validation.passwordRequired" };
     } else if (password.length < 6) {
-      nextErrors.password = "Password must be at least 6 characters";
+      nextErrors.password = { key: "validation.passwordMinLength", values: { min: 6 } };
     }
 
     if (nextErrors.name || nextErrors.email || nextErrors.password) {
@@ -127,7 +128,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
         placeholder={t("yourName")}
         placeholderTextColor="#8b909b"
       />
-      {fieldErrors.name ? <Text style={styles.error}>{fieldErrors.name}</Text> : null}
+      {fieldErrors.name ? <Text style={[styles.error, textAlign()]}>{t(fieldErrors.name.key, fieldErrors.name.values)}</Text> : null}
 
       <Text style={styles.label}>{t("Is_Email")}</Text>
       <TextInput
@@ -143,7 +144,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
         placeholder="you@example.com"
         placeholderTextColor="#8b909b"
       />
-      {fieldErrors.email ? <Text style={styles.error}>{fieldErrors.email}</Text> : null}
+      {fieldErrors.email ? <Text style={[styles.error, textAlign()]}>{t(fieldErrors.email.key, fieldErrors.email.values)}</Text> : null}
 
       <Text style={styles.label}>{t("password")}</Text>
       <View style={[styles.passwordRow, fieldErrors.password ? styles.inputError : null]}>
@@ -171,7 +172,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
           />
         </TouchableOpacity>
       </View>
-      {fieldErrors.password ? <Text style={styles.error}>{fieldErrors.password}</Text> : null}
+      {fieldErrors.password ? <Text style={[styles.error, textAlign()]}>{t(fieldErrors.password.key, fieldErrors.password.values)}</Text> : null}
 
       {submitError ? <Text style={styles.error}>{submitError}</Text> : null}
 

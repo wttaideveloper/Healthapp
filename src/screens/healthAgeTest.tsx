@@ -28,7 +28,8 @@ import { DrawerParamList } from "../navigation/DrawerNavigator";
 import { useTranslation } from "react-i18next";
 import { Dimensions } from "react-native";
 import { isValidName } from "../components/utils/validation";
-import { flipIcon, forwardIcon, startEnd } from "../components/utils/rtl";
+import { flipIcon, forwardIcon, startEnd, textAlign } from "../components/utils/rtl";
+import { type ValidationError } from "../components/utils/localizedValidation";
 
 type HealthAgeTestProps = DrawerScreenProps<DrawerParamList, "healthAgeTest">;
 
@@ -96,7 +97,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
     blood_glucose_mmol_points: "",
   });
   const [popup, setPopup] = React.useState(true);
-  const [stepError, setStepError] = React.useState<string | null>(null);
+  const [stepError, setStepError] = React.useState<ValidationError | null>(null);
   const [selectedAge, setSelectedAge] = React.useState("");
   const [selectedHeightUnit, setSelectedHeightUnit] = React.useState("ft in");
   const [selectedWeightUnit, setSelectedWeightUnit] = React.useState("Lb");
@@ -228,21 +229,23 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
                   ? "whatIsYourBloodPressure"
                   : "whatIsYourBloodGlucose";
 
-  const validateAgeValue = (rawAge: string): string | null => {
+  const validateAgeValue = (rawAge: string): ValidationError | null => {
     const trimmed = rawAge.trim();
-    if (!trimmed) return "Age is required.";
-    if (!/^\d{1,2}$/.test(trimmed)) return `Age must be between ${MIN_AGE} and ${MAX_AGE}.`;
+    if (!trimmed) return { key: "validation.fieldRequired", fieldKey: "age" };
+    if (!/^\d{1,2}$/.test(trimmed)) {
+      return { key: "validation.ageRange", values: { min: MIN_AGE, max: MAX_AGE } };
+    }
     const numericAge = Number(trimmed);
     if (Number.isNaN(numericAge) || numericAge < MIN_AGE || numericAge > MAX_AGE) {
-      return `Age must be between ${MIN_AGE} and ${MAX_AGE}.`;
+      return { key: "validation.ageRange", values: { min: MIN_AGE, max: MAX_AGE } };
     }
     return null;
   };
 
-  const validateStep = (targetStep: number): string | null => {
+  const validateStep = (targetStep: number): ValidationError | null => {
     if (targetStep === 1) {
-      if (!value.name.trim()) return "Name is required.";
-      if (!isValidName(value.name)) return "Name must start with a letter and cannot be numbers only.";
+      if (!value.name.trim()) return { key: "validation.fieldRequired", fieldKey: "Is_Name" };
+      if (!isValidName(value.name)) return { key: "validation.nameInvalid" };
       return null;
     }
 
@@ -251,16 +254,16 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
     }
 
     if (targetStep === 3) {
-      if (!value.gender.trim()) return "Gender is required.";
+      if (!value.gender.trim()) return { key: "validation.fieldRequired", fieldKey: "gender" };
       return null;
     }
 
     if (targetStep === 4) {
       if (selectedHeightUnit === "cm") {
-        if (!value.height_Cm.trim()) return "Height is required.";
+        if (!value.height_Cm.trim()) return { key: "validation.fieldRequired", fieldKey: "height" };
       } else {
         if (!value.height_Ft.trim() || !value.height_In.trim()) {
-          return "Height (ft/in) is required.";
+          return { key: "validation.heightFtInRequired" };
         }
       }
       return null;
@@ -268,35 +271,35 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
 
     if (targetStep === 5) {
       if (selectedWeightUnit === "Lb") {
-        if (!value.weight_Lb.trim()) return "Weight is required.";
+        if (!value.weight_Lb.trim()) return { key: "validation.fieldRequired", fieldKey: "weight" };
       } else {
-        if (!value.weight_Kg.trim()) return "Weight is required.";
+        if (!value.weight_Kg.trim()) return { key: "validation.fieldRequired", fieldKey: "weight" };
       }
       return null;
     }
 
     if (targetStep === 6) {
       if (selectedWaistUnit === "In") {
-        if (!value.waist_Circumference_In.trim()) return "Waist circumference is required.";
+        if (!value.waist_Circumference_In.trim()) return { key: "validation.fieldRequired", fieldKey: "whatIsYourWaistCircumference" };
       } else {
-        if (!value.waist_Circumference_Cm.trim()) return "Waist circumference is required.";
+        if (!value.waist_Circumference_Cm.trim()) return { key: "validation.fieldRequired", fieldKey: "whatIsYourWaistCircumference" };
       }
       return null;
     }
 
     if (targetStep === 7) {
       if (!value.blood_pressure_sys.trim() || !value.blood_pressure_dia.trim()) {
-        return "Blood pressure values are required.";
+        return { key: "validation.fieldRequired", fieldKey: "bloodPressure" };
       }
       return null;
     }
 
     if (targetStep === 8) {
       if (selectedGlucoseUnit === "mg/dL") {
-        if (!value.blood_glucose_mg.trim()) return "Blood glucose is required.";
+        if (!value.blood_glucose_mg.trim()) return { key: "validation.fieldRequired", fieldKey: "bloodGlucoseLevel" };
       } else {
         if (!value.blood_glucose_mmol.trim() || !value.blood_glucose_mmol_points.trim()) {
-          return "Blood glucose is required.";
+          return { key: "validation.fieldRequired", fieldKey: "bloodGlucoseLevel" };
         }
       }
       return null;
@@ -305,9 +308,20 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
     return null;
   };
 
-  const showValidationError = (message: string) => {
-    setStepError(message);
-    Alert.alert(t("validation"), message, [{ text: t("Fs_Close") }]);
+  const getValidationMessage = (error: ValidationError) =>
+    t(error.key, {
+      ...error.values,
+      ...(error.fieldKey ? { field: t(error.fieldKey) } : {}),
+    });
+
+  const validationMessage = stepError
+    ? getValidationMessage(stepError)
+    : null;
+
+  const showValidationError = (error: ValidationError) => {
+    const message = getValidationMessage(error);
+    setStepError(error);
+    Alert.alert(t("validation.title"), message, [{ text: t("Fs_Close") }]);
   };
 
   const renderItem = () => {
@@ -1992,7 +2006,11 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
             <Image source={icons.healthAgeLogo} style={{ width: 24, height: 42 }} />
           </View>
           {renderItem()}
-          {stepError ? <Text style={styles.stepErrorText}>{stepError}</Text> : null}
+          {stepError ? (
+            <Text style={[styles.stepErrorText, textAlign()]}>
+              {validationMessage}
+            </Text>
+          ) : null}
         </View>
 
         <View

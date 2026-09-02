@@ -19,7 +19,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { icons } from "../components/images";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
-import { flipIcon } from "../components/utils/rtl";
+import { flipIcon, textAlign } from "../components/utils/rtl";
+import { type DisplayError, isValidationError } from "../components/utils/localizedValidation";
 
 type ForgotPasswordScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, "ForgotPassword">;
@@ -34,7 +35,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
   const [isLoading, setIsLoading] = useState(false);
   const [otpRequested, setOtpRequested] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<DisplayError | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const isWebDesktop = width >= 760;
   const isNativeMobile = Platform.OS !== "web";
@@ -50,12 +51,12 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
 
   const onRequestOtp = async () => {
     if (!normalizedEmail) {
-      setError("Email is required");
+      setError({ key: "validation.emailRequired" });
       return;
     }
 
     if (!isValidEmail(normalizedEmail)) {
-      setError("Please enter a valid email address");
+      setError({ key: "validation.emailInvalid" });
       return;
     }
 
@@ -75,15 +76,15 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
 
   const onResetPassword = async () => {
     if (!normalizedEmail) {
-      setError("Email is required");
+      setError({ key: "validation.emailRequired" });
       return;
     }
     if (!/^\d{6}$/.test(otp.trim())) {
-      setError("OTP must be a 6-digit code");
+      setError({ key: "validation.otpSixDigits" });
       return;
     }
     if (newPassword.trim().length < 8) {
-      setError("New password must be at least 8 characters");
+      setError({ key: "validation.newPasswordMinLength", values: { min: 8 } });
       return;
     }
 
@@ -197,7 +198,11 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
       )}
 
       {notice ? <Text style={styles.notice}>{notice}</Text> : null}
-      {error ? <Text style={styles.error}>{error}</Text> : null}
+      {error ? (
+        <Text style={[styles.error, textAlign()]}>
+          {isValidationError(error) ? t(error.key, error.values) : error}
+        </Text>
+      ) : null}
 
       <TouchableOpacity
         style={styles.secondaryButton}

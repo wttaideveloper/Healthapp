@@ -38,7 +38,8 @@ import { useTranslation } from "react-i18next";
 import { useSubscription } from "../context/subScriptionContext";
 import { isValidEmail, isValidName } from "../components/utils/validation";
 import { useAuth } from "../context/authContext";
-import { flipIcon, forwardIcon } from "../components/utils/rtl";
+import { flipIcon, forwardIcon, textAlign } from "../components/utils/rtl";
+import { type ValidationError } from "../components/utils/localizedValidation";
 import {
   FREE_DAILY_TASK_LIMIT,
   getDailyLimitStatus,
@@ -119,7 +120,7 @@ const InterestScreen: React.FC<InterestScreenProps> = ({
   const { isSubscribed } = useSubscription();
   const { user } = useAuth();
   const [otherText, setOtherText] = React.useState("");
-  const [interestError, setInterestError] = React.useState<string | null>(null);
+  const [interestError, setInterestError] = React.useState<ValidationError | null>(null);
 
   const [interestList, setInterestList] = React.useState<
     { Id: number; interestTopic: string }[]
@@ -144,7 +145,7 @@ const InterestScreen: React.FC<InterestScreenProps> = ({
     Zip: "",
     Address: "",
   });
-  const [formError, setFormError] = React.useState<string | null>(null);
+  const [formError, setFormError] = React.useState<ValidationError | null>(null);
 
   React.useEffect(() => {
     const fallbackName =
@@ -301,7 +302,7 @@ const InterestScreen: React.FC<InterestScreenProps> = ({
   const handleNext = () => {
     if (step == 1) {
       if (interestList.length == 0) {
-        setInterestError("Please select at least one interest.");
+        setInterestError({ key: "validation.interestRequired" });
         return;
       }
       setInterestError(null);
@@ -311,15 +312,15 @@ const InterestScreen: React.FC<InterestScreenProps> = ({
       const name = value.Name.trim();
       const email = value.Email.trim().toLowerCase();
       if (!name || !email) {
-        setFormError("Name and email are required.");
+        setFormError({ key: "validation.nameAndEmailRequired" });
         return;
       }
       if (!isValidName(name)) {
-        setFormError("Name must start with a letter and cannot be numbers only.");
+        setFormError({ key: "validation.nameInvalid" });
         return;
       }
       if (!isValidEmail(email)) {
-        setFormError("Please enter a valid email address.");
+        setFormError({ key: "validation.emailInvalid" });
         return;
       }
       setFormError(null);
@@ -495,10 +496,10 @@ const InterestScreen: React.FC<InterestScreenProps> = ({
         )}
       </ScrollView>
       {step == 2 && formError ? (
-        <Text style={styles.formErrorText}>{formError}</Text>
+        <Text style={[styles.formErrorText, textAlign()]}>{t(formError.key, formError.values)}</Text>
       ) : null}
       {step == 1 && interestError ? (
-        <Text style={styles.formErrorText}>{interestError}</Text>
+        <Text style={[styles.formErrorText, textAlign()]}>{t(interestError.key, interestError.values)}</Text>
       ) : null}
       {step == 1 && interestList.some((item) => item.Id === 12) && (
         <CustomInput

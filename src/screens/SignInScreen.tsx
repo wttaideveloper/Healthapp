@@ -19,15 +19,16 @@ import { icons } from "../components/images";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
-import { flipIcon } from "../components/utils/rtl";
+import { flipIcon, textAlign } from "../components/utils/rtl";
+import { type ValidationError } from "../components/utils/localizedValidation";
 
 type SignInScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, "SignIn">;
 };
 
 type SignInFieldErrors = {
-  email?: string;
-  password?: string;
+  email?: ValidationError;
+  password?: ValidationError;
 };
 
 const SignInScreen: React.FC<SignInScreenProps> = ({ navigation }) => {
@@ -63,13 +64,13 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ navigation }) => {
     const nextErrors: SignInFieldErrors = {};
 
     if (!normalizedEmail) {
-      nextErrors.email = "Email is required";
+      nextErrors.email = { key: "validation.emailRequired" };
     } else if (!isValidEmail(normalizedEmail)) {
-      nextErrors.email = "Please enter a valid email address";
+      nextErrors.email = { key: "validation.emailInvalid" };
     }
 
     if (!password) {
-      nextErrors.password = "Password is required";
+      nextErrors.password = { key: "validation.passwordRequired" };
     }
 
     if (nextErrors.email || nextErrors.password) {
@@ -114,7 +115,7 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ navigation }) => {
         placeholder="you@example.com"
         placeholderTextColor="#8b909b"
       />
-      {fieldErrors.email ? <Text style={styles.error}>{fieldErrors.email}</Text> : null}
+      {fieldErrors.email ? <Text style={[styles.error, textAlign()]}>{t(fieldErrors.email.key, fieldErrors.email.values)}</Text> : null}
 
       <Text style={styles.label}>{t("password")}</Text>
       <View style={[styles.passwordRow, fieldErrors.password ? styles.inputError : null]}>
@@ -142,7 +143,7 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ navigation }) => {
           />
         </TouchableOpacity>
       </View>
-      {fieldErrors.password ? <Text style={styles.error}>{fieldErrors.password}</Text> : null}
+      {fieldErrors.password ? <Text style={[styles.error, textAlign()]}>{t(fieldErrors.password.key, fieldErrors.password.values)}</Text> : null}
       <TouchableOpacity
         style={styles.forgotButton}
         onPress={() => navigation.navigate("ForgotPassword")}

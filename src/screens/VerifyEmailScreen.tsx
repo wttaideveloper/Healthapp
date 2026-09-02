@@ -14,6 +14,8 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { useAuth } from "../context/authContext";
 import { useTranslation } from "react-i18next";
+import { textAlign } from "../components/utils/rtl";
+import { type DisplayError, isValidationError } from "../components/utils/localizedValidation";
 
 type VerifyEmailRouteProp = RouteProp<RootStackParamList, "VerifyEmail">;
 type VerifyEmailNavigationProp = StackNavigationProp<RootStackParamList, "VerifyEmail">;
@@ -27,7 +29,7 @@ const VerifyEmailScreen: React.FC<VerifyEmailProps> = ({ route, navigation }) =>
   const { t } = useTranslation();
   const { verifyEmail, resendVerification, isLoading, pendingVerificationEmail, isAuthenticated } = useAuth();
   const [code, setCode] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<DisplayError | null>(null);
   const targetEmail = pendingVerificationEmail ?? route.params?.email ?? "";
 
   useEffect(() => {
@@ -44,7 +46,7 @@ const VerifyEmailScreen: React.FC<VerifyEmailProps> = ({ route, navigation }) =>
 
   const onVerify = async () => {
     if (!code.trim()) {
-      setError("Verification code is required");
+      setError({ key: "validation.verificationCodeRequired" });
       return;
     }
 
@@ -89,7 +91,11 @@ const VerifyEmailScreen: React.FC<VerifyEmailProps> = ({ route, navigation }) =>
           keyboardType="number-pad"
         />
 
-        {error ? <Text style={styles.error}>{error}</Text> : null}
+        {error ? (
+          <Text style={[styles.error, textAlign()]}>
+            {isValidationError(error) ? t(error.key, error.values) : error}
+          </Text>
+        ) : null}
 
         <TouchableOpacity style={styles.primaryButton} onPress={onVerify} disabled={isLoading}>
           {isLoading ? <ActivityIndicator color="#ffffff" /> : <Text style={styles.primaryText}>{t("verifyAndContinue")}</Text>}

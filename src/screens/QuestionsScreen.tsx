@@ -24,8 +24,9 @@ import {
 } from "../components/utils/readExcel";
 import { calculateBMI } from "../components/utils/BmiCalculation";
 import { useTranslation } from "react-i18next";
-import { flipIcon, forwardIcon } from "../components/utils/rtl";
+import { flipIcon, forwardIcon, textAlign } from "../components/utils/rtl";
 import { getQuestionSourceUrl } from "../components/utils/medicalSources";
+import { type ValidationError } from "../components/utils/localizedValidation";
 
 type QuestionsProps = DrawerScreenProps<DrawerParamList, "QuestionsScreen">;
 
@@ -163,7 +164,7 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
   const [selectedAnswers, setSelectedAnswers] = React.useState<
     { questionId: number; text: string; points: number }[]
   >([]);
-  const [questionError, setQuestionError] = React.useState<string | null>(null);
+  const [questionError, setQuestionError] = React.useState<ValidationError | null>(null);
 
   // Citation backing the medical guidance behind the current question.
   const questionSourceUrl = getQuestionSourceUrl(
@@ -217,19 +218,19 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
     );
 
     if (!isAnswered) {
-      const message = "Please select an option to continue.";
-      setQuestionError(message);
+      const error = { key: "validation.selectOption" };
+      setQuestionError(error);
       if (Platform.OS !== "web") {
-        Alert.alert(t("validation"), message, [{ text: t("Fs_Close") }]);
+        Alert.alert(t("validation.title"), t(error.key), [{ text: t("Fs_Close") }]);
       }
       return;
     }
     if (currentIndex + 1 == 12) {
       if (selectedAnswers.length !== 12) {
-        const message = "Please complete all questions before proceeding.";
-        setQuestionError(message);
+        const error = { key: "validation.completeQuestions" };
+        setQuestionError(error);
         if (Platform.OS !== "web") {
-          Alert.alert(t("validation"), message, [{ text: t("Fs_Close") }]);
+          Alert.alert(t("validation.title"), t(error.key), [{ text: t("Fs_Close") }]);
         }
         return;
       }
@@ -416,7 +417,11 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
           }
           style={styles.subQuestion}
         ></Font>
-        {questionError ? <Font text={questionError} style={styles.errorText} /> : null}
+        {questionError ? (
+          <Text style={[styles.errorText, textAlign()]}>
+            {t(questionError.key, questionError.values)}
+          </Text>
+        ) : null}
 
         {/*
           Apple Guideline 1.4.1: every question that carries medical guidance
