@@ -120,6 +120,7 @@ export const getRevenueCatConfigurationError = (): string | null => null;
 
 export const getRevenueCatTargetProductIds = (): string[] => [];
 export const isNativeStorePurchaseEnabled = (): boolean => false;
+export const mustUseAppStoreIapForPro = (): boolean => false;
 
 export const initIAP = async (): Promise<void> => {
   return;

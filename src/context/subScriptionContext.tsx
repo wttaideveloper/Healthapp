@@ -8,6 +8,7 @@ import {
     verifySubscriptionStatusRevenueCat,
     verifySubscriptionStatusBackend,
     verifySubscriptionStatusSafe,
+    mustUseAppStoreIapForPro,
     type SubscriptionStatus,
 } from "../components/utils/purchase";
 import { useAuth } from "./authContext";
@@ -79,15 +80,18 @@ export const SubscriptionProvider: React.FC<ProviderProps> = ({ children }) => {
             }
         }
 
-        // Direct RevenueCat fallback is only for signed-out/native debugging. Signed-in users
-        // must unlock from backend ownership to avoid sharing Apple-ID purchases across accounts.
+        // Direct RevenueCat fallback is only for signed-out/native debugging on iOS/Android.
+        // Signed-in users on those platforms unlock from backend ownership to avoid sharing
+        // Apple-ID purchases across accounts. Mac App Store must instead gate Pro on the
+        // StoreKit/RevenueCat `pro` entitlement, including for signed-in users.
+        const storeIapRequired = mustUseAppStoreIapForPro();
         let revenueCat: SubscriptionStatus | null = null;
         if (Platform.OS !== "web") {
             try {
                 const hasAuthenticatedUser = Boolean(accessToken && user?.id);
-                if (!hasAuthenticatedUser) {
+                if (!hasAuthenticatedUser || storeIapRequired) {
                     await initIAP();
-                    await syncRevenueCatUser(null);
+                    await syncRevenueCatUser(storeIapRequired ? user?.id ?? null : null);
                     revenueCat = await verifySubscriptionStatusRevenueCat();
                 }
             } catch (error) {
@@ -99,14 +103,17 @@ export const SubscriptionProvider: React.FC<ProviderProps> = ({ children }) => {
         const hasAuthenticatedUser = Boolean(accessToken && user?.id);
         const allowDirectRevenueCatEntitlement = !hasAuthenticatedUser;
 
-        const mergedIsValid =
-            Boolean(result.isValid) ||
-            (allowDirectRevenueCatEntitlement && Boolean(revenueCat?.isValid));
-        const mergedAutoRenewing =
-            Boolean(result.autoRenewing) ||
-            (allowDirectRevenueCatEntitlement && Boolean(revenueCat?.autoRenewing));
-        const mergedExpiry =
-            result.expiryDate && allowDirectRevenueCatEntitlement && revenueCat?.expiryDate
+        const mergedIsValid = storeIapRequired
+            ? Boolean(revenueCat?.isValid)
+            : Boolean(result.isValid) ||
+              (allowDirectRevenueCatEntitlement && Boolean(revenueCat?.isValid));
+        const mergedAutoRenewing = storeIapRequired
+            ? Boolean(revenueCat?.autoRenewing)
+            : Boolean(result.autoRenewing) ||
+              (allowDirectRevenueCatEntitlement && Boolean(revenueCat?.autoRenewing));
+        const mergedExpiry = storeIapRequired
+            ? revenueCat?.expiryDate ?? null
+            : result.expiryDate && allowDirectRevenueCatEntitlement && revenueCat?.expiryDate
                 ? result.expiryDate > revenueCat.expiryDate
                     ? result.expiryDate
                     : revenueCat.expiryDate
@@ -117,7 +124,9 @@ export const SubscriptionProvider: React.FC<ProviderProps> = ({ children }) => {
         const source: "none" | "iap" | "workspace" | "stripe" | "mixed" =
             !mergedIsValid
                 ? "none"
-                : allowDirectRevenueCatEntitlement && revenueCat?.isValid && result.isValid
+                : storeIapRequired
+                    ? "iap"
+                    : allowDirectRevenueCatEntitlement && revenueCat?.isValid && result.isValid
                     ? "mixed"
                     : result.provider === "stripe"
                         ? "stripe"

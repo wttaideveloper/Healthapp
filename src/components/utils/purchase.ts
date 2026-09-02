@@ -138,6 +138,14 @@ const isMacCatalyst = (): boolean =>
 const shouldUseStripeOnNative = (): boolean =>
   isMacCatalyst() && MAC_CATALYST_BILLING_MODE === "stripe";
 
+/**
+ * Mac App Store builds (Catalyst + IAP mode) must gate Pro on StoreKit/RevenueCat.
+ * Workspace and Stripe hasAccess must not unlock paid features on that platform.
+ * iPhone/iPad, Android, web, and non-store Mac (mode=stripe) are unchanged.
+ */
+export const mustUseAppStoreIapForPro = (): boolean =>
+  isMacCatalyst() && !shouldUseStripeOnNative();
+
 export const isNativeStorePurchaseEnabled = (): boolean =>
   Platform.OS !== "web" && !shouldUseStripeOnNative();
 
@@ -628,6 +636,16 @@ export const clearCachedSubscriptionStatus = async (): Promise<void> => {
 // Compatibility helper used in older screens (e.g. HistoryScreen).
 // Returns a merged view: backend cached status plus RevenueCat (when available).
 export const verifySubscriptionStatus = async (): Promise<SubscriptionStatus> => {
+  if (mustUseAppStoreIapForPro()) {
+    return (
+      (await verifySubscriptionStatusRevenueCat()) ?? {
+        isValid: false,
+        autoRenewing: false,
+        expiryDate: null,
+      }
+    );
+  }
+
   const backend = await verifySubscriptionStatusSafe();
   const rc = await verifySubscriptionStatusRevenueCat();
   if (!rc) return backend;
