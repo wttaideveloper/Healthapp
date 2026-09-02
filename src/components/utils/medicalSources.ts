@@ -71,7 +71,7 @@ export const REPORT_SOURCE_BY_TOPIC = {
   breakfast: "https://www.cdc.gov/healthy-weight-growth/be-sugar-smart/index.html",
   snacking: "https://pubmed.ncbi.nlm.nih.gov/34144310/",
   fruitsVegetables: "https://www.cdc.gov/nutrition/features/eat-more-fruits-vegetables.html",
-  wholeGrains: "https://www.myplate.gov/eat-healthy/grains",
+  wholeGrains: "https://www.cdc.gov/nchs/products/databriefs/db341.htm",
   nuts: "https://adventisthealthstudy.org/studies/AHS-1/findings-nuts",
   redMeat: "https://www.who.int/news-room/questions-and-answers/item/cancer-carcinogenicity-of-the-consumption-of-red-meat-and-processed-meat",
   exercise: "https://health.gov/our-work/nutrition-physical-activity/physical-activity-guidelines",
