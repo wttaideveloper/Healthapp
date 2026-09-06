@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   Text,
   Platform,
-  useWindowDimensions,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
@@ -16,6 +15,8 @@ import Button from "../components/Button";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTranslation } from "react-i18next";
 import { flipIcon } from "../components/utils/rtl";
+import { useResponsiveLayout } from "../components/utils/layout";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const ONBOARDING_COMPLETED_KEY = "onboarding_completed";
 
@@ -26,10 +27,12 @@ type IntroScreen1Props = {
 const IntroScreen1: React.FC<IntroScreen1Props> = ({ navigation }) => {
   const { t } = useTranslation();
   const [step, setStep] = React.useState(1);
-  const { width } = useWindowDimensions();
-  const isWebDesktop = width >= 760;
+  const { width, height, isWideLayout: isWebDesktop } = useResponsiveLayout();
+  const insets = useSafeAreaInsets();
   const isWeb = Platform.OS === "web";
   const stepImage = step === 1 ? icons.intro1 : step === 2 ? icons.intro2 : icons.intro3;
+  const imageSize = Math.min(302, Math.max(176, width - 48), height * 0.34);
+  const artScale = imageSize / 302;
 
   const handleBackPress = () => {
     if (step > 1 && step <= 3) {
@@ -72,7 +75,7 @@ const IntroScreen1: React.FC<IntroScreen1Props> = ({ navigation }) => {
   // };
 
   return (
-    <View style={[styles.container, isWeb && styles.webContainer]}>
+    <View style={[styles.container, isWeb && styles.webContainer, { paddingBottom: Math.max(insets.bottom, 8) }]}>
       <View style={[styles.pageShell, isWeb && styles.webShell]}>
         <TouchableOpacity
           onPress={handleBackPress}
@@ -88,24 +91,23 @@ const IntroScreen1: React.FC<IntroScreen1Props> = ({ navigation }) => {
           style={[styles.mainBody, isWebDesktop && styles.mainBodyDesktop]}
         >
           <View style={[styles.visualWrap, isWebDesktop && styles.visualWrapDesktop]}>
-            <View style={styles.circleContainer}>
+            <View style={[styles.circleContainer, { marginVertical: Math.min(50, height * 0.04) }]}>
               {/* Outer Circle (Largest) */}
-              <View style={[styles.circle, styles.largeCircle]} />
+              <View style={[styles.circle, { width: 360 * artScale, height: 360 * artScale }]} />
 
               {/* Middle Circle (Dashed) */}
               <View
                 style={[
                   styles.circle,
-                  styles.mediumCircle,
-                  { borderStyle: "dashed" },
+                  { width: 290 * artScale, height: 290 * artScale, borderStyle: "dashed" },
                 ]}
               />
 
               {/* Inner Circle (Smallest) */}
-              <View style={[styles.circle, styles.smallCircle]} />
+              <View style={[styles.circle, { width: 230 * artScale, height: 230 * artScale }]} />
 
               {/* Image on Top */}
-              <Image source={stepImage} style={styles.image} />
+              <Image source={stepImage} style={{ width: imageSize, height: imageSize, resizeMode: "contain" }} />
             </View>
           </View>
           <View style={[styles.copyWrap, isWebDesktop && styles.copyWrapDesktop]}>
@@ -123,7 +125,7 @@ const IntroScreen1: React.FC<IntroScreen1Props> = ({ navigation }) => {
                     ? "simpleScienceBacked"
                     : "getPersonalizedTips"
               }
-              style={{ color: "black", fontWeight: "semibold", fontSize: 24 }}
+              style={{ color: "black", fontWeight: "semibold", fontSize: 24, flexShrink: 1 }}
             />
             <Font
               // text={

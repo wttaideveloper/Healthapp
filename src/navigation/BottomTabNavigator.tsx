@@ -2,6 +2,7 @@ import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import HomeScreen from "../screens/HomeScreen";
 import PurchaseScreen from "../screens/PurchaseScreen";
@@ -22,6 +23,7 @@ const Tab = createBottomTabNavigator<BottomTabParamList>();
 
 const BottomTabNavigator: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   const [showModal, setShowModal] = React.useState(false);
   const { isSubscribed } = useSubscription();
   const { isAuthenticated } = useAuth();
@@ -56,8 +58,8 @@ const BottomTabNavigator: React.FC<{ navigation: any }> = ({ navigation }) => {
           tabBarInactiveTintColor: "black",
           tabBarStyle: {
             backgroundColor: "#ffffff",
-            paddingBottom: 5,
-            height: 60,
+            paddingBottom: Math.max(insets.bottom, 6),
+            height: 52 + Math.max(insets.bottom, 6),
           },
           headerTransparent: true,
           headerTitleAlign: "center",

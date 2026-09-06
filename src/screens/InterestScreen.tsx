@@ -9,7 +9,6 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  useWindowDimensions,
   View,
 } from "react-native";
 import React from 'react';
@@ -38,7 +37,9 @@ import { useTranslation } from "react-i18next";
 import { useSubscription } from "../context/subScriptionContext";
 import { isValidEmail, isValidName } from "../components/utils/validation";
 import { useAuth } from "../context/authContext";
-import { flipIcon, forwardIcon, textAlign } from "../components/utils/rtl";
+import { flipIcon, forwardIcon, startEnd, textAlign } from "../components/utils/rtl";
+import { useResponsiveLayout } from "../components/utils/layout";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { type ValidationError } from "../components/utils/localizedValidation";
 import {
   FREE_DAILY_TASK_LIMIT,
@@ -115,8 +116,12 @@ const InterestScreen: React.FC<InterestScreenProps> = ({
   route,
 }) => {
   const { t } = useTranslation();
-  const { width } = useWindowDimensions();
-  const isWebDesktop = width >= 760;
+  const { width, isWideLayout: isWebDesktop } = useResponsiveLayout();
+  const insets = useSafeAreaInsets();
+  const interestCardWidth = Math.max(
+    132,
+    Math.min(155, (Math.min(width, isWebDesktop ? 1120 : width) - 50) / 2)
+  );
   const { isSubscribed } = useSubscription();
   const { user } = useAuth();
   const [otherText, setOtherText] = React.useState("");
@@ -191,7 +196,7 @@ const InterestScreen: React.FC<InterestScreenProps> = ({
     try {
       const reportId = await addReport(
         "user", // Provide a valid user ID
-        route?.params?.reportData?.name,
+        route?.params?.reportData?.name ?? "Unknown",
         "Email",
         "Report",
         route.params?.answers,
@@ -243,14 +248,15 @@ const InterestScreen: React.FC<InterestScreenProps> = ({
 
     const data = await readExcelFile();
     if (data) {
+      const reportAge = route.params?.reportData?.age ?? "0";
       const calculatedHealthAge = calculateHealthAge(
         data,
-        parseInt(route?.params?.reportData?.age),
+        parseInt(reportAge, 10),
         totalScore == 0.5 ? 0 : totalScore
       );
       const calculatePotentialAge = calculatePotentialHealthAge(
         data,
-        parseInt(route?.params?.reportData?.age),
+        parseInt(reportAge, 10),
         12
       );
       console.log(calculatedHealthAge, "health age");
@@ -268,7 +274,7 @@ const InterestScreen: React.FC<InterestScreenProps> = ({
       setStep(1);
       setInterestList([]);
       navigation.navigate("ReportScreen", {
-        age: route?.params?.reportData?.age,
+        age: reportAge,
         answers: route.params?.answers,
         reportData: {
           name: route?.params?.reportData.name,
@@ -413,7 +419,7 @@ const InterestScreen: React.FC<InterestScreenProps> = ({
                 onPress={()=> toggleInterest(val.id, val.description)}
                 key={val.id}
                   style={{
-                    width: 155,
+                    width: interestCardWidth,
                     flexDirection: "column",
                     justifyContent: "center",
                     alignItems: "center",
@@ -437,7 +443,7 @@ const InterestScreen: React.FC<InterestScreenProps> = ({
                       textAlign: "center",
                     }}
                   ></Font>
-                  <View style={{ position: "absolute", top: 10, right: 10 }}>
+                  <View style={{ position: "absolute", top: 10, ...startEnd({ end: 10 }) }}>
                     <CheckBox
                       value={interestList.some((item) => item.Id === val.id)}
                       setValue={() => toggleInterest(val.id, val.description)}
@@ -511,7 +517,7 @@ const InterestScreen: React.FC<InterestScreenProps> = ({
       )}
 
       <View
-        style={styles.navRow}
+        style={[styles.navRow, { paddingBottom: 8 + insets.bottom }]}
       >
         <TouchableOpacity
           onPress={() => {

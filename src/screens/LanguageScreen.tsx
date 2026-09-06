@@ -5,8 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Platform,
-  useWindowDimensions,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
@@ -16,6 +14,8 @@ import i18n from "../components/i18n";
 import { LinearGradient } from "expo-linear-gradient";
 import Button from "../components/Button";
 import { switchLanguage } from "../components/utils/rtl";
+import { useResponsiveLayout } from "../components/utils/layout";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type LanguageScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, "Language">;
@@ -50,11 +50,12 @@ const languages = [
 const LanguageScreen: React.FC<LanguageScreenProps> = ({ navigation }) => {
   const { t } = useTranslation();
   const [language, setLanguage] = React.useState(i18n.language);
-  const { width } = useWindowDimensions();
-  // Derived from useWindowDimensions so the grid reflows on rotation,
-  // window resize, split-screen and foldable unfold.
-  const itemWidth = width / 4; // Adjust column width
-  const isWebDesktop = width >= 760;
+  const { width, isWideLayout: isWebDesktop } = useResponsiveLayout();
+  const insets = useSafeAreaInsets();
+  const columns = width < 360 ? 3 : 4;
+  const horizontalPadding = 40;
+  const columnGap = 15;
+  const itemWidth = (width - horizontalPadding - columnGap * (columns - 1)) / columns;
 
   const changeLanguage = (lng: string) => {
     // switchLanguage persists language + direction, swaps translations, and
@@ -123,7 +124,7 @@ const LanguageScreen: React.FC<LanguageScreenProps> = ({ navigation }) => {
   return (
     <ScrollView
       style={styles.screen}
-      contentContainerStyle={styles.container}
+      contentContainerStyle={[styles.container, { paddingBottom: 24 + insets.bottom }]}
       keyboardShouldPersistTaps="handled"
     >
       <View

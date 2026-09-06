@@ -10,7 +10,6 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  useWindowDimensions,
   View,
 } from "react-native";
 import React from "react";
@@ -32,6 +31,8 @@ import { Dimensions } from "react-native";
 import { isValidName } from "../components/utils/validation";
 import { flipIcon, forwardIcon, startEnd, textAlign } from "../components/utils/rtl";
 import { type ValidationError } from "../components/utils/localizedValidation";
+import { useResponsiveLayout } from "../components/utils/layout";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type HealthAgeTestProps = DrawerScreenProps<DrawerParamList, "healthAgeTest">;
 
@@ -39,10 +40,12 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
   const MIN_AGE = 16;
   const MAX_AGE = 80;
   const { t } = useTranslation();
-  const { width } = useWindowDimensions();
-  const isWebDesktop = width >= 760;
-  // `width` comes from useWindowDimensions, so the picker resizes with the window.
-  const fullPickerWidth = isWebDesktop ? 560 : width;
+  const { width, isWideLayout: isWebDesktop } = useResponsiveLayout();
+  const insets = useSafeAreaInsets();
+  const contentGutter = isWebDesktop ? 24 : 20;
+  const fullPickerWidth = isWebDesktop
+    ? 560
+    : Math.max(240, width - contentGutter * 2);
   const confirmExit = () => {
     Alert.alert(
       t("leavePage"),
@@ -417,13 +420,12 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
           ></Font>
           <View
             style={{
-              // backgroundColor:"red",
-
               height: 300,
               flexDirection: "row",
               justifyContent: "center",
               alignItems: "flex-start",
               gap: 10,
+              width: "100%",
             }}
           >
             <TouchableOpacity
@@ -435,7 +437,9 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
                 borderWidth: 1,
                 borderColor: value.gender == "male" ? "#284374" : "#F2F5F9",
                 borderRadius: 14,
-                width: 154,
+                flex: 1,
+                maxWidth: 180,
+                minWidth: 120,
                 height: 136,
                 flexDirection: "column",
                 justifyContent: "center",
@@ -448,7 +452,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
                 style={{ width: 48, height: 48 }}
               ></Image>
               <Font text="male" style={{ fontWeight: "500" }}></Font>
-              <View style={{ position: "absolute", top: 10, right: 10 }}>
+              <View style={{ position: "absolute", top: 10, ...startEnd({ end: 10 }) }}>
                 <CheckBox
                   value={value.gender == "male" ? true : false}
                 ></CheckBox>
@@ -463,7 +467,9 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
                 borderWidth: 1,
                 borderColor: value.gender == "female" ? "#284374" : "#F2F5F9",
                 borderRadius: 14,
-                width: 154,
+                flex: 1,
+                maxWidth: 180,
+                minWidth: 120,
                 height: 136,
                 flexDirection: "column",
                 justifyContent: "center",
@@ -476,7 +482,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
                 style={{ width: 48, height: 48 }}
               ></Image>
               <Font text="female" style={{ fontWeight: "500" }}></Font>
-              <View style={{ position: "absolute", top: 10, right: 10 }}>
+              <View style={{ position: "absolute", top: 10, ...startEnd({ end: 10 }) }}>
                 <CheckBox
                   value={value.gender == "female" ? true : false}
                 ></CheckBox>
@@ -1986,9 +1992,10 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
                   borderRadius: 16,
                   paddingVertical: 14,
                   paddingHorizontal: 14,
-                  width: 329,
+                  width: "100%",
+                  maxWidth: 329,
                 },
-                isWebDesktop ? { width: "100%", borderRadius: 18 } : null,
+                isWebDesktop ? { maxWidth: "100%", borderRadius: 18 } : null,
               ]}
             >
               <Image source={icons.bulb} style={{ width: 16, height: 16 }} />
@@ -2029,7 +2036,11 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
         </ScrollView>
 
         <View
-          style={[styles.navRow, isWebDesktop ? styles.webBottomRow : null]}
+          style={[
+            styles.navRow,
+            isWebDesktop ? styles.webBottomRow : null,
+            { paddingBottom: 8 + insets.bottom },
+          ]}
         >
           <TouchableOpacity
             onPress={() => {

@@ -7,8 +7,7 @@ import {
   BackHandler,
   TouchableOpacity,
   Text,
-  Platform,
-  useWindowDimensions,
+  ScrollView,
 } from "react-native";
 import Font from "../components/CustomisedFont";
 import { icons } from "../components/images";
@@ -23,6 +22,7 @@ import {
   FREE_DAILY_TASK_LIMIT,
   getDailyLimitStatus,
 } from "../components/utils/usageLimit";
+import { useResponsiveLayout } from "../components/utils/layout";
 
 type HomeScreenProps = {
   navigation: DrawerNavigationProp<DrawerParamList, "Main">;
@@ -30,11 +30,10 @@ type HomeScreenProps = {
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [count, setCount] = React.useState<number>(0);
-  const { width } = useWindowDimensions();
+  const { isWideLayout: isWebDesktop } = useResponsiveLayout();
   const { t } = useTranslation();
   const { isSubscribed } = useSubscription();
   const hasPremium = isSubscribed;
-  const isWebDesktop = width >= 760;
 
   useFocusEffect(
     React.useCallback(() => {
@@ -157,6 +156,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={styles.mobileScrollContent}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
       <View style={{ width: "100%" }}>
         {!hasPremium && (
           <View
@@ -174,7 +179,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                 padding: 2, // Border thickness
                 borderRadius: 999999,
                 marginEnd: 14,
-                width: "50%",
+                maxWidth: "92%",
+                flexShrink: 1,
               }}
             >
               {/* <Image
@@ -243,16 +249,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           </View>
         </View>
       </View>
+      </ScrollView>
       <Button
         type="intro"
         style={{
-          // backgroundColor:"black",
           padding: 10,
-          // marginTop: 40,
-          position: "absolute",
-          bottom: 20,
-          left: 0,
-          right: 0,
+          marginTop: 12,
         }}
         title="startAssessment"
         onPress={onStartAssessment}
@@ -269,6 +271,9 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     paddingHorizontal: 20,
     paddingVertical: 10,
+  },
+  mobileScrollContent: {
+    flexGrow: 1,
   },
   welcomeText: {
     fontSize: 24,

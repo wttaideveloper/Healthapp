@@ -8,7 +8,6 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  useWindowDimensions,
   View,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -21,6 +20,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { flipIcon, textAlign } from "../components/utils/rtl";
 import { type ValidationError } from "../components/utils/localizedValidation";
+import { useResponsiveLayout } from "../components/utils/layout";
 
 type SignInScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, "SignIn">;
@@ -34,13 +34,12 @@ type SignInFieldErrors = {
 const SignInScreen: React.FC<SignInScreenProps> = ({ navigation }) => {
   const { t } = useTranslation();
   const { signIn, isLoading, useMockAuth, isAuthenticated } = useAuth();
-  const { width } = useWindowDimensions();
+  const { isWideLayout: isWebDesktop } = useResponsiveLayout();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fieldErrors, setFieldErrors] = useState<SignInFieldErrors>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  const isWebDesktop = width >= 760;
   const isNativeMobile = Platform.OS !== "web";
   const backToApp = () => {
     navigation.replace("InitialScreen");

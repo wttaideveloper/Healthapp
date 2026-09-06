@@ -8,7 +8,6 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  useWindowDimensions,
   View,
 } from "react-native";
 import React from "react";
@@ -27,6 +26,8 @@ import { useTranslation } from "react-i18next";
 import { flipIcon, forwardIcon, textAlign } from "../components/utils/rtl";
 import { getQuestionSourceUrl } from "../components/utils/medicalSources";
 import { type ValidationError } from "../components/utils/localizedValidation";
+import { useResponsiveLayout } from "../components/utils/layout";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type QuestionsProps = DrawerScreenProps<DrawerParamList, "QuestionsScreen">;
 
@@ -158,8 +159,8 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
   const openSource = React.useCallback((url: string) => {
     Linking.openURL(url).catch(() => undefined);
   }, []);
-  const { width } = useWindowDimensions();
-  const isWebDesktop = width >= 760;
+  const { isWideLayout: isWebDesktop } = useResponsiveLayout();
+  const insets = useSafeAreaInsets();
   const [currentIndex, setCurrentIndex] = React.useState(0);
   const [selectedAnswers, setSelectedAnswers] = React.useState<
     { questionId: number; text: string; points: number }[]
@@ -445,8 +446,8 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
       <FlatList
         data={questionsData[currentIndex].options}
         keyExtractor={(item) => item.text}
-        style={isWebDesktop ? { flex: 1, width: "100%", minHeight: 0 } : undefined}
-        contentContainerStyle={isWebDesktop ? { paddingBottom: 10 } : undefined}
+        style={{ flex: 1, width: "100%", minHeight: 0 }}
+        contentContainerStyle={{ paddingBottom: 10 }}
         renderItem={({ item }) => (
           <>
             {console.log(item, "item")}
@@ -474,7 +475,11 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
         )}
       />
       <View
-        style={[styles.navRow, isWebDesktop ? styles.webBottomRow : null]}
+        style={[
+          styles.navRow,
+          isWebDesktop ? styles.webBottomRow : null,
+          { paddingBottom: 8 + insets.bottom },
+        ]}
       >
         <TouchableOpacity
           onPress={() => {

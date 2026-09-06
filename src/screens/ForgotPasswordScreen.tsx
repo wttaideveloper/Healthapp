@@ -8,7 +8,6 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  useWindowDimensions,
   View,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -21,6 +20,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
 import { flipIcon, textAlign } from "../components/utils/rtl";
 import { type DisplayError, isValidationError } from "../components/utils/localizedValidation";
+import { useResponsiveLayout } from "../components/utils/layout";
 
 type ForgotPasswordScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, "ForgotPassword">;
@@ -28,7 +28,7 @@ type ForgotPasswordScreenProps = {
 
 const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation }) => {
   const { t } = useTranslation();
-  const { width } = useWindowDimensions();
+  const { isWideLayout: isWebDesktop } = useResponsiveLayout();
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -37,7 +37,6 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<DisplayError | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
-  const isWebDesktop = width >= 760;
   const isNativeMobile = Platform.OS !== "web";
 
   const backToSignIn = () => {

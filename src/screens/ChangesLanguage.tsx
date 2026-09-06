@@ -5,8 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Platform,
-  useWindowDimensions,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
@@ -17,6 +15,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import Button from "../components/Button";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { switchLanguage } from "../components/utils/rtl";
+import { useResponsiveLayout } from "../components/utils/layout";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type ChangeLanguageProps = {
   navigation: StackNavigationProp<RootStackParamList, "ChangeLanguage">;
@@ -52,11 +52,12 @@ const languages = [
 const ChangeLanguage: React.FC<ChangeLanguageProps> = ({ navigation }) => {
   const { t } = useTranslation();
   const [language, setLanguage] = React.useState(i18n.language);
-  const { width } = useWindowDimensions();
-  // Derived from useWindowDimensions so the grid reflows on rotation,
-  // window resize, split-screen and foldable unfold.
-  const itemWidth = width / 4; // Adjust column width
-  const isWebDesktop = width >= 760;
+  const { width, isWideLayout: isWebDesktop } = useResponsiveLayout();
+  const insets = useSafeAreaInsets();
+  const columns = width < 360 ? 3 : 4;
+  const horizontalPadding = 40;
+  const columnGap = 15;
+  const itemWidth = (width - horizontalPadding - columnGap * (columns - 1)) / columns;
   const setLanguageToStore = async (lang: string) => {
     try {
       await AsyncStorage.setItem("language", lang);
@@ -122,7 +123,7 @@ const ChangeLanguage: React.FC<ChangeLanguageProps> = ({ navigation }) => {
     );
   }
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={[styles.container, { paddingBottom: 24 + insets.bottom }]}>
       <View
         style={{
           justifyContent: "center",
@@ -131,8 +132,8 @@ const ChangeLanguage: React.FC<ChangeLanguageProps> = ({ navigation }) => {
         }}
       >
         <Font text="chooseLanguage" fontFamily="Roboto" style={styles.title} />
-        <ScrollView
-          contentContainerStyle={{ alignItems: "center", paddingBottom: 100 }}
+        <View
+          style={{ alignItems: "center", paddingBottom: 24, width: "100%" }}
         >
           <View
             style={{
@@ -194,7 +195,7 @@ const ChangeLanguage: React.FC<ChangeLanguageProps> = ({ navigation }) => {
               </TouchableOpacity>
             ))}
           </View>
-        </ScrollView>
+        </View>
       </View>
 
       <Button
@@ -202,10 +203,6 @@ const ChangeLanguage: React.FC<ChangeLanguageProps> = ({ navigation }) => {
         style={{
           padding: 10,
           marginTop: 40,
-          position: "absolute",
-          bottom: 20,
-          left: 0,
-          right: 0,
         }}
         title="Hs_Change"
         onPress={() => navigation.navigate("InitialScreen")}
