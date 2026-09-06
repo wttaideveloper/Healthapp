@@ -9,7 +9,7 @@ export type AuthUser = {
   role?: "user" | "admin";
   hasAccess?: boolean;
   isEmailVerified?: boolean;
-  status?: "pending" | "active";
+  status?: "pending" | "active" | "disabled";
   entitlement?: {
     source: "workspace" | "individual_iap" | "individual_stripe" | null;
     expiresAt: string | null;
@@ -301,7 +301,7 @@ const buildUserFromBackend = (raw: unknown): AuthUser | null => {
     role: source.role === "admin" || source.role === "user" ? source.role : undefined,
     hasAccess: typeof source.hasAccess === "boolean" ? source.hasAccess : undefined,
     isEmailVerified,
-    status: source.status === "pending" || source.status === "active" ? source.status : undefined,
+    status: source.status === "pending" || source.status === "active" || source.status === "disabled" ? source.status : undefined,
     entitlement,
     emailVerified: isEmailVerified,
   };
