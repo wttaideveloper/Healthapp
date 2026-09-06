@@ -2,8 +2,10 @@ import {
   Alert,
   BackHandler,
   Image,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -1918,6 +1920,10 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
   }
   console.log(value.height_In, "value.height_In");
 
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
+
   return (
     <KeyboardAvoidingView
       style={styles.keyboardWrap}
@@ -1926,6 +1932,14 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
     >
       <View style={[styles.container, isWebDesktop ? styles.webContainer : null]}>
       <View style={[styles.contentWrap, isWebDesktop ? styles.webContentWrap : null]}>
+        <ScrollView
+          style={styles.scrollArea}
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode={Platform.OS === "ios" ? "interactive" : "on-drag"}
+          nestedScrollEnabled
+          showsVerticalScrollIndicator={false}
+        >
         <View
           style={[
             {
@@ -2012,12 +2026,14 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
             </Text>
           ) : null}
         </View>
+        </ScrollView>
 
         <View
           style={[styles.navRow, isWebDesktop ? styles.webBottomRow : null]}
         >
           <TouchableOpacity
             onPress={() => {
+              dismissKeyboard();
               if (step > 1 && step <= 8) {
                 setStep(step - 1);
               } else {
@@ -2046,6 +2062,7 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
 
           <TouchableOpacity
             onPress={() => {
+              dismissKeyboard();
               if (step >= 1 && step < 8) {
                 setPopup(false);
                 const currentStepError = validateStep(step);
@@ -2169,6 +2186,12 @@ const styles = StyleSheet.create({
   contentWrap: {
     flex: 1,
     width: "100%",
+  },
+  scrollArea: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
   },
   webContentWrap: {
     maxWidth: 560,
