@@ -57,10 +57,15 @@
         {
           "ios": {
             "deploymentTarget": "15.1"
+          },
+          "android": {
+            "compileSdkVersion": 36,
+            "targetSdkVersion": 36
           }
         }
       ],
-      "./plugins/withIosNoMacCatalyst"
+      "./plugins/withIosNoMacCatalyst",
+      "./plugins/withAndroidPredictiveBackOptOut"
     ],
     "extra": {
       "eas": {
