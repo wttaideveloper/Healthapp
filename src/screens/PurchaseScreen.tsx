@@ -494,7 +494,12 @@ const PurchaseScreen: React.FC = () => {
 
   const planPrice = selectedPlan?.priceString || FALLBACK_PLAN_PRICE;
   const planTitle = selectedPlan?.title || selectedPlan?.description || FALLBACK_PLAN_DESCRIPTION;
-  const planPeriod = selectedPlan?.billingPeriod ? `Billing period: ${selectedPlan.billingPeriod}` : "";
+  // Guideline 3.1.2(c): always disclose a duration, even before the store
+  // returns plan data (or on web/Stripe, which has no RevenueCat billingPeriod).
+  // healthage_pro_annual is a fixed 1-year subscription, so that's the safe fallback.
+  const planPeriod = selectedPlan?.billingPeriod
+    ? `Billing period: ${selectedPlan.billingPeriod}`
+    : "Billing period: 1 year";
   const sourceLabel =
     subscriptionSource === "iap"
       ? "In-app purchase"

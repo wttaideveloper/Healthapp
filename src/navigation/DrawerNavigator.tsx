@@ -5,7 +5,7 @@ import BottomTabNavigator from "./BottomTabNavigator";
 import ProfileScreen from "../screens/PurchaseScreen";
 import HistoryScreen from "../screens/HistoryScreen";
 import { CustomDrawerContent } from "../components/CustomDrawer";
-import { Image, Platform, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from "react-native";
+import { Image, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from "react-native";
 import { icons } from "../components/images";
 import PurchaseScreen from "../screens/PurchaseScreen";
 import { LinearGradient } from "expo-linear-gradient";
@@ -30,6 +30,7 @@ import CheckoutResultScreen from "../screens/CheckoutResultScreen";
 import { clearCachedSubscriptionStatus } from "../components/utils/purchase";
 import { useTranslation } from "react-i18next";
 import { flipIcon, startEnd, switchLanguage, useDirection } from "../components/utils/rtl";
+import { isMacCatalyst } from "../components/utils/platform";
 
 export type DrawerParamList = {
   Main: undefined;
@@ -290,6 +291,16 @@ const HeaderRight = ({ navigation }) => {
 const Stack = createStackNavigator<StackParamList>();
 const Drawer = createDrawerNavigator<DrawerParamList>();
 const WebStack = createStackNavigator<DrawerParamList>();
+// WebShellHeader/WebNavigator render the desktop-style shell (top navbar, Reports
+// dropdown, language switcher) for both wide web and Mac Catalyst — see
+// isMacDesktop in DrawerNavigator below. They are kept DOM-safe on purpose:
+// - the window/keydown listener effect below already no-ops when
+//   Platform.OS !== "web", so it never runs on Mac Catalyst;
+// - dropdownBackdrop's position and the language list's scrolling were made
+//   native-safe (see webStyles.dropdownBackdrop and the language ScrollView)
+//   instead of relying on web-only CSS (position: fixed / overflow: auto).
+// Nothing here reads Platform.OS === "web" as a router condition, so this does
+// not change what wide-web users see.
 const WebShellHeader: React.FC<{
   navigation: any;
   hasPremium: boolean;
@@ -527,7 +538,13 @@ const WebShellHeader: React.FC<{
               <Text style={webStyles.caret}>▼</Text>
             </TouchableOpacity>
             {languageOpen ? (
-              <View style={[webStyles.dropdown as any, webStyles.languageDropdown, startEnd({ end: 0 })]}>
+              // The list is taller than languageDropdown's maxHeight, so it relies on
+              // scrolling to reach every language. CSS overflowY only works on web;
+              // ScrollView makes it scrollable on native (Mac Catalyst) too, and is a
+              // no-op behavioral change on web (renders the same scrollable box there).
+              <ScrollView
+                style={[webStyles.dropdown as any, webStyles.languageDropdown, startEnd({ end: 0 })]}
+              >
                 {languageOptions.map((option) => {
                   const active = option.code === languageCode;
                   return (
@@ -542,7 +559,7 @@ const WebShellHeader: React.FC<{
                     </TouchableOpacity>
                   );
                 })}
-              </View>
+              </ScrollView>
             ) : null}
           </View>
 
@@ -572,10 +589,26 @@ const WebNavigator: React.FC = () => {
     );
   };
   const WebPageFullBleed: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    // Web scrolls this page via CSS (webStyles.page's overflowY), which has no
+    // native equivalent. Only HomeScreen (the sole user of this wrapper) has no
+    // ScrollView of its own, so wrapping in one here on native is safe — no
+    // risk of the nested-ScrollView collapse that would happen on the other
+    // (WebPage-wrapped) screens, which already scroll internally.
+    if (Platform.OS === "web") {
+      return (
+        <View style={[webStyles.page, webStyles.pageNoPadding]}>
+          <View style={webStyles.pageInnerFluid}>{children}</View>
+        </View>
+      );
+    }
+
     return (
-      <View style={[webStyles.page, webStyles.pageNoPadding]}>
+      <ScrollView
+        style={[webStyles.page, webStyles.pageNoPadding]}
+        contentContainerStyle={{ flexGrow: 1 }}
+      >
         <View style={webStyles.pageInnerFluid}>{children}</View>
-      </View>
+      </ScrollView>
     );
   };
 
@@ -1048,7 +1081,22 @@ const DrawerNavigator: React.FC = () => {
   const WEB_DESKTOP_MIN_WIDTH = 900;
 
   // Web desktop gets the top navbar layout. Web narrow (mobile-sized) uses the normal drawer UI.
-  if (Platform.OS === "web" && width >= WEB_DESKTOP_MIN_WIDTH) {
+  const isWebDesktop = Platform.OS === "web" && width >= WEB_DESKTOP_MIN_WIDTH;
+
+  // Mac Catalyst reports Platform.OS === "ios" (same as iPhone/iPad), so the check
+  // above never matches it: the Mac app fell through to the phone-sized hamburger
+  // Drawer + bottom-tab shell below, stretched into a full-size Mac window (the
+  // Guideline 4.2 "minimal/mobile-feeling" finding). isMacCatalyst() detects the
+  // Mac Catalyst runtime specifically and is never true on iPhone/iPad/Android, so
+  // this branch cannot change iOS or Android behavior.
+  const isMacDesktop = isMacCatalyst() && width >= WEB_DESKTOP_MIN_WIDTH;
+
+  // Mac gets the same desktop navbar shell as wide web rather than a parallel
+  // reimplementation (WebNavigator/WebShellHeader below have been audited and
+  // hardened to avoid DOM-only assumptions so they render correctly as native
+  // Mac Catalyst views, not just in a browser). iPhone, iPad, Android, and any
+  // narrow window (including a resized Mac window) keep the existing mobile shell.
+  if (isWebDesktop || isMacDesktop) {
     return <WebNavigator />;
   }
 
@@ -1085,7 +1133,10 @@ const webStyles = StyleSheet.create({
     zIndex: 1000,
   },
   dropdownBackdrop: {
-    position: "fixed",
+    // "fixed" is a valid CSS position on web (viewport-relative) but is not a
+    // real React Native position value; on native platforms (Mac Catalyst)
+    // fall back to "absolute" so this doesn't get silently dropped.
+    position: Platform.OS === "web" ? "fixed" : "absolute",
     top: 0,
     right: 0,
     bottom: 0,

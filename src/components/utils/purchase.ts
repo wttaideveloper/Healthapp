@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Linking, Platform } from "react-native";
 import type { CustomerInfo, PurchasesPackage } from "react-native-purchases";
 import { apiRequest, getApiRoot } from "./api";
+import { isMacCatalyst } from "./platform";
 
 const SUB_STATUS_STORAGE_KEY = "sub_status";
 const ENTITLEMENT_STATUS_PATH =
@@ -127,9 +128,6 @@ const getRevenueCatConfig = (): RevenueCatRuntimeConfig => ({
 
 export const getRevenueCatTargetProductIds = (): string[] =>
   getRevenueCatConfig().productIds;
-
-const isMacCatalyst = (): boolean =>
-  Platform.OS === "ios" && Boolean((Platform as any)?.constants?.isMacCatalyst);
 
 /**
  * Stripe on native is Mac Catalyst only, and only when billing mode is explicitly "stripe".

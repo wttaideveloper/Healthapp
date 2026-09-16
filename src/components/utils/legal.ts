@@ -4,4 +4,4 @@ export const TERMS_OF_USE_URL =
 
 export const PRIVACY_POLICY_URL =
   process.env.EXPO_PUBLIC_PRIVACY_POLICY_URL?.trim() ||
-  "https://healthage.app/privacy";
+  "https://healthage.healthexporesources.com/privacy";
