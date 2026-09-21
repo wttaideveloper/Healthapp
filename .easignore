@@ -15,6 +15,16 @@ node_modules/
 .cursor/
 .aider*
 
+# ---- Kilo Code (AI coding assistant) agent state ----
+# .kilo/worktrees/ holds full git worktree checkouts (one per agent task),
+# each duplicating the entire tracked project — including the ~145 MB assets/
+# folder. These are local-only and listed in .git/info/exclude (not committed,
+# so .gitignore never mentions them), which is invisible to EAS since this
+# .easignore file replaces .gitignore entirely for the build upload. This was
+# the single largest unaccounted-for contributor to archive size (~140-160 MB).
+.kilo/
+.kilocode/
+
 # ---- Expo, Metro and TypeScript caches (regenerated) ----
 .expo/
 .metro-health-check*
