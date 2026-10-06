@@ -43,6 +43,18 @@ import { useTranslation } from "react-i18next";
 const FALLBACK_PLAN_PRICE = "$49/year";
 const FALLBACK_PLAN_DESCRIPTION = "Annual Pro subscription";
 
+// Guideline 3.1.2(c): the subscription must disclose what it actually
+// unlocks. Each key maps to a confirmed Premium-gated feature (see
+// BottomTabNavigator.tsx, CustomDrawer.tsx, HistoryScreen.tsx) — do not add
+// entries here that aren't backed by real gated functionality.
+const PRO_FEATURE_KEYS = [
+  "proFeatureUnlimitedAssessments",
+  "proFeatureReportHistory",
+  "proFeatureCsvExport",
+  "proFeaturePrinting",
+  "proFeatureReportBranding",
+] as const;
+
 const formatDate = (value: Date | null): string | null => {
   if (!value) return null;
   return value.toLocaleDateString(undefined, {
@@ -604,6 +616,16 @@ const PurchaseScreen: React.FC = () => {
             <Text style={styles.accessTitle}>Health Age Pro</Text>
             <Text style={styles.accessSubtitle}>{t("subscribeYearlyDesc")}</Text>
 
+            <View style={styles.featureList}>
+              <Text style={styles.featureListTitle}>{t("proIncludesTitle")}</Text>
+              {PRO_FEATURE_KEYS.map((key) => (
+                <View key={key} style={styles.featureListItem}>
+                  <Text style={styles.featureBullet}>•</Text>
+                  <Text style={styles.featureText}>{t(key)}</Text>
+                </View>
+              ))}
+            </View>
+
             {Platform.OS !== "web" && storeError ? (
               <View style={styles.errorCard}>
                 <Text style={styles.errorTitle}>{t("subscriptionsUnavailable")}</Text>
@@ -829,6 +851,33 @@ const styles = StyleSheet.create({
   },
   accessTitle: { color: "#274273", fontWeight: "700", fontSize: 20 },
   accessSubtitle: { color: "#274273", fontSize: 14, marginTop: 8, marginBottom: 12 },
+  featureList: {
+    width: "100%",
+    marginBottom: 14,
+  },
+  featureListTitle: {
+    color: "#274273",
+    fontSize: 14,
+    fontWeight: "700",
+    marginBottom: 8,
+  },
+  featureListItem: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: 4,
+  },
+  featureBullet: {
+    color: "#0B9FD4",
+    fontSize: 14,
+    lineHeight: 19,
+    marginRight: 8,
+  },
+  featureText: {
+    flex: 1,
+    color: "#33415C",
+    fontSize: 13,
+    lineHeight: 19,
+  },
   planCard: {
     borderWidth: 1,
     borderColor: "#E5DCC7",

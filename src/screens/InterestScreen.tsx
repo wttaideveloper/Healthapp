@@ -35,7 +35,7 @@ import CustomInput from "../components/CustomInput";
 import { addReport } from "../components/utils/reportService";
 import { useTranslation } from "react-i18next";
 import { useSubscription } from "../context/subScriptionContext";
-import { isValidEmail, isValidName } from "../components/utils/validation";
+import { isValidName } from "../components/utils/validation";
 import { useAuth } from "../context/authContext";
 import { flipIcon, forwardIcon, startEnd, textAlign } from "../components/utils/rtl";
 import { useResponsiveLayout } from "../components/utils/layout";
@@ -145,7 +145,6 @@ const InterestScreen: React.FC<InterestScreenProps> = ({
   const [step, setStep] = React.useState(1);
   const [value, setValue] = React.useState({
     Name: "",
-    Email: "",
     Phone: "",
     Zip: "",
     Address: "",
@@ -157,14 +156,12 @@ const InterestScreen: React.FC<InterestScreenProps> = ({
       route?.params?.reportData?.name?.trim?.() ||
       user?.name?.trim?.() ||
       "";
-    const fallbackEmail = user?.email?.trim?.() || "";
 
     setValue((prev) => ({
       ...prev,
       Name: prev.Name || fallbackName,
-      Email: prev.Email || fallbackEmail,
     }));
-  }, [route?.params?.reportData?.name, user?.email, user?.name]);
+  }, [route?.params?.reportData?.name, user?.name]);
   
   // React.useEffect(() => {
   //   const backAction = () => {
@@ -197,7 +194,7 @@ const InterestScreen: React.FC<InterestScreenProps> = ({
       const reportId = await addReport(
         "user", // Provide a valid user ID
         route?.params?.reportData?.name ?? "Unknown",
-        "Email",
+        "", // Email is not collected on this screen (not required for the Health Age flow); user_email column allows empty string.
         "Report",
         route.params?.answers,
         {
@@ -266,7 +263,6 @@ const InterestScreen: React.FC<InterestScreenProps> = ({
       setPotentialAge(calculatePotentialAge);
       setValue({
         Name: "",
-        Email: "",
         Phone: "",
         Zip: "",
         Address: "",
@@ -316,22 +312,17 @@ const InterestScreen: React.FC<InterestScreenProps> = ({
       setStep(2);
     } else {
       const name = value.Name.trim();
-      const email = value.Email.trim().toLowerCase();
-      if (!name || !email) {
-        setFormError({ key: "validation.nameAndEmailRequired" });
+      if (!name) {
+        setFormError({ key: "validation.nameRequired" });
         return;
       }
       if (!isValidName(name)) {
         setFormError({ key: "validation.nameInvalid" });
         return;
       }
-      if (!isValidEmail(email)) {
-        setFormError({ key: "validation.emailInvalid" });
-        return;
-      }
       setFormError(null);
       handleCalculate();
-    
+
     }
   };
 
@@ -461,15 +452,6 @@ const InterestScreen: React.FC<InterestScreenProps> = ({
               value={value.Name}
               onChangeText={(val) => {
                 setValue((prev) => ({ ...prev, Name: val }));
-                if (formError) setFormError(null);
-              }}
-            ></CustomInput>
-            <CustomInput
-              title="Is_Email"
-              placeHolder={"Enter Email"}
-              value={value.Email}
-              onChangeText={(val) => {
-                setValue((prev) => ({ ...prev, Email: val }));
                 if (formError) setFormError(null);
               }}
             ></CustomInput>
