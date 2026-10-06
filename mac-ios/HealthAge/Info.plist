@@ -54,8 +54,6 @@
     </dict>
     <key>NSCameraUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your camera</string>
-    <key>NSMicrophoneUsageDescription</key>
-    <string>Allow $(PRODUCT_NAME) to access your microphone</string>
     <key>NSPhotoLibraryAddUsageDescription</key>
     <string>Health Age needs permission to save generated health reports and exported files to your photo library when you choose to save them.</string>
     <key>NSPhotoLibraryUsageDescription</key>
