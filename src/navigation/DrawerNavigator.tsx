@@ -485,32 +485,59 @@ const WebShellHeader: React.FC<{
               <Text style={webStyles.caret}>▼</Text>
             </TouchableOpacity>
             {reportsOpen ? (
-              <View style={[webStyles.dropdown as any, startEnd({ start: 0 })]}>
+              <View style={[webStyles.dropdown as any, webStyles.reportsDropdown, startEnd({ start: 0 })]}>
                 <TouchableOpacity
-                  style={webStyles.dropdownItem}
+                  style={webStyles.dropdownItemStacked}
                   onPress={() => goReports("PrintScreen", { screen: "Questionnaire" })}
                 >
-                  <Text style={webStyles.dropdownText}>{t("PrintQuestion")}</Text>
+                  <View style={webStyles.dropdownItemHeader}>
+                    <Text style={webStyles.dropdownText}>{t("PrintQuestion")}</Text>
+                    {!hasPremium ? (
+                      <Image source={icons.proSymbol} style={webStyles.proPill} />
+                    ) : null}
+                  </View>
                   {!hasPremium ? (
-                    <Image source={icons.proSymbol} style={webStyles.proPill} />
+                    <Text style={webStyles.dropdownItemHelper}>
+                      {t("menuTooltipQuestionnaire")}
+                    </Text>
                   ) : null}
                 </TouchableOpacity>
+
+                <View style={webStyles.dropdownDivider} />
+
                 <TouchableOpacity
-                  style={webStyles.dropdownItem}
+                  style={webStyles.dropdownItemStacked}
                   onPress={() => goReports("PrintScreen", { screen: "Report" })}
                 >
-                  <Text style={webStyles.dropdownText}>{t("printReportLabel")}</Text>
+                  <View style={webStyles.dropdownItemHeader}>
+                    <Text style={webStyles.dropdownText}>{t("printReportLabel")}</Text>
+                    {!hasPremium ? (
+                      <Image source={icons.proSymbol} style={webStyles.proPill} />
+                    ) : null}
+                  </View>
                   {!hasPremium ? (
-                    <Image source={icons.proSymbol} style={webStyles.proPill} />
+                    <Text style={webStyles.dropdownItemHelper}>
+                      {t("menuTooltipPrintReport")}
+                    </Text>
                   ) : null}
                 </TouchableOpacity>
+
+                <View style={webStyles.dropdownDivider} />
+
                 <TouchableOpacity
-                  style={webStyles.dropdownItem}
+                  style={webStyles.dropdownItemStacked}
                   onPress={() => goReports("ReportSettings")}
                 >
-                  <Text style={webStyles.dropdownText}>{t("reportSetting")}</Text>
+                  <View style={webStyles.dropdownItemHeader}>
+                    <Text style={webStyles.dropdownText}>{t("reportSetting")}</Text>
+                    {!hasPremium ? (
+                      <Image source={icons.proSymbol} style={webStyles.proPill} />
+                    ) : null}
+                  </View>
                   {!hasPremium ? (
-                    <Image source={icons.proSymbol} style={webStyles.proPill} />
+                    <Text style={webStyles.dropdownItemHelper}>
+                      {t("menuTooltipReportSettings")}
+                    </Text>
                   ) : null}
                 </TouchableOpacity>
               </View>
@@ -1246,9 +1273,31 @@ const webStyles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 12,
   },
-  dropdownText: { fontSize: 13, color: "#111827", fontWeight: "500" },
+  reportsDropdown: {
+    width: 280,
+  },
+  dropdownItemStacked: {
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+  },
+  dropdownItemHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  dropdownItemHelper: {
+    fontSize: 11,
+    color: "#64748B",
+    marginTop: 3,
+    lineHeight: 14,
+  },
+  dropdownDivider: {
+    height: 1,
+    backgroundColor: "#F1F5F9",
+  },
+  dropdownText: { fontSize: 13, color: "#111827", fontWeight: "600" },
   dropdownTextActive: { color: "#0F4FA8", fontWeight: "700" },
-  proPill: { width: 48, height: 18, resizeMode: "contain" },
+  proPill: { width: 44, height: 18, resizeMode: "contain" },
   languageDropdown: {
     width: 190,
     // Anchored to the inline-end edge via startEnd() at the usage site.

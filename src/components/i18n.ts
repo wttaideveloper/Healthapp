@@ -296,7 +296,35 @@ const resources = {
       thisOneForPro: "Oops! This One’s for PRO Members.",
 
       proMembersDesc:
+
         "This feature is reserved for our Pro Members. Want in? Upgrade now and enjoy exclusive benefits tailored just for you!",
+
+      unlockHealthAgePremium: "Unlock Health Age Premium",
+
+      closeDialog: "Close",
+      premiumSubtitle: "Get more from your health assessments with Premium tools and reporting features.",
+      unlimitedAssessmentsTitle: "Unlimited Health Assessments",
+      unlimitedAssessmentsDesc: "Perform unlimited health-age assessments without the free daily assessment limit.",
+      assessmentHistoryTitle: "Assessment History",
+      assessmentHistoryDesc: "Save and revisit your previous assessment results.",
+      organizedReportHistoryTitle: "Organized Report History",
+      organizedReportHistoryDesc: "Access your saved reports and organize them into groups, where supported.",
+      csvExportTitle: "CSV Export",
+      csvExportDesc: "Export supported assessment and report data to CSV for your records.",
+      printHealthReportsTitle: "Print Health Reports",
+      printHealthReportsDesc: "Print or share your health reports using the existing reporting functionality.",
+      printableQuestionnaireTitle: "Printable Questionnaire",
+      printableQuestionnaireDesc: "Access the existing printable health assessment questionnaire.",
+      personalizedReportBrandingTitle: "Personalized Report Branding",
+      personalizedReportBrandingDesc: "Configure supported branding details, such as your logo and contact information, on exported or printed reports.",
+      annualSubscriptionSub: "Annual Premium subscription",
+      autoRenewTerms: "Automatically renews yearly unless canceled in your store account settings at least 24 hours before the period ends. Cancel anytime.",
+      upgradeToPremium: "Upgrade to Premium",
+      maybeLater: "Maybe Later",
+      menuTooltipQuestionnaire: "Print blank assessment questionnaires (Premium)",
+      menuTooltipPrintReport: "Print customized health reports (Premium)",
+      menuTooltipReportSettings: "Customize report branding and contact info (Premium)",
+
 
       UpgradeComplete: "Upgrade Complete!",
 
@@ -788,7 +816,33 @@ const resources = {
       thisOneForPro: "ऊप्स! यह प्रो सदस्यों के लिए है।",
 
       proMembersDesc:
+
         "यह सुविधा हमारे प्रो सदस्यों के लिए आरक्षित है। शामिल होना चाहते हैं? अभी अपग्रेड करें और विशेष लाभों का आनंद लें जो विशेष रूप से आपके लिए तैयार किए गए हैं!",
+
+      unlockHealthAgePremium: "Health Age Premium अनलॉक करें",
+      premiumSubtitle: "प्रीमियम टूल्स और रिपोर्टिंग सुविधाओं के साथ अपने स्वास्थ्य आकलनों से अधिक लाभ उठाएं।",
+      unlimitedAssessmentsTitle: "असीमित स्वास्थ्य आकलन",
+      unlimitedAssessmentsDesc: "निःशुल्क दैनिक सीमा के बिना असीमित हेल्थ-एज आकलन करें।",
+      assessmentHistoryTitle: "आकलन इतिहास",
+      assessmentHistoryDesc: "अपने पिछले आकलन परिणामों को सहेजें और दोबारा देखें।",
+      organizedReportHistoryTitle: "व्यवस्थित रिपोर्ट इतिहास",
+      organizedReportHistoryDesc: "अपनी सहेजी गई रिपोर्टों तक पहुंचें और उन्हें समूहों में व्यवस्थित करें।",
+      csvExportTitle: "CSV एक्सपोर्ट",
+      csvExportDesc: "अपने रिकॉर्ड के लिए समर्थित आकलन और रिपोर्ट डेटा को CSV में निर्यात करें।",
+      printHealthReportsTitle: "स्वास्थ्य रिपोर्ट प्रिंट करें",
+      printHealthReportsDesc: "मौजूदा रिपोर्टिंग कार्यक्षमता का उपयोग करके अपनी रिपोर्ट प्रिंट या साझा करें।",
+      printableQuestionnaireTitle: "प्रिंट करने योग्य प्रश्नावली",
+      printableQuestionnaireDesc: "मौजूदा प्रिंट करने योग्य स्वास्थ्य आकलन प्रश्नावली तक पहुंचें।",
+      personalizedReportBrandingTitle: "व्यक्तिगत रिपोर्ट ब्रांडिंग",
+      personalizedReportBrandingDesc: "मुद्रित रिपोर्ट पर अपना लोगो और संपर्क जानकारी जैसे विवरण कॉन्फ़िगर करें।",
+      annualSubscriptionSub: "वार्षिक प्रीमियम सदस्यता",
+      autoRenewTerms: "अवधि समाप्त होने से कम से कम 24 घंटे पहले स्टोर सेटिंग्स में रद्द न किए जाने पर स्वतः नवीनीकृत होती है। कभी भी रद्द करें।",
+      upgradeToPremium: "प्रीमियम में अपग्रेड करें",
+      maybeLater: "शायद बाद में",
+      menuTooltipQuestionnaire: "खाली आकलन प्रश्नावली प्रिंट करें (प्रीमियम)",
+      menuTooltipPrintReport: "अनुकूलित स्वास्थ्य रिपोर्ट प्रिंट करें (प्रीमियम)",
+      menuTooltipReportSettings: "रिपोर्ट ब्रांडिंग और संपर्क जानकारी कस्टमाइज़ करें (प्रीमियम)",
+
 
       UpgradeComplete: "अपग्रेड पूरा हुआ!",
 
@@ -1259,7 +1313,33 @@ const resources = {
       thisOneForPro: "¡Ups! Esto es para Miembros PRO.",
 
       proMembersDesc:
+
         "Esta función está reservada para nuestros Miembros Pro. ¿Quieres unirte? ¡Actualiza ahora y disfruta de beneficios exclusivos diseñados solo para ti!",
+
+      unlockHealthAgePremium: "Desbloquea Health Age Premium",
+      premiumSubtitle: "Aprovecha al máximo tus evaluaciones con herramientas y funciones de informes Premium.",
+      unlimitedAssessmentsTitle: "Evaluaciones ilimitadas",
+      unlimitedAssessmentsDesc: "Realiza evaluaciones ilimitadas sin el límite diario gratuito.",
+      assessmentHistoryTitle: "Historial de evaluaciones",
+      assessmentHistoryDesc: "Guarda y consulta tus resultados de evaluaciones anteriores.",
+      organizedReportHistoryTitle: "Historial de informes organizado",
+      organizedReportHistoryDesc: "Accede a tus informes guardados y organízalos en grupos.",
+      csvExportTitle: "Exportación a CSV",
+      csvExportDesc: "Exporta datos de evaluaciones e informes a CSV para tus registros.",
+      printHealthReportsTitle: "Imprimir informes de salud",
+      printHealthReportsDesc: "Imprime o comparte tus informes de salud con la función existente.",
+      printableQuestionnaireTitle: "Cuestionario imprimible",
+      printableQuestionnaireDesc: "Accede al cuestionario de evaluación de salud imprimible.",
+      personalizedReportBrandingTitle: "Marca personalizada en informes",
+      personalizedReportBrandingDesc: "Configura detalles como tu logotipo y datos de contacto en los informes.",
+      annualSubscriptionSub: "Suscripción Premium anual",
+      autoRenewTerms: "Se renueva anualmente de forma automática a menos que se cancele al menos 24 horas antes del final del período. Cancela en cualquier momento.",
+      upgradeToPremium: "Mejorar a Premium",
+      maybeLater: "Quizás más tarde",
+      menuTooltipQuestionnaire: "Imprimir cuestionarios en blanco (Premium)",
+      menuTooltipPrintReport: "Imprimir informes de salud personalizados (Premium)",
+      menuTooltipReportSettings: "Personalizar marca de informes y datos de contacto (Premium)",
+
 
       UpgradeComplete: "¡Actualización Completa!",
 
@@ -1713,7 +1793,33 @@ const resources = {
       thisOneForPro: "おっと！こちらはPROメンバー限定です。",
 
       proMembersDesc:
+
         "この機能はProメンバー限定です。ご希望ですか？今すぐアップグレードして、あなただけの特別な特典をお楽しみください！",
+
+      unlockHealthAgePremium: "Health Age Premium をアンロック",
+      premiumSubtitle: "プレミアムツールとレポート機能で健康評価をさらに活用しましょう。",
+      unlimitedAssessmentsTitle: "無制限の健康評価",
+      unlimitedAssessmentsDesc: "毎日の無料制限なしで無制限に健康年齢評価を実行できます。",
+      assessmentHistoryTitle: "評価履歴",
+      assessmentHistoryDesc: "過去の評価結果を保存し、いつでも確認できます。",
+      organizedReportHistoryTitle: "整理されたレポート履歴",
+      organizedReportHistoryDesc: "保存したレポートにアクセスし、グループに整理できます。",
+      csvExportTitle: "CSVエクスポート",
+      csvExportDesc: "評価とレポートのデータを記録用にCSVへ書き出せます。",
+      printHealthReportsTitle: "健康レポートの印刷",
+      printHealthReportsDesc: "既存のレポート機能を使用して健康レポートを印刷または共有できます。",
+      printableQuestionnaireTitle: "印刷可能な質問票",
+      printableQuestionnaireDesc: "印刷可能な健康評価質問票にアクセスできます。",
+      personalizedReportBrandingTitle: "レポートのカスタムブランディング",
+      personalizedReportBrandingDesc: "印刷するレポートにロゴや連絡先情報を設定できます。",
+      annualSubscriptionSub: "年間プレミアムサブスクリプション",
+      autoRenewTerms: "期間終了の24時間前までにストア設定で解約しない限り、毎年自動更新されます。いつでも解約可能です。",
+      upgradeToPremium: "プレミアムにアップグレード",
+      maybeLater: "後で",
+      menuTooltipQuestionnaire: "白紙の質問票を印刷 (Premium)",
+      menuTooltipPrintReport: "カスタマイズされた健康レポートを印刷 (Premium)",
+      menuTooltipReportSettings: "レポートのブランディングと連絡先を設定 (Premium)",
+
 
       UpgradeComplete: "アップグレード完了！",
 
@@ -2197,7 +2303,33 @@ const resources = {
       thisOneForPro: "Oups ! Ceci est réservé aux Membres PRO.",
 
       proMembersDesc:
+
         "Cette fonctionnalité est réservée à nos Membres Pro. Vous voulez en faire partie ? Mettez à niveau maintenant et profitez d'avantages exclusifs conçus spécialement pour vous !",
+
+      unlockHealthAgePremium: "Débloquez Health Age Premium",
+      premiumSubtitle: "Tirez le meilleur parti de vos évaluations avec des outils et rapports Premium.",
+      unlimitedAssessmentsTitle: "Évaluations de santé illimitées",
+      unlimitedAssessmentsDesc: "Effectuez des évaluations illimitées sans la limite quotidienne gratuite.",
+      assessmentHistoryTitle: "Historique des évaluations",
+      assessmentHistoryDesc: "Enregistrez et consultez vos résultats d'évaluations précédents.",
+      organizedReportHistoryTitle: "Historique des rapports organisé",
+      organizedReportHistoryDesc: "Accédez à vos rapports enregistrés et organisez-les en groupes.",
+      csvExportTitle: "Export CSV",
+      csvExportDesc: "Exportez les données d'évaluation et de rapport au format CSV.",
+      printHealthReportsTitle: "Imprimer les rapports de santé",
+      printHealthReportsDesc: "Imprimez ou partagez vos rapports de santé avec les fonctionnalités existantes.",
+      printableQuestionnaireTitle: "Questionnaire imprimable",
+      printableQuestionnaireDesc: "Accédez au questionnaire d'évaluation de santé imprimable.",
+      personalizedReportBrandingTitle: "Personnalisation des rapports",
+      personalizedReportBrandingDesc: "Configurez votre logo et vos coordonnées sur les rapports imprimés.",
+      annualSubscriptionSub: "Abonnement annuel Premium",
+      autoRenewTerms: "Renouvellement automatique annuel sauf résiliation au moins 24 h avant la fin de la période dans les réglages. Résiliable à tout moment.",
+      upgradeToPremium: "Passer à Premium",
+      maybeLater: "Peut-être plus tard",
+      menuTooltipQuestionnaire: "Imprimer des questionnaires vierges (Premium)",
+      menuTooltipPrintReport: "Imprimer des rapports de santé personnalisés (Premium)",
+      menuTooltipReportSettings: "Personnaliser l'en-tête et les coordonnées (Premium)",
+
 
       UpgradeComplete: "Mise à niveau terminée !",
 
@@ -2661,7 +2793,33 @@ const resources = {
       yearlyPurchase: "年度购买",
       thisOneForPro: "哎呀！这是Pro会员专享功能。",
       proMembersDesc:
+
         "此功能仅限Pro会员使用。想体验吗？立即升级，享受为您量身定制的专属权益！",
+
+      unlockHealthAgePremium: "解锁 Health Age Premium",
+      premiumSubtitle: "通过高级工具和报告功能，充分利用您的健康评估。",
+      unlimitedAssessmentsTitle: "无限次健康评估",
+      unlimitedAssessmentsDesc: "无每日免费评估限制，尽享无限次健康年龄评估。",
+      assessmentHistoryTitle: "评估历史记录",
+      assessmentHistoryDesc: "保存并随时查看先前的评估结果。",
+      organizedReportHistoryTitle: "有序的报告历史",
+      organizedReportHistoryDesc: "访问已保存的报告并按组进行分类整理。",
+      csvExportTitle: "CSV 导出",
+      csvExportDesc: "将支持的评估和报告数据导出为 CSV 以备记录。",
+      printHealthReportsTitle: "打印健康报告",
+      printHealthReportsDesc: "利用现有报告功能打印或分享您的健康报告。",
+      printableQuestionnaireTitle: "可打印的问卷",
+      printableQuestionnaireDesc: "获取可打印的健康评估问卷。",
+      personalizedReportBrandingTitle: "个性化报告品牌",
+      personalizedReportBrandingDesc: "在打印或导出的报告上配置您的徽标和联系方式。",
+      annualSubscriptionSub: "年度 Premium 订阅",
+      autoRenewTerms: "每年自动续订，除非在当前周期结束前至少 24 小时在商店账户中取消。可随时取消。",
+      upgradeToPremium: "升级至 Premium",
+      maybeLater: "以后再说",
+      menuTooltipQuestionnaire: "打印空白评估问卷 (Premium)",
+      menuTooltipPrintReport: "打印定制健康报告 (Premium)",
+      menuTooltipReportSettings: "定制报告品牌和联系信息 (Premium)",
+
       UpgradeComplete: "升级完成！",
       NowAProMember: "您现在是Pro会员了！",
 
@@ -3117,7 +3275,33 @@ const resources = {
       thisOneForPro: "عذرًا! هذه الميزة مخصصة لأعضاء PRO فقط.",
 
       proMembersDesc:
+
         "هذه الميزة مخصصة لأعضاء PRO لدينا. هل ترغب في الانضمام؟ قم بالترقية الآن واستمتع بالمزايا الحصرية المصممة خصيصًا لك!",
+
+      unlockHealthAgePremium: "فتح Health Age Premium",
+      premiumSubtitle: "احصل على المزيد من تقييماتك الصحية مع أدوات وتقارير بريميوم المتقدمة.",
+      unlimitedAssessmentsTitle: "تقييمات صحية غير محدودة",
+      unlimitedAssessmentsDesc: "قم بإجراء تقييمات غير محدودة للعمر الصحي بدون التقيد بالحد اليومي المجاني.",
+      assessmentHistoryTitle: "سجل التقييمات",
+      assessmentHistoryDesc: "احفظ نتائج تقييماتك السابقة واطلع عليها في أي وقت.",
+      organizedReportHistoryTitle: "سجل تقارير منظم",
+      organizedReportHistoryDesc: "الوصول إلى تقاريرك المحفوظة وتنظيمها في مجموعات.",
+      csvExportTitle: "تصدير بتنسيق CSV",
+      csvExportDesc: "قم بتصدير بيانات التقييمات والتقارير إلى ملفات CSV لسجلاتك.",
+      printHealthReportsTitle: "طباعة التقارير الصحية",
+      printHealthReportsDesc: "اطبع أو شارك تقاريرك الصحية باستخدام وظائف التقارير الحالية.",
+      printableQuestionnaireTitle: "استبيان قابل للطباعة",
+      printableQuestionnaireDesc: "الوصول إلى استبيان التقييم الصحي القابل للطباعة.",
+      personalizedReportBrandingTitle: "تخصيص العلامة التجارية للتقرير",
+      personalizedReportBrandingDesc: "أضف شعارك ومعلومات الاتصال الخاصة بك إلى التقارير المطبوعة.",
+      annualSubscriptionSub: "اشتراك سنوي في بريميوم",
+      autoRenewTerms: "يتجدد تلقائيًا سنويًا ما لم يتم الإلغاء قبل 24 ساعة من انتهاء الفترة من إعدادات المتجر. يمكنك الإلغاء في أي وقت.",
+      upgradeToPremium: "الترقية إلى بريميوم",
+      maybeLater: "ربما لاحقًا",
+      menuTooltipQuestionnaire: "طباعة استبيانات تقييم فارغة (Premium)",
+      menuTooltipPrintReport: "طباعة تقارير صحية مخصصة (Premium)",
+      menuTooltipReportSettings: "تخصيص شعار التقرير وبيانات الاتصال (Premium)",
+
 
       UpgradeComplete: "اكتملت الترقية!",
 
@@ -3410,7 +3594,33 @@ const resources = {
       thisOneForPro: "Oops! Questa è solo per i membri PRO.",
 
       proMembersDesc:
+
         "Questa funzionalità è riservata ai nostri membri Pro. Vuoi farne parte? Aggiorna ora e goditi vantaggi esclusivi pensati apposta per te!",
+
+      unlockHealthAgePremium: "Sblocca Health Age Premium",
+      premiumSubtitle: "Ottieni di più dalle tue valutazioni con strumenti e report Premium.",
+      unlimitedAssessmentsTitle: "Valutazioni di salute illimitate",
+      unlimitedAssessmentsDesc: "Effettua valutazioni illimitate dell'età biologica senza il limite giornaliero gratuito.",
+      assessmentHistoryTitle: "Cronologia valutazioni",
+      assessmentHistoryDesc: "Salva e consulta i risultati delle tue valutazioni precedenti.",
+      organizedReportHistoryTitle: "Cronologia report organizzata",
+      organizedReportHistoryDesc: "Accedi ai report salvati e organizzali in gruppi.",
+      csvExportTitle: "Esportazione CSV",
+      csvExportDesc: "Esporta i dati delle valutazioni e dei report in CSV per i tuoi archivi.",
+      printHealthReportsTitle: "Stampa report di salute",
+      printHealthReportsDesc: "Stampa o condividi i tuoi report di salute usando la funzionalità esistente.",
+      printableQuestionnaireTitle: "Questionario stampabile",
+      printableQuestionnaireDesc: "Accedi al questionario di valutazione della salute stampabile.",
+      personalizedReportBrandingTitle: "Personalizzazione dei report",
+      personalizedReportBrandingDesc: "Configura il tuo logo e i dati di contatto sui report stampati.",
+      annualSubscriptionSub: "Abbonamento annuale Premium",
+      autoRenewTerms: "Si rinnova automaticamente ogni anno a meno che non venga annullato almeno 24 ore prima della fine del periodo. Annulla in qualsiasi momento.",
+      upgradeToPremium: "Passa a Premium",
+      maybeLater: "Forse più tardi",
+      menuTooltipQuestionnaire: "Stampa questionari in bianco (Premium)",
+      menuTooltipPrintReport: "Stampa report di salute personalizzati (Premium)",
+      menuTooltipReportSettings: "Personalizza logo e contatti dei report (Premium)",
+
 
       UpgradeComplete: "Aggiornamento completato!",
 
@@ -3714,7 +3924,33 @@ const resources = {
       thisOneForPro: "이 기능은 PRO 멤버 전용입니다.",
 
       proMembersDesc:
+
         "이 기능은 Pro 멤버 전용입니다. 지금 업그레이드하고 나만을 위한 특별한 혜택을 누리세요!",
+
+      unlockHealthAgePremium: "Health Age Premium 잠금 해제",
+      premiumSubtitle: "프리미엄 도구와 보고서 기능으로 건강 평가를 더욱 효과적으로 활용하세요.",
+      unlimitedAssessmentsTitle: "무제한 건강 평가",
+      unlimitedAssessmentsDesc: "일일 무료 제한 없이 무제한으로 건강 나이 평가를 진행하세요.",
+      assessmentHistoryTitle: "평가 기록",
+      assessmentHistoryDesc: "이전 평가 결과를 저장하고 언제든지 다시 확인하세요.",
+      organizedReportHistoryTitle: "체계적인 보고서 관리",
+      organizedReportHistoryDesc: "저장된 보고서에 접근하고 그룹별로 깔끔하게 정리하세요.",
+      csvExportTitle: "CSV 내보내기",
+      csvExportDesc: "기록 보관을 위해 평가 및 보고서 데이터를 CSV로 내보내세요.",
+      printHealthReportsTitle: "건강 보고서 인쇄",
+      printHealthReportsDesc: "기존 보고서 기능을 사용하여 건강 보고서를 인쇄하거나 공유하세요.",
+      printableQuestionnaireTitle: "인쇄 가능한 설문지",
+      printableQuestionnaireDesc: "인쇄 가능한 건강 평가 설문지를 이용할 수 있습니다.",
+      personalizedReportBrandingTitle: "맞춤 보고서 브랜딩",
+      personalizedReportBrandingDesc: "인쇄된 보고서에 로고 및 연락처 정보를 맞춤 설정하세요.",
+      annualSubscriptionSub: "연간 프리미엄 구독",
+      autoRenewTerms: "기간 종료 최소 24시간 전에 스토어 설정에서 취소하지 않는 한 매년 자동 갱신됩니다. 언제든지 취소 가능합니다.",
+      upgradeToPremium: "프리미엄으로 업그레이드",
+      maybeLater: "나중에 하기",
+      menuTooltipQuestionnaire: "빈 평가 설문지 인쇄 (Premium)",
+      menuTooltipPrintReport: "맞춤형 건강 보고서 인쇄 (Premium)",
+      menuTooltipReportSettings: "보고서 브랜딩 및 연락처 정보 설정 (Premium)",
+
 
       UpgradeComplete: "업그레이드 완료!",
 
@@ -4193,7 +4429,33 @@ const resources = {
       thisOneForPro: "Упс! Это только для PRO-участников.",
 
       proMembersDesc:
+
         "Эта функция доступна только нашим Pro-участникам. Хотите получить доступ? Обновитесь сейчас и наслаждайтесь эксклюзивными преимуществами, созданными специально для вас!",
+
+      unlockHealthAgePremium: "Разблокируйте Health Age Premium",
+      premiumSubtitle: "Получите максимум от оценок здоровья с премиальными инструментами и отчетами.",
+      unlimitedAssessmentsTitle: "Неограниченные оценки здоровья",
+      unlimitedAssessmentsDesc: "Проходите неограниченное количество оценок без бесплатного дневного лимита.",
+      assessmentHistoryTitle: "История оценок",
+      assessmentHistoryDesc: "Сохраняйте и просматривайте результаты ваших предыдущих оценок.",
+      organizedReportHistoryTitle: "Упорядоченная история отчетов",
+      organizedReportHistoryDesc: "Получайте доступ к сохраненным отчетам и упорядочивайте их по группам.",
+      csvExportTitle: "Экспорт в CSV",
+      csvExportDesc: "Экспортируйте данные оценок и отчетов в CSV для ведения записей.",
+      printHealthReportsTitle: "Печать отчетов о здоровье",
+      printHealthReportsDesc: "Печатайте или делитесь отчетами о здоровье с помощью существующей функции.",
+      printableQuestionnaireTitle: "Печатная анкета",
+      printableQuestionnaireDesc: "Получите доступ к печатной анкете оценки здоровья.",
+      personalizedReportBrandingTitle: "Персонализация отчетов",
+      personalizedReportBrandingDesc: "Настройте свой логотип и контактные данные в печатных отчетах.",
+      annualSubscriptionSub: "Годовая подписка Premium",
+      autoRenewTerms: "Продлевается автоматически каждый год, если не отменено как минимум за 24 часа до окончания срока. Отмена в любое время.",
+      upgradeToPremium: "Перейти на Premium",
+      maybeLater: "Может быть позже",
+      menuTooltipQuestionnaire: "Печать пустых анкет (Premium)",
+      menuTooltipPrintReport: "Печать индивидуальных отчетов о здоровье (Premium)",
+      menuTooltipReportSettings: "Настройка брендинга и контактов для отчетов (Premium)",
+
 
       UpgradeComplete: "Обновление завершено!",
 
@@ -4682,7 +4944,33 @@ const resources = {
       thisOneForPro: "Ops! Este é apenas para Membros PRO.",
 
       proMembersDesc:
+
         "Este recurso é reservado para nossos Membros Pro. Quer participar? Atualize agora e aproveite benefícios exclusivos feitos só para você!",
+
+      unlockHealthAgePremium: "Desbloqueie o Health Age Premium",
+      premiumSubtitle: "Aproveite melhor suas avaliações com ferramentas e relatórios Premium.",
+      unlimitedAssessmentsTitle: "Avaliações de saúde ilimitadas",
+      unlimitedAssessmentsDesc: "Realize avaliações ilimitadas sem o limite diário gratuito.",
+      assessmentHistoryTitle: "Histórico de avaliações",
+      assessmentHistoryDesc: "Salve e consulte seus resultados de avaliações anteriores.",
+      organizedReportHistoryTitle: "Histórico de relatórios organizado",
+      organizedReportHistoryDesc: "Acesse seus relatórios salvos e organize-os em grupos.",
+      csvExportTitle: "Exportação em CSV",
+      csvExportDesc: "Exporte dados de avaliações e relatórios para CSV para seus registros.",
+      printHealthReportsTitle: "Imprimir relatórios de saúde",
+      printHealthReportsDesc: "Imprima ou compartilhe seus relatórios usando a funcionalidade existente.",
+      printableQuestionnaireTitle: "Questionário imprimível",
+      printableQuestionnaireDesc: "Acesse o questionário de avaliação de saúde imprimível.",
+      personalizedReportBrandingTitle: "Personalização de relatórios",
+      personalizedReportBrandingDesc: "Configure seu logotipo e dados de contato nos relatórios impressos.",
+      annualSubscriptionSub: "Assinatura anual Premium",
+      autoRenewTerms: "Renova anualmente de forma automática, a menos que seja cancelada pelo menos 24 horas antes do término. Cancele quando quiser.",
+      upgradeToPremium: "Atualizar para o Premium",
+      maybeLater: "Talvez mais tarde",
+      menuTooltipQuestionnaire: "Imprimir questionários em branco (Premium)",
+      menuTooltipPrintReport: "Imprimir relatórios de saúde personalizados (Premium)",
+      menuTooltipReportSettings: "Personalizar logotipo e contatos dos relatórios (Premium)",
+
 
       UpgradeComplete: "Atualização Concluída!",
 
@@ -5152,7 +5440,33 @@ const resources = {
       thisOneForPro: "Ups! Dieses Feature ist nur für PRO-Mitglieder.",
 
       proMembersDesc:
+
         "Diese Funktion ist unseren Pro-Mitgliedern vorbehalten. Willst du dabei sein? Upgrade jetzt und genieße exklusive Vorteile, die nur für dich gemacht sind!",
+
+      unlockHealthAgePremium: "Health Age Premium freischalten",
+      premiumSubtitle: "Holen Sie mehr aus Ihren Gesundheitsbewertungen mit Premium-Tools und Berichten heraus.",
+      unlimitedAssessmentsTitle: "Unbegrenzte Gesundheitsbewertungen",
+      unlimitedAssessmentsDesc: "Führen Sie unbegrenzt viele Bewertungen ohne das kostenlose Tageslimit durch.",
+      assessmentHistoryTitle: "Bewertungshistorie",
+      assessmentHistoryDesc: "Speichern und überprüfen Sie Ihre früheren Bewertungsergebnisse.",
+      organizedReportHistoryTitle: "Organisierte Berichtshistorie",
+      organizedReportHistoryDesc: "Greifen Sie auf gespeicherte Berichte zu und ordnen Sie diese in Gruppen.",
+      csvExportTitle: "CSV-Export",
+      csvExportDesc: "Exportieren Sie Bewertungs- und Berichtsdaten zur Dokumentation als CSV.",
+      printHealthReportsTitle: "Gesundheitsberichte drucken",
+      printHealthReportsDesc: "Drucken oder teilen Sie Ihre Berichte mit der vorhandenen Funktion.",
+      printableQuestionnaireTitle: "Druckbarer Fragebogen",
+      printableQuestionnaireDesc: "Greifen Sie auf den druckbaren Gesundheitsfragebogen zu.",
+      personalizedReportBrandingTitle: "Personalisiertes Berichts-Branding",
+      personalizedReportBrandingDesc: "Fügen Sie Ihr Logo und Ihre Kontaktdaten zu gedruckten Berichten hinzu.",
+      annualSubscriptionSub: "Jährliches Premium-Abonnement",
+      autoRenewTerms: "Verlängert sich jährlich automatisch, sofern nicht mindestens 24 Stunden vor Ablauf gekündigt wird. Jederzeit kündbar.",
+      upgradeToPremium: "Auf Premium upgraden",
+      maybeLater: "Vielleicht später",
+      menuTooltipQuestionnaire: "Leere Fragebögen drucken (Premium)",
+      menuTooltipPrintReport: "Personalisierte Gesundheitsberichte drucken (Premium)",
+      menuTooltipReportSettings: "Berichts-Branding und Kontaktdaten anpassen (Premium)",
+
 
       UpgradeComplete: "Upgrade abgeschlossen!",
 
@@ -5633,7 +5947,33 @@ const resources = {
       thisOneForPro: "Oops! E ta pa Miembronan PRO.",
 
       proMembersDesc:
+
         "E karakterístika aki ta reservá pa nos Miembronan Pro. Kier partisipá? Hasi upgrade awor i disfruta di benefisionan eksklusivo, spesialmente pa bo!",
+
+      unlockHealthAgePremium: "Desblokiá Health Age Premium",
+      premiumSubtitle: "Saka mas probecho di bo evaluashonnan ku hèrmèntnan i rapòrtnan Premium.",
+      unlimitedAssessmentsTitle: "Evaluashonnan di Salú Sin Límite",
+      unlimitedAssessmentsDesc: "Hasi evaluashonnan sin e límite diario grátis.",
+      assessmentHistoryTitle: "Historial di Evaluashon",
+      assessmentHistoryDesc: "Warda i revisá bo resultadonan anterior.",
+      organizedReportHistoryTitle: "Historial di Rapòrt Organisá",
+      organizedReportHistoryDesc: "Aksedé na bo rapòrtnan wardá i organisá nan den grupo.",
+      csvExportTitle: "Eksportashon CSV",
+      csvExportDesc: "Eksportá datonan di evaluashon i rapòrt na CSV.",
+      printHealthReportsTitle: "Prent Rapòrtnan di Salú",
+      printHealthReportsDesc: "Prent òf kompartí bo rapòrtnan ku e funshon existente.",
+      printableQuestionnaireTitle: "Kuestionario pa Prent",
+      printableQuestionnaireDesc: "Aksedé na e kuestionario di salú pa prent.",
+      personalizedReportBrandingTitle: "Personalisa Bo Rapòrt",
+      personalizedReportBrandingDesc: "Konfigurá bo logo i kontakto riba rapòrtnan prentá.",
+      annualSubscriptionSub: "Suskripshon anual Premium",
+      autoRenewTerms: "Ta renobá outomátikamente tur aña a ménos ku kenselá por lo ménos 24 ora promé ku e periodo kaba. Kenselá na kualke momento.",
+      upgradeToPremium: "Upgréd na Premium",
+      maybeLater: "Kisas despwes",
+      menuTooltipQuestionnaire: "Prent kuestionario bashí (Premium)",
+      menuTooltipPrintReport: "Prent rapòrtnan di salú personalisá (Premium)",
+      menuTooltipReportSettings: "Konfigurá logo i kontakto riba rapòrt (Premium)",
+
 
       UpgradeComplete: "Upgrade Kompleto!",
 
@@ -5925,7 +6265,33 @@ const resources = {
       thisOneForPro: "Ôi! Tính năng này chỉ dành cho thành viên PRO.",
 
       proMembersDesc:
+
         "Tính năng này được dành riêng cho thành viên Pro của chúng tôi. Muốn tham gia? Nâng cấp ngay và tận hưởng các đặc quyền dành riêng cho bạn!",
+
+      unlockHealthAgePremium: "Mở khóa Health Age Premium",
+      premiumSubtitle: "Khai thác tối đa các bài đánh giá sức khỏe với công cụ và báo cáo Premium.",
+      unlimitedAssessmentsTitle: "Đánh giá sức khỏe không giới hạn",
+      unlimitedAssessmentsDesc: "Thực hiện đánh giá tuổi sức khỏe không giới hạn mà không bị giới hạn hàng ngày.",
+      assessmentHistoryTitle: "Lịch sử đánh giá",
+      assessmentHistoryDesc: "Lưu và xem lại kết quả các bài đánh giá trước đây của bạn.",
+      organizedReportHistoryTitle: "Lịch sử báo cáo có tổ chức",
+      organizedReportHistoryDesc: "Truy cập các báo cáo đã lưu và sắp xếp chúng thành các nhóm.",
+      csvExportTitle: "Xuất CSV",
+      csvExportDesc: "Xuất dữ liệu đánh giá và báo cáo ra tệp CSV để lưu trữ.",
+      printHealthReportsTitle: "In báo cáo sức khỏe",
+      printHealthReportsDesc: "In hoặc chia sẻ báo cáo sức khỏe bằng tính năng sẵn có.",
+      printableQuestionnaireTitle: "Bản câu hỏi có thể in",
+      printableQuestionnaireDesc: "Truy cập bản câu hỏi đánh giá sức khỏe có thể in.",
+      personalizedReportBrandingTitle: "Thương hiệu báo cáo cá nhân hóa",
+      personalizedReportBrandingDesc: "Thêm logo và thông tin liên hệ của bạn vào các báo cáo in.",
+      annualSubscriptionSub: "Gói đăng ký Premium hàng năm",
+      autoRenewTerms: "Tự động gia hạn hàng năm trừ khi được hủy trong cài đặt cửa hàng ít nhất 24 giờ trước khi kết thúc kỳ. Hủy bất cứ lúc nào.",
+      upgradeToPremium: "Nâng cấp lên Premium",
+      maybeLater: "Để sau",
+      menuTooltipQuestionnaire: "In bảng câu hỏi đánh giá trống (Premium)",
+      menuTooltipPrintReport: "In báo cáo sức khỏe tùy chỉnh (Premium)",
+      menuTooltipReportSettings: "Tùy chỉnh thương hiệu báo cáo và thông tin liên hệ (Premium)",
+
 
       UpgradeComplete: "Nâng cấp hoàn tất!",
 
@@ -6425,7 +6791,33 @@ const resources = {
       thisOneForPro: "Oups! Ity ho an'ny Mpikambana PRO ihany.",
 
       proMembersDesc:
+
         "Ity endri-javatra ity dia natokana ho an'ny Mpikambana Pro. Te hiditra? Havaozy dieny izao ary ankafizo ireo tombontsoa manokana natao ho anao!",
+
+      unlockHealthAgePremium: "Sokafy ny Health Age Premium",
+      premiumSubtitle: "Mahazoa tombony bebe kokoa amin'ny fanombanana miaraka amin'ny fitaovana Premium.",
+      unlimitedAssessmentsTitle: "Fanombanana ara-pahasalamana tsy voafetra",
+      unlimitedAssessmentsDesc: "Manaova fanombanana tsy misy fetra isan'andro maimaim-poana.",
+      assessmentHistoryTitle: "Tantaran'ny fanombanana",
+      assessmentHistoryDesc: "Tehirizo sy jereo indray ny valin'ny fanombanana teo aloha.",
+      organizedReportHistoryTitle: "Tantaran'ny tatitra voalamina",
+      organizedReportHistoryDesc: "Midira amin'ireo tatitra voatahiry ary alamino ho vondrona.",
+      csvExportTitle: "Famoahana CSV",
+      csvExportDesc: "Avoahy ho rakitra CSV ny angon-drakitra fanombanana sy tatitra.",
+      printHealthReportsTitle: "Manonta tatitra ara-pahasalamana",
+      printHealthReportsDesc: "Atontao na zarao ny tatitra ara-pahasalamana misy anao.",
+      printableQuestionnaireTitle: "Fanontaniana azo atonta",
+      printableQuestionnaireDesc: "Midira amin'ny fanontaniana fanombanana ara-pahasalamana azo atonta.",
+      personalizedReportBrandingTitle: "Famantarana manokana ny tatitra",
+      personalizedReportBrandingDesc: "Ampidiro ny sary famantarana sy ny fifandraisana amin'ny tatitra atonta.",
+      annualSubscriptionSub: "Famandrihana Premium isan-taona",
+      autoRenewTerms: "Mihavao ho azy isan-taona raha tsy foanana 24 ora mialoha amin'ny firafitry ny fivarotana. Azo foanana amin'ny fotoana rehetra.",
+      upgradeToPremium: "Havaozy ho Premium",
+      maybeLater: "Angamba any aoriana",
+      menuTooltipQuestionnaire: "Manonta fanontaniana fanombanana banga (Premium)",
+      menuTooltipPrintReport: "Manonta tatitra ara-pahasalamana manokana (Premium)",
+      menuTooltipReportSettings: "Amboary ny marika sy ny fifandraisana amin'ny tatitra (Premium)",
+
 
       UpgradeComplete: "Fanaraha-maso vita!",
 
@@ -6877,7 +7269,33 @@ const resources = {
       thisOneForPro: "Ups! Denne er kun for PRO-medlemmer.",
 
       proMembersDesc:
+
         "Denne funktion er forbeholdt vores Pro-medlemmer. Vil du være med? Opgrader nu og nyd eksklusive fordele skræddersyet til dig!",
+
+      unlockHealthAgePremium: "Lås op for Health Age Premium",
+      premiumSubtitle: "Få mere ud af dine sundhedsvurderinger med Premium-værktøjer og rapporter.",
+      unlimitedAssessmentsTitle: "Ubegrænsede sundhedsvurderinger",
+      unlimitedAssessmentsDesc: "Udfør ubegrænsede helbredsalder-vurderinger uden den gratis daglige grænse.",
+      assessmentHistoryTitle: "Vurderingshistorik",
+      assessmentHistoryDesc: "Gem og gense dine tidligere vurderingsresultater.",
+      organizedReportHistoryTitle: "Organiseret rapporthistorik",
+      organizedReportHistoryDesc: "Få adgang til dine gemte rapporter og organiser dem i grupper.",
+      csvExportTitle: "CSV-eksport",
+      csvExportDesc: "Eksportér vurderings- og rapportdata til CSV til dine optegnelser.",
+      printHealthReportsTitle: "Udskriv sundhedsrapporter",
+      printHealthReportsDesc: "Udskriv eller del dine sundhedsrapporter med den eksisterende funktion.",
+      printableQuestionnaireTitle: "Udskrivbart spørgeskema",
+      printableQuestionnaireDesc: "Få adgang til det udskrivbare spørgeskema til sundhedsvurdering.",
+      personalizedReportBrandingTitle: "Personlig rapportbranding",
+      personalizedReportBrandingDesc: "Konfigurer logo og kontaktoplysninger på udskrevne rapporter.",
+      annualSubscriptionSub: "Årligt Premium-abonnement",
+      autoRenewTerms: "Fornyes automatisk årligt, medmindre det opsiges mindst 24 timer før periodens udløb. Opsig når som helst.",
+      upgradeToPremium: "Opgrader til Premium",
+      maybeLater: "Måske senere",
+      menuTooltipQuestionnaire: "Udskriv blanke spørgeskemaer (Premium)",
+      menuTooltipPrintReport: "Udskriv tilpassede sundhedsrapporter (Premium)",
+      menuTooltipReportSettings: "Tilpas rapportbranding og kontaktoplysninger (Premium)",
+
 
       UpgradeComplete: "Opgradering gennemført!",
 
@@ -7366,7 +7784,33 @@ const resources = {
       thisOneForPro: "ஓஹ்! இது ப்ரோ உறுப்பினர்களுக்கானது.",
 
       proMembersDesc:
+
         "இந்த அம்சம் எங்கள் ப்ரோ உறுப்பினர்களுக்காக மட்டுமே. சேர விருப்பமா? இப்போது மேம்படுத்தி, உங்கள் தேவைகளுக்கேற்ப வடிவமைக்கப்பட்ட சிறப்பு நன்மைகளை அனுபவியுங்கள்!",
+
+      unlockHealthAgePremium: "Health Age Premium ஐ திறக்கவும்",
+      premiumSubtitle: "பிரீமியம் கருவிகள் மற்றும் அறிக்கை அம்சங்களுடன் கூடுதல் பலன்களைப் பெறுங்கள்.",
+      unlimitedAssessmentsTitle: "வரம்பற்ற சுகாதார மதிப்பீடுகள்",
+      unlimitedAssessmentsDesc: "இலவச தினசரி வரம்பு இல்லாமல் வரம்பற்ற சுகாதார வயது மதிப்பீடுகளைச் செய்யுங்கள்.",
+      assessmentHistoryTitle: "மதிப்பீட்டு வரலாறு",
+      assessmentHistoryDesc: "முந்தைய மதிப்பீட்டு முடிவுகளைச் சேமித்து மீண்டும் பார்வையிடவும்.",
+      organizedReportHistoryTitle: "ஒழுங்கமைக்கப்பட்ட அறிக்கை வரலாறு",
+      organizedReportHistoryDesc: "சேமிக்கப்பட்ட அறிக்கைகளை அணுகி குழுக்களாக ஒழுங்கமைக்கவும்.",
+      csvExportTitle: "CSV ஏற்றுமதி",
+      csvExportDesc: "உங்கள் பதிவுகளுக்காக மதிப்பீடு மற்றும் அறிக்கை தரவை CSV ஆக ஏற்றுமதி செய்யுங்கள்.",
+      printHealthReportsTitle: "சுகாதார அறிக்கைகளை அச்சிடவும்",
+      printHealthReportsDesc: "தற்போதுள்ள அம்சத்தைப் பயன்படுத்தி உங்கள் அறிக்கைகளை அச்சிடவும் அல்லது பகிரவும்.",
+      printableQuestionnaireTitle: "அச்சிடக்கூடிய வினாத்தாள்",
+      printableQuestionnaireDesc: "அச்சிடக்கூடிய சுகாதார மதிப்பீட்டு வினாத்தாளை அணுகவும்.",
+      personalizedReportBrandingTitle: "தனிப்பயனாக்கப்பட்ட அறிக்கை பிராண்டிங்",
+      personalizedReportBrandingDesc: "அச்சிடப்பட்ட அறிக்கைகளில் லோகோ மற்றும் தொடர்பு விவரங்களைச் சேர்க்கவும்.",
+      annualSubscriptionSub: "ஆண்டு பிரீமியம் சந்தா",
+      autoRenewTerms: "காலக்கெடு முடிவதற்கு குறைந்தது 24 மணி நேரத்திற்கு முன் ரத்து செய்யாவிட்டால் தானாகப் புதுப்பிக்கப்படும். எப்போது வேண்டுமானாலும் ரத்து செய்யலாம்.",
+      upgradeToPremium: "பிரீமியத்திற்கு மேம்படுத்தவும்",
+      maybeLater: "பிறகு பார்க்கலாம்",
+      menuTooltipQuestionnaire: "வெற்று மதிப்பீட்டு வினாத்தாள்களை அச்சிடவும் (Premium)",
+      menuTooltipPrintReport: "தனிப்பயனாக்கப்பட்ட சுகாதார அறிக்கைகளை அச்சிடவும் (Premium)",
+      menuTooltipReportSettings: "அறிக்கை பிராண்டிங் மற்றும் தொடர்புத் தகவலைத் தனிப்பயனாக்குங்கள் (Premium)",
+
 
       UpgradeComplete: "மேம்படுத்தல் முடிந்தது!",
 
@@ -7817,7 +8261,33 @@ const resources = {
       yearlyPurchase: "বার্ষিক ক্রয়",
       thisOneForPro: "ওহ! এটি প্রো সদস্যদের জন্য।",
       proMembersDesc:
+
         "এই সুবিধাটি শুধুমাত্র আমাদের প্রো সদস্যদের জন্য সংরক্ষিত। যোগ দিতে চান? এখনই আপগ্রেড করুন এবং আপনার জন্য বিশেষভাবে তৈরি সুবিধাগুলো উপভোগ করুন!",
+
+      unlockHealthAgePremium: "Health Age Premium আনলক করুন",
+      premiumSubtitle: "প্রিমিয়াম সরঞ্জাম এবং রিপোর্টিং বৈশিষ্ট্যের মাধ্যমে আরও বেশি সুবিধা পান।",
+      unlimitedAssessmentsTitle: "সীমাহীন স্বাস্থ্য মূল্যায়ন",
+      unlimitedAssessmentsDesc: "দৈনিক ফ্রি সীমা ছাড়াই সীমাহীন স্বাস্থ্য বয়স মূল্যায়ন করুন।",
+      assessmentHistoryTitle: "মূল্যায়ন ইতিহাস",
+      assessmentHistoryDesc: "আপনার আগের মূল্যায়নের ফলাফল সংরক্ষণ করুন এবং পুনরায় দেখুন।",
+      organizedReportHistoryTitle: "সংগঠিত রিপোর্ট ইতিহাস",
+      organizedReportHistoryDesc: "সংরক্ষিত রিপোর্ট অ্যাক্সেস করুন এবং সেগুলিকে গ্রুপে সংগঠিত করুন।",
+      csvExportTitle: "CSV এক্সপোর্ট",
+      csvExportDesc: "আপনার রেকর্ডের জন্য মূল্যায়ন এবং রিপোর্ট ডেটা CSV তে এক্সপোর্ট করুন।",
+      printHealthReportsTitle: "স্বাস্থ্য রিপোর্ট প্রিন্ট করুন",
+      printHealthReportsDesc: "বিদ্যমান রিপোর্টিং বৈশিষ্ট্য ব্যবহার করে আপনার রিপোর্ট প্রিন্ট বা শেয়ার করুন।",
+      printableQuestionnaireTitle: "প্রিন্টযোগ্য প্রশ্নাবলী",
+      printableQuestionnaireDesc: "প্রিন্টযোগ্য স্বাস্থ্য মূল্যায়ন প্রশ্নাবলী অ্যাক্সেস করুন।",
+      personalizedReportBrandingTitle: "ব্যক্তিগতকৃত রিপোর্ট ব্র্যান্ডিং",
+      personalizedReportBrandingDesc: "প্রিন্ট করা রিপোর্টে আপনার লোগো এবং যোগাযোগের তথ্য যুক্ত করুন।",
+      annualSubscriptionSub: "বার্ষিক প্রিমিয়াম সাবস্ক্রিপশন",
+      autoRenewTerms: "মেয়াদ শেষ হওয়ার অন্তত ২৪ ঘণ্টা আগে স্টোর সেটিংসে বাতিল না করা হলে প্রতি বছর স্বয়ংক্রিয়ভাবে পুনর্নবীকরণ হয়। যেকোনো সময় বাতিলযোগ্য।",
+      upgradeToPremium: "প্রিমিয়ামে আপগ্রেড করুন",
+      maybeLater: "পরে হতে পারে",
+      menuTooltipQuestionnaire: "খালি মূল্যায়ন প্রশ্নাবলী প্রিন্ট করুন (Premium)",
+      menuTooltipPrintReport: "কাস্টমাইজড স্বাস্থ্য রিপোর্ট প্রিন্ট করুন (Premium)",
+      menuTooltipReportSettings: "রিপোর্ট ব্র্যান্ডিং এবং যোগাযোগের তথ্য কাস্টমাইজ করুন (Premium)",
+
       UpgradeComplete: "আপগ্রেড সম্পন্ন!",
       NowAProMember: "আপনি এখন একজন প্রো সদস্য!",
       UpgradeTo: "আপগ্রেড করুন",
@@ -8264,7 +8734,33 @@ const resources = {
       yearlyPurchase: "Pembelian tahunan",
       thisOneForPro: "Ups! Yang ini untuk Anggota PRO.",
       proMembersDesc:
+
         "Fitur ini khusus untuk Anggota Pro kami. Ingin bergabung? Tingkatkan sekarang dan nikmati manfaat eksklusif yang dirancang khusus untuk Anda!",
+
+      unlockHealthAgePremium: "Buka Health Age Premium",
+      premiumSubtitle: "Dapatkan lebih banyak dari penilaian kesehatan Anda dengan fitur Premium.",
+      unlimitedAssessmentsTitle: "Penilaian Kesehatan Tanpa Batas",
+      unlimitedAssessmentsDesc: "Lakukan penilaian usia kesehatan tanpa batas batas harian gratis.",
+      assessmentHistoryTitle: "Riwayat Penilaian",
+      assessmentHistoryDesc: "Simpan dan lihat kembali hasil penilaian Anda sebelumnya.",
+      organizedReportHistoryTitle: "Riwayat Laporan Terorganisir",
+      organizedReportHistoryDesc: "Akses laporan tersimpan dan atur ke dalam grup.",
+      csvExportTitle: "Ekspor CSV",
+      csvExportDesc: "Ekspor data penilaian dan laporan ke CSV untuk catatan Anda.",
+      printHealthReportsTitle: "Cetak Laporan Kesehatan",
+      printHealthReportsDesc: "Cetak atau bagikan laporan kesehatan menggunakan fitur yang tersedia.",
+      printableQuestionnaireTitle: "Kuesioner yang Dapat Dicetak",
+      printableQuestionnaireDesc: "Akses kuesioner penilaian kesehatan yang dapat dicetak.",
+      personalizedReportBrandingTitle: "Branding Laporan yang Dipersonalisasi",
+      personalizedReportBrandingDesc: "Konfigurasikan logo dan info kontak pada laporan yang dicetak.",
+      annualSubscriptionSub: "Langganan Premium Tahunan",
+      autoRenewTerms: "Diperbarui otomatis setiap tahun kecuali dibatalkan di pengaturan toko setidaknya 24 jam sebelum periode berakhir. Batalkan kapan saja.",
+      upgradeToPremium: "Tingkatkan ke Premium",
+      maybeLater: "Nanti Saja",
+      menuTooltipQuestionnaire: "Cetak kuesioner penilaian kosong (Premium)",
+      menuTooltipPrintReport: "Cetak laporan kesehatan yang disesuaikan (Premium)",
+      menuTooltipReportSettings: "Sesuaikan branding laporan dan info kontak (Premium)",
+
       UpgradeComplete: "Peningkatan Selesai!",
       NowAProMember: "Anda Sekarang Anggota Pro!",
       UpgradeTo: "Tingkatkan Ke",
@@ -8710,7 +9206,33 @@ const resources = {
       yearlyPurchase: "Yıllık satın alma",
       thisOneForPro: "Hop! Bu, PRO Üyelere özel.",
       proMembersDesc:
+
         "Bu özellik yalnızca Pro Üyelerimize özeldir. Katılmak ister misiniz? Hemen yükseltin ve size özel hazırlanmış ayrıcalıkların keyfini çıkarın!",
+
+      unlockHealthAgePremium: "Health Age Premium'un Kilidini Açın",
+      premiumSubtitle: "Premium araçlar ve raporlama özellikleri ile sağlık değerlendirmelerinizden daha fazlasını alın.",
+      unlimitedAssessmentsTitle: "Sınırsız Sağlık Değerlendirmesi",
+      unlimitedAssessmentsDesc: "Ücretsiz günlük limit olmadan sınırsız sağlık yaşı değerlendirmesi yapın.",
+      assessmentHistoryTitle: "Değerlendirme Geçmişi",
+      assessmentHistoryDesc: "Önceki değerlendirme sonuçlarınızı kaydedin ve tekrar inceleyin.",
+      organizedReportHistoryTitle: "Düzenli Rapor Geçmişi",
+      organizedReportHistoryDesc: "Kayıtlı raporlarınıza erişin ve bunları gruplar halinde düzenleyin.",
+      csvExportTitle: "CSV Dışa Aktarma",
+      csvExportDesc: "Kayıtlarınız için değerlendirme ve rapor verilerini CSV olarak dışa aktarın.",
+      printHealthReportsTitle: "Sağlık Raporlarını Yazdırın",
+      printHealthReportsDesc: "Mevcut raporlama özelliğini kullanarak raporlarınızı yazdırın veya paylaşın.",
+      printableQuestionnaireTitle: "Yazdırılabilir Anket",
+      printableQuestionnaireDesc: "Yazdırılabilir sağlık değerlendirme anketine erişin.",
+      personalizedReportBrandingTitle: "Kişiselleştirilmiş Rapor Markalaması",
+      personalizedReportBrandingDesc: "Yazdırılan raporlara logonuzu ve iletişim bilgilerinizi ekleyin.",
+      annualSubscriptionSub: "Yıllık Premium Abonelik",
+      autoRenewTerms: "Dönem bitiminden en az 24 saat önce mağaza ayarlarından iptal edilmediği sürece her yıl otomatik yenilenir. İstediğiniz zaman iptal edin.",
+      upgradeToPremium: "Premium'a Yükselt",
+      maybeLater: "Belki Daha Sonra",
+      menuTooltipQuestionnaire: "Boş değerlendirme anketlerini yazdırın (Premium)",
+      menuTooltipPrintReport: "Özelleştirilmiş sağlık raporlarını yazdırın (Premium)",
+      menuTooltipReportSettings: "Rapor markalamasını ve iletişim bilgilerini özelleştirin (Premium)",
+
       UpgradeComplete: "Yükseltme Tamamlandı!",
       NowAProMember: "Artık bir Pro Üyesiniz!",
       UpgradeTo: "Şuna Yükselt",
@@ -9156,7 +9678,33 @@ const resources = {
       yearlyPurchase: "వార్షిక కొనుగోలు",
       thisOneForPro: "అయ్యో! ఇది ప్రో సభ్యుల కోసం.",
       proMembersDesc:
+
         "ఈ ఫీచర్ మా ప్రో సభ్యుల కోసం మాత్రమే. చేరాలనుకుంటున్నారా? ఇప్పుడే అప్‌గ్రేడ్ చేసి మీ కోసం ప్రత్యేకంగా రూపొందించిన ప్రయోజనాలను ఆస్వాదించండి!",
+
+      unlockHealthAgePremium: "Health Age Premium ని అన్‌లాక్ చేయండి",
+      premiumSubtitle: "ప్రీమియం టూల్స్ మరియు రిపోర్టింగ్ ఫీచర్లతో మరిన్ని ప్రయోజనాలను పొందండి.",
+      unlimitedAssessmentsTitle: "అపరిమిత ఆరోగ్య అంచనాలు",
+      unlimitedAssessmentsDesc: "ఉచిత రోజువారీ పరిమితి లేకుండా అపరిమిత ఆరోగ్య వయస్సు అంచనాలను చేయండి.",
+      assessmentHistoryTitle: "అంచనాల చరిత్ర",
+      assessmentHistoryDesc: "మీ మునుపటి అంచనా ఫలితాలను సేవ్ చేసుకోండి మరియు మళ్లీ చూడండి.",
+      organizedReportHistoryTitle: "వ్యవస్థీకృత నివేదికల చరిత్ర",
+      organizedReportHistoryDesc: "సేవ్ చేసిన నివేదికలను యాక్సెస్ చేయండి మరియు వాటిని సమూహాలుగా నిర్వహించండి.",
+      csvExportTitle: "CSV ఎగుమతి",
+      csvExportDesc: "మీ రికార్డుల కోసం అంచనా మరియు నివేదిక డేటాను CSV కి ఎగుమతి చేయండి.",
+      printHealthReportsTitle: "ఆరోగ్య నివేదికలను ముద్రించండి",
+      printHealthReportsDesc: "ప్రస్తుత రిపోర్టింగ్ ఫంక్షనాలిటీని ఉపయోగించి మీ నివేదికలను ప్రింట్ చేయండి లేదా షేర్ చేయండి.",
+      printableQuestionnaireTitle: "ప్రింట్ చేయదగిన ప్రశ్నాపత్రం",
+      printableQuestionnaireDesc: "ప్రింట్ చేయగల ఆరోగ్య అంచనా ప్రశ్నాపత్రాన్ని యాక్సెస్ చేయండి.",
+      personalizedReportBrandingTitle: "వ్యక్తిగతీకరించిన నివేదిక బ్రాండింగ్",
+      personalizedReportBrandingDesc: "ప్రింట్ చేసిన నివేదికలపై మీ లోగో మరియు సంప్రదింపు సమాచారాన్ని జోడించండి.",
+      annualSubscriptionSub: "వార్షిక ప్రీమియం సభ్యత్వం",
+      autoRenewTerms: "గడువు ముగియడానికి కనీసం 24 గంటల ముందు స్టోర్ సెట్టింగ్లలో రద్దు చేయకపోతే స్వయంచాలకంగా పునరుద్ధరించబడుతుంది. ఎప్పుడైనా రద్దు చేయవచ్చు.",
+      upgradeToPremium: "ప్రీమియంకు అప్‌గ్రేడ్ చేయండి",
+      maybeLater: "తర్వాత చూడవచ్చు",
+      menuTooltipQuestionnaire: "ఖాళీ అంచనా ప్రశ్నాపత్రాలను ప్రింట్ చేయండి (Premium)",
+      menuTooltipPrintReport: "అనుకూలీకరించిన ఆరోగ్య నివేదికలను ప్రింట్ చేయండి (Premium)",
+      menuTooltipReportSettings: "నివేదిక బ్రాండింగ్ మరియు సంప్రదింపు సమాచారాన్ని అనుకూలీకరించండి (Premium)",
+
       UpgradeComplete: "అప్‌గ్రేడ్ పూర్తయింది!",
       NowAProMember: "మీరు ఇప్పుడు ప్రో సభ్యులు!",
       UpgradeTo: "దీనికి అప్‌గ్రేడ్ చేయండి",
@@ -9602,7 +10150,33 @@ const resources = {
       yearlyPurchase: "ਸਾਲਾਨਾ ਖਰੀਦ",
       thisOneForPro: "ਓਹੋ! ਇਹ ਪ੍ਰੋ ਮੈਂਬਰਾਂ ਲਈ ਹੈ।",
       proMembersDesc:
+
         "ਇਹ ਸਹੂਲਤ ਸਿਰਫ਼ ਸਾਡੇ ਪ੍ਰੋ ਮੈਂਬਰਾਂ ਲਈ ਹੈ। ਸ਼ਾਮਲ ਹੋਣਾ ਚਾਹੁੰਦੇ ਹੋ? ਹੁਣੇ ਅੱਪਗ੍ਰੇਡ ਕਰੋ ਅਤੇ ਤੁਹਾਡੇ ਲਈ ਖ਼ਾਸ ਤਿਆਰ ਕੀਤੇ ਲਾਭਾਂ ਦਾ ਆਨੰਦ ਲਓ!",
+
+      unlockHealthAgePremium: "Health Age Premium ਨੂੰ ਅਨਲੌਕ ਕਰੋ",
+      premiumSubtitle: "ਪ੍ਰੀਮੀਅਮ ਟੂਲਜ਼ ਅਤੇ ਰਿਪੋਰਟਿੰਗ ਵਿਸ਼ੇਸ਼ਤਾਵਾਂ ਨਾਲ ਵਧੇਰੇ ਲਾਭ ਪ੍ਰਾਪਤ ਕਰੋ।",
+      unlimitedAssessmentsTitle: "ਅਸੀਮਤ ਸਿਹਤ ਮੁਲਾਂਕਣ",
+      unlimitedAssessmentsDesc: "ਮੁਫ਼ਤ ਰੋਜ਼ਾਨਾ ਸੀਮਾ ਤੋਂ ਬਿਨਾਂ ਅਸੀਮਤ ਸਿਹਤ ਉਮਰ ਮੁਲਾਂਕਣ ਕਰੋ।",
+      assessmentHistoryTitle: "ਮੁਲਾਂਕਣ ਇਤਿਹਾਸ",
+      assessmentHistoryDesc: "ਆਪਣੇ ਪਿਛਲੇ ਮੁਲਾਂਕਣ ਨਤੀਜਿਆਂ ਨੂੰ ਸੁਰੱਖਿਅਤ ਕਰੋ ਅਤੇ ਦੁਬਾਰਾ ਦੇਖੋ।",
+      organizedReportHistoryTitle: "ਸੰਗਠਿਤ ਰਿਪੋਰਟ ਇਤਿਹਾਸ",
+      organizedReportHistoryDesc: "ਸੁਰੱਖਿਅਤ ਕੀਤੀਆਂ ਰਿਪੋਰਟਾਂ ਤੱਕ ਪਹੁੰਚ ਕਰੋ ਅਤੇ ਉਹਨਾਂ ਨੂੰ ਸਮੂਹਾਂ ਵਿੱਚ ਸੰਗਠਿਤ ਕਰੋ।",
+      csvExportTitle: "CSV ਨਿਰਯਾਤ",
+      csvExportDesc: "ਆਪਣੇ ਰਿਕਾਰਡਾਂ ਲਈ ਮੁਲਾਂਕਣ ਅਤੇ ਰਿਪੋਰਟ ਡੇਟਾ ਨੂੰ CSV ਵਿੱਚ ਨਿਰਯਾਤ ਕਰੋ।",
+      printHealthReportsTitle: "ਸਿਹਤ ਰਿਪੋਰਟਾਂ ਪ੍ਰਿੰਟ ਕਰੋ",
+      printHealthReportsDesc: "ਮੌਜੂਦਾ ਰਿਪੋਰਟਿੰਗ ਕਾਰਜਕੁਸ਼ਲਤਾ ਦੀ ਵਰਤੋਂ ਕਰਕੇ ਆਪਣੀਆਂ ਰਿਪੋਰਟਾਂ ਪ੍ਰਿੰਟ ਕਰੋ ਜਾਂ ਸਾਂਝੀਆਂ ਕਰੋ।",
+      printableQuestionnaireTitle: "ਪ੍ਰਿੰਟ ਕਰਨ ਯੋਗ ਪ੍ਰਸ਼ਨਾਵਲੀ",
+      printableQuestionnaireDesc: "ਪ੍ਰਿੰਟ ਕਰਨ ਯੋਗ ਸਿਹਤ ਮੁਲਾਂਕਣ ਪ੍ਰਸ਼ਨਾਵਲੀ ਤੱਕ ਪਹੁੰਚ ਕਰੋ।",
+      personalizedReportBrandingTitle: "ਨਿੱਜੀ ਰਿਪੋਰਟ ਬ੍ਰਾਂਡਿੰਗ",
+      personalizedReportBrandingDesc: "ਪ੍ਰਿੰਟ ਕੀਤੀਆਂ ਰਿਪੋਰਟਾਂ 'ਤੇ ਆਪਣਾ ਲੋਗੋ ਅਤੇ ਸੰਪਰਕ ਜਾਣਕਾਰੀ ਸ਼ਾਮਲ ਕਰੋ।",
+      annualSubscriptionSub: "ਸਾਲਾਨਾ ਪ੍ਰੀਮੀਅਮ ਗਾਹਕੀ",
+      autoRenewTerms: "ਮਿਆਦ ਖਤਮ ਹੋਣ ਤੋਂ ਘੱਟੋ-ਘੱਟ 24 ਘੰਟੇ ਪਹਿਲਾਂ ਸਟੋਰ ਸੈਟਿੰਗਾਂ ਵਿੱਚ ਰੱਦ ਨਾ ਕੀਤੇ ਜਾਣ 'ਤੇ ਆਪਣੇ ਆਪ ਨਵਿਆਇਆ ਜਾਂਦਾ ਹੈ। ਕਦੇ ਵੀ ਰੱਦ ਕਰੋ।",
+      upgradeToPremium: "ਪ੍ਰੀਮੀਅਮ ਵਿੱਚ ਅੱਪਗ੍ਰੇਡ ਕਰੋ",
+      maybeLater: "ਸ਼ਾਇਦ ਬਾਅਦ ਵਿੱਚ",
+      menuTooltipQuestionnaire: "ਖਾਲੀ ਮੁਲਾਂਕਣ ਪ੍ਰਸ਼ਨਾਵਲੀਆਂ ਪ੍ਰਿੰਟ ਕਰੋ (Premium)",
+      menuTooltipPrintReport: "ਕਸਟਮਾਈਜ਼ਡ ਸਿਹਤ ਰਿਪੋਰਟਾਂ ਪ੍ਰਿੰਟ ਕਰੋ (Premium)",
+      menuTooltipReportSettings: "ਰਿਪੋਰਟ ਬ੍ਰਾਂਡਿੰਗ ਅਤੇ ਸੰਪਰਕ ਜਾਣਕਾਰੀ ਨੂੰ ਅਨੁਕੂਲਿਤ ਕਰੋ (Premium)",
+
       UpgradeComplete: "ਅੱਪਗ੍ਰੇਡ ਪੂਰਾ ਹੋਇਆ!",
       NowAProMember: "ਤੁਸੀਂ ਹੁਣ ਪ੍ਰੋ ਮੈਂਬਰ ਹੋ!",
       UpgradeTo: "ਇਸ ਵਿੱਚ ਅੱਪਗ੍ਰੇਡ ਕਰੋ",
@@ -10052,7 +10626,33 @@ const resources = {
       yearlyPurchase: "خرید سالانه",
       thisOneForPro: "اوه! این یکی مخصوص اعضای پرو است.",
       proMembersDesc:
+
         "این قابلیت تنها برای اعضای پرو ما در نظر گرفته شده است. می‌خواهید بپیوندید؟ همین حالا ارتقا دهید و از مزایای ویژه‌ای که برای شما آماده شده بهره‌مند شوید!",
+
+      unlockHealthAgePremium: "باز کردن قفل Health Age Premium",
+      premiumSubtitle: "با ابزارها و قابلیت‌های گزارش‌دهی ویژه، بیشترین بهره را از ارزیابی‌های سلامت خود ببرید.",
+      unlimitedAssessmentsTitle: "ارزیابی‌های سلامت نامحدود",
+      unlimitedAssessmentsDesc: "ارزیابی‌های نامحدود سن سلامت را بدون محدودیت روزانه رایگان انجام دهید.",
+      assessmentHistoryTitle: "تاریخچه ارزیابی‌ها",
+      assessmentHistoryDesc: "نتایج ارزیابی‌های قبلی خود را ذخیره و دوباره بررسی کنید.",
+      organizedReportHistoryTitle: "تاریخچه گزارش‌های سازمان‌یافته",
+      organizedReportHistoryDesc: "به گزارش‌های ذخیره‌شده دسترسی پیدا کرده و آن‌ها را در گروه‌ها مرتب کنید.",
+      csvExportTitle: "خروجی CSV",
+      csvExportDesc: "داده‌های ارزیابی و گزارش را برای سوابق خود به CSV صادر کنید.",
+      printHealthReportsTitle: "چاپ گزارش‌های سلامت",
+      printHealthReportsDesc: "با استفاده از قابلیت‌های موجود، گزارش‌های سلامت خود را چاپ یا به اشتراک بگذارید.",
+      printableQuestionnaireTitle: "پرسشنامه قابل چاپ",
+      printableQuestionnaireDesc: "به پرسشنامه ارزیابی سلامت قابل چاپ دسترسی داشته باشید.",
+      personalizedReportBrandingTitle: "شخصی‌سازی برند گزارش‌ها",
+      personalizedReportBrandingDesc: "لوگو و اطلاعات تماس خود را در گزارش‌های چاپ‌شده پیکربندی کنید.",
+      annualSubscriptionSub: "اشتراک سالانه پریمیوم",
+      autoRenewTerms: "به طور خودکار سالانه تمدید می‌شود مگر اینکه حداقل ۲۴ ساعت قبل از پایان دوره در تنظیمات فروشگاه لغو شود. لغو در هر زمان.",
+      upgradeToPremium: "ارتقا به پریمیوم",
+      maybeLater: "شاید بعداً",
+      menuTooltipQuestionnaire: "چاپ پرسشنامه‌های خام ارزیابی (Premium)",
+      menuTooltipPrintReport: "چاپ گزارش‌های سلامت سفارشی (Premium)",
+      menuTooltipReportSettings: "شخصی‌سازی برند گزارش و اطلاعات تماس (Premium)",
+
       UpgradeComplete: "ارتقا کامل شد!",
       NowAProMember: "شما اکنون عضو پرو هستید!",
       UpgradeTo: "ارتقا به",
@@ -10498,7 +11098,33 @@ const resources = {
       yearlyPurchase: "سالانہ خریداری",
       thisOneForPro: "اوہو! یہ پرو ممبرز کے لیے ہے۔",
       proMembersDesc:
+
         "یہ سہولت صرف ہمارے پرو ممبرز کے لیے مخصوص ہے۔ شامل ہونا چاہتے ہیں؟ ابھی اپ گریڈ کریں اور خاص طور پر آپ کے لیے تیار کردہ فوائد سے لطف اٹھائیں!",
+
+      unlockHealthAgePremium: "Health Age Premium انلاک کریں",
+      premiumSubtitle: "پریمیم ٹولز اور رپورٹنگ کی خصوصیات کے ساتھ اپنی صحت کے جائزوں سے بھرپور فائدہ اٹھائیں۔",
+      unlimitedAssessmentsTitle: "صحت کے لامحدود جائزے",
+      unlimitedAssessmentsDesc: "مفت روزانہ کی حد کے بغیر لامحدود ہیلتھ ایج جائزے انجام دیں۔",
+      assessmentHistoryTitle: "جائزوں کی تاریخ",
+      assessmentHistoryDesc: "اپنے پچھلے جائزوں کے نتائج محفوظ کریں اور دوبارہ دیکھیں۔",
+      organizedReportHistoryTitle: "منظم رپورٹ کی تاریخ",
+      organizedReportHistoryDesc: "اپنی محفوظ شدہ رپورٹس تک رسائی حاصل کریں اور انہیں گروپس میں منظم کریں۔",
+      csvExportTitle: "CSV ایکسپورٹ",
+      csvExportDesc: "اپنے ریکارڈ کے لیے جائزوں اور رپورٹ کے ڈیٹا کو CSV میں ایکسپورٹ کریں۔",
+      printHealthReportsTitle: "صحت کی رپورٹس پرنٹ کریں",
+      printHealthReportsDesc: "موجودہ رپورٹنگ فیچر کا استعمال کرتے ہوئے اپنی رپورٹس پرنٹ یا شیئر کریں۔",
+      printableQuestionnaireTitle: "پرنٹ کے قابل سوالنامہ",
+      printableQuestionnaireDesc: "پرنٹ کے قابل صحت کے جائزے کے سوالنامے تک رسائی حاصل کریں۔",
+      personalizedReportBrandingTitle: "ذاتی نوعیت کی رپورٹ برانڈنگ",
+      personalizedReportBrandingDesc: "پرنٹ شدہ رپورٹس پر اپنا لوگو اور رابطے کی تفصیلات ترتیب دیں۔",
+      annualSubscriptionSub: "سالانہ پریمیم سبسکرپشن",
+      autoRenewTerms: "ہر سال خودکار طور پر تجدید ہوتی ہے جب تک کہ مدت ختم ہونے سے کم از کم 24 گھنٹے پہلے منسوخ نہ کی جائے۔ کسی بھی وقت منسوخ کریں۔",
+      upgradeToPremium: "پریمیم میں اپ گریڈ کریں",
+      maybeLater: "شاید بعد میں",
+      menuTooltipQuestionnaire: "خالی تشخیصی سوالنامے پرنٹ کریں (Premium)",
+      menuTooltipPrintReport: "اپنی مرضی کے مطابق صحت کی رپورٹس پرنٹ کریں (Premium)",
+      menuTooltipReportSettings: "رپورٹ برانڈنگ اور رابطے کی تفصیلات حسب ضرورت بنائیں (Premium)",
+
       UpgradeComplete: "اپ گریڈ مکمل ہو گیا!",
       NowAProMember: "آپ اب پرو ممبر ہیں!",
       UpgradeTo: "اس میں اپ گریڈ کریں",
@@ -10945,7 +11571,33 @@ const resources = {
       yearlyPurchase: "רכישה שנתית",
       thisOneForPro: "אופס! זה מיועד לחברי PRO.",
       proMembersDesc:
+
         "תכונה זו שמורה לחברי הפרו שלנו. רוצה להצטרף? שדרג עכשיו ותיהנה מהטבות בלעדיות שהותאמו במיוחד עבורך!",
+
+      unlockHealthAgePremium: "שחרור Health Age Premium",
+      premiumSubtitle: "הפק את המרב מהערכות הבריאות שלך עם כלי פרימיום ודוחות מתקדמים.",
+      unlimitedAssessmentsTitle: "הערכות בריאות ללא הגבלה",
+      unlimitedAssessmentsDesc: "בצע הערכות גיל בריאות ללא הגבלה וללא מגבלה יומית חינמית.",
+      assessmentHistoryTitle: "היסטוריית הערכות",
+      assessmentHistoryDesc: "שמור ועיין מחדש בתוצאות ההערכה הקודמות שלך.",
+      organizedReportHistoryTitle: "היסטוריית דוחות מאורגנת",
+      organizedReportHistoryDesc: "גש לדוחות השמורים שלך וארגן אותם בקבוצות.",
+      csvExportTitle: "ייצוא ל-CSV",
+      csvExportDesc: "ייצא נתוני הערכות ודוחות לקובץ CSV עבור התיעוד שלך.",
+      printHealthReportsTitle: "הדפסת דוחות בריאות",
+      printHealthReportsDesc: "הדפס או שתף את דוחות הבריאות שלך באמצעות הפונקציונליות הקיימת.",
+      printableQuestionnaireTitle: "שאלון להדפסה",
+      printableQuestionnaireDesc: "גש לשאלון הערכת הבריאות הניתן להדפסה.",
+      personalizedReportBrandingTitle: "מיתוג דוחות בהתאמה אישית",
+      personalizedReportBrandingDesc: "הגדר לוגו ופרטי קשר שיופיעו בדוחות המודפסים.",
+      annualSubscriptionSub: "מנוי פרימיום שנתי",
+      autoRenewTerms: "מתחדש אוטומטית מדי שנה אלא אם יבוטל בהגדרות החנות לפחות 24 שעות לפני סיום התקופה. ניתן לבטל בכל עת.",
+      upgradeToPremium: "שדרג ל-Premium",
+      maybeLater: "אולי מאוחר יותר",
+      menuTooltipQuestionnaire: "הדפסת שאלון ריק (Premium)",
+      menuTooltipPrintReport: "הדפסת דוח בריאות מותאם אישית (Premium)",
+      menuTooltipReportSettings: "התאמת מיתוג ופרטי קשר בדוח (Premium)",
+
       UpgradeComplete: "השדרוג הושלם!",
       NowAProMember: "אתה עכשיו חבר פרו!",
       UpgradeTo: "שדרג ל-",

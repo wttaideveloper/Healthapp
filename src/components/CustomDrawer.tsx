@@ -43,6 +43,7 @@ export const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (
     navigateLocation?: string;
     subTabs?: Array<{
       name: string;
+      helperKey?: string;
       iconKey: keyof typeof icons;
       navigateLocation: string;
       screen?: string;
@@ -70,6 +71,7 @@ export const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (
       subTabs: [
         {
           name: "PrintQuestion",
+          helperKey: "menuTooltipQuestionnaire",
           iconKey: "print",
           navigateLocation: "PrintScreen",
           screen: "Questionnaire",
@@ -77,6 +79,7 @@ export const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (
         },
         {
           name: "PrintReport",
+          helperKey: "menuTooltipPrintReport",
           iconKey: "print",
           navigateLocation: "PrintScreen",
           screen: "Report",
@@ -84,6 +87,7 @@ export const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (
         },
         {
           name: "reportSetting",
+          helperKey: "menuTooltipReportSettings",
           iconKey: "report",
           navigateLocation: "ReportSettings",
           pro: !hasPremium,
@@ -163,14 +167,21 @@ export const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (
                           source={icons[ee?.iconKey]}
                           style={{ width: 20, height: 20 }}
                         ></Image>
-                        <Font text={ee.name} style={styles.drawerText}></Font>
+                        <View style={{ marginStart: 10, flexShrink: 1 }}>
+                          <Font text={ee.name} style={styles.drawerSubText}></Font>
+                          {ee.pro && ee.helperKey ? (
+                            <Text style={styles.subItemHelper}>
+                              {t(ee.helperKey)}
+                            </Text>
+                          ) : null}
+                        </View>
                       </View>
                       {ee.pro && (
                         <Image
                           source={icons.proSymbol}
                           style={{
-                            width: 48,
-                            height: 22,
+                            width: 44,
+                            height: 20,
                             justifyContent: "flex-end",
                           }}
                         ></Image>
@@ -269,6 +280,17 @@ const styles = StyleSheet.create({
     marginStart: 10,
     fontSize: 16,
     fontWeight: 500,
+  },
+  drawerSubText: {
+    color: "#1F2937",
+    fontSize: 14.5,
+    fontWeight: 500,
+  },
+  subItemHelper: {
+    color: "#6B7280",
+    fontSize: 11,
+    marginTop: 2,
+    lineHeight: 14,
   },
   separator: {
     borderBottomWidth: 1,
