@@ -217,7 +217,7 @@ const PurchaseScreenWeb: React.FC = () => {
             <View style={styles.header}>
                 <Text style={styles.preHeading}>{t("upgradeYourExperience")}</Text>
                 <Text style={styles.mainHeading}>Health Age <Text style={styles.blue}>Pro</Text></Text>
-                <Text style={styles.subHeading}>{t("unlockClinicalInsights")}</Text>
+                <Text style={styles.subHeading}>{t("premiumSubtitle")}</Text>
             </View>
 
             <View style={[styles.grid, isDesktop ? styles.row : styles.column]}>
@@ -235,7 +235,6 @@ const PurchaseScreenWeb: React.FC = () => {
 
                 {/* Middle Column: Subscription (The "Action") */}
                 <View style={[styles.card, styles.highlightCard]}>
-                    <View style={styles.bestValueTag}><Text style={styles.tagText}>{t("popular")}</Text></View>
                     <Text style={styles.cardTitle}>{t("annualPlan")}</Text>
                     <Text style={styles.price}>$49<Text style={styles.period}>{t("perYear")}</Text></Text>
                     {notice ? (
