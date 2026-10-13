@@ -1,4 +1,5 @@
 import React from "react";
+import BackButton from "../components/BackButton";
 import {
   View,
   Text,
@@ -77,6 +78,9 @@ const ChangeLanguage: React.FC<ChangeLanguageProps> = ({ navigation }) => {
     return (
       <ScrollView style={styles.webScroll} contentContainerStyle={styles.webRoot}>
         <View style={styles.webContent}>
+          <View style={{ alignSelf: "flex-start", marginBottom: 12 }}>
+            <BackButton fallback={{ name: "InitialScreen" }} />
+          </View>
           <Text style={styles.webTitle}>{t("selectLanguage")}</Text>
 
           <View style={styles.webGrid}>
@@ -124,6 +128,9 @@ const ChangeLanguage: React.FC<ChangeLanguageProps> = ({ navigation }) => {
   }
   return (
     <ScrollView contentContainerStyle={[styles.container, { paddingBottom: 24 + insets.bottom }]}>
+      <View style={{ alignSelf: "flex-start", marginBottom: 12 }}>
+        <BackButton fallback={{ name: "InitialScreen" }} />
+      </View>
       <View
         style={{
           justifyContent: "center",

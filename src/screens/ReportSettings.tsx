@@ -11,6 +11,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
+import { goBackOrFallback } from "../components/utils/navigationBack";
 import React, { useCallback } from "react";
 import Button from "../components/Button";
 import * as ImagePicker from "expo-image-picker";
@@ -187,7 +188,7 @@ const ReportSettings: React.FC<ReportScreenProps> = ({ navigation, route }) => {
                 style={{ fontWeight: 700, fontSize: 20, color: "#262F40" }}
               ></Font>
               <TouchableOpacity
-                onPress={() => navigation.navigate("Main")}
+                onPress={() => goBackOrFallback(navigation, { name: "Main" })}
                 style={{
                   flexDirection: "row",
                   gap: 4,
@@ -219,8 +220,10 @@ const ReportSettings: React.FC<ReportScreenProps> = ({ navigation, route }) => {
               <Image
                 source={icons.reportSetting}
                 style={{
-                  width: 321,
-                  height: 115,
+                  // Fixed 321px overflowed 320px-wide phones; scale down but never past the artwork size.
+                  width: "100%",
+                  maxWidth: 321,
+                  aspectRatio: 321 / 115,
                   borderWidth: 2,
                   borderColor: "#DFE9F0",
                   borderRadius: 12,

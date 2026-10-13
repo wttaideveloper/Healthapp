@@ -6,7 +6,7 @@
   "version": "1.0.3",
   "main": "index.ts",
   "scripts": {
-    "test": "node --test src/components/utils/csvGenerator.test.ts src/components/utils/pdfBranding.test.ts src/components/utils/usageLimitCore.test.ts src/components/premiumCopy.test.ts",
+    "test": "node --test src/components/utils/csvGenerator.test.ts src/components/utils/pdfBranding.test.ts src/components/utils/usageLimitCore.test.ts src/components/premiumCopy.test.ts src/components/utils/navigationBack.test.ts",
     "start": "expo start --dev-client",
     "android": "expo run:android",
     "ios": "expo run:ios",

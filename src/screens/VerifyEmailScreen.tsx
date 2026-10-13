@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import BackButton from "../components/BackButton";
 import { RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
@@ -77,6 +78,9 @@ const VerifyEmailScreen: React.FC<VerifyEmailProps> = ({ route, navigation }) =>
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
+      <View style={styles.backRow}>
+        <BackButton fallback={{ name: "SignUp" }} />
+      </View>
       <View style={styles.card}>
         <Text style={styles.title}>{t("verifyEmail")}</Text>
         <Text style={styles.subtitle}>Enter the code sent to {targetEmail}.</Text>
@@ -118,6 +122,11 @@ const VerifyEmailScreen: React.FC<VerifyEmailProps> = ({ route, navigation }) =>
 };
 
 const styles = StyleSheet.create({
+  backRow: {
+    width: "100%",
+    maxWidth: 420,
+    marginBottom: 12,
+  },
   container: {
     flex: 1,
     backgroundColor: "#f3f7fb",

@@ -1,4 +1,5 @@
 import React from "react";
+import { goBackOrFallback } from "../components/utils/navigationBack";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { DrawerScreenProps } from "@react-navigation/drawer";
 import { Asset } from "expo-asset";
@@ -371,7 +372,7 @@ const PrintScreenWeb: React.FC<PrintScreenProps> = ({ navigation, route }) => {
           text={docType === "Report" ? "PrintReport" : "PrintQuestion"}
           style={styles.headerTitle}
         />
-        <TouchableOpacity onPress={() => navigation.navigate("Main")} style={styles.closeBtn}>
+        <TouchableOpacity onPress={() => goBackOrFallback(navigation, { name: "Main" })} style={styles.closeBtn}>
           <Font text="Fs_Close" style={styles.closeText} />
           <Image source={icons.close} style={styles.closeIcon} />
         </TouchableOpacity>

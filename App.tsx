@@ -39,6 +39,7 @@ const App: React.FC = () => {
           ChangeLanguage: "change-language",
           SignIn: "signin",
           SignUp: "signup",
+          ForgotPassword: "forgot-password",
           VerifyEmail: "verify-email",
         },
       },

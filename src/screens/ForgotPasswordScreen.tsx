@@ -15,6 +15,7 @@ import { RootStackParamList } from "../navigation/AppNavigator";
 import { authService } from "../components/utils/authService";
 import { isValidEmail } from "../components/utils/validation";
 import { Ionicons } from "@expo/vector-icons";
+import BackButton from "../components/BackButton";
 import { icons } from "../components/images";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
@@ -218,6 +219,9 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
       <View style={styles.webShell}>
         <View style={styles.webFrame}>
           <View style={styles.webHero}>
+            <View style={{ marginBottom: 16 }}>
+              <BackButton fallback={{ name: "SignIn" }} />
+            </View>
             <Image source={icons.menuLogo} style={styles.webLogo} />
             <Text style={styles.webHeroTitle}>{t("resetYourPassword")}</Text>
             <Text style={styles.webHeroText}>{t("resetPasswordHeroDesc")}</Text>
@@ -239,15 +243,11 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
       style={[styles.container, isNativeMobile ? styles.mobileContainer : null]}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      {isNativeMobile ? (
-        <View style={styles.mobileTopBackRow}>
-          <View style={styles.mobileTopBackInner}>
-            <TouchableOpacity style={styles.mobileBackButton} onPress={backToSignIn}>
-              <Ionicons name="arrow-back" size={18} color="#475569" style={flipIcon()} />
-            </TouchableOpacity>
-          </View>
+      <View style={styles.mobileTopBackRow}>
+        <View style={styles.mobileTopBackInner}>
+          <BackButton fallback={{ name: "SignIn" }} />
         </View>
-      ) : null}
+      </View>
       <View
         style={[
           styles.card,

@@ -14,6 +14,9 @@ import HealthAgeTest from "../screens/healthAgeTest";
 import questions from "../screens/QuestionsScreen";
 import QuestionsScreen from "../screens/QuestionsScreen";
 import { createStackNavigator } from "@react-navigation/stack";
+import BackButton from "../components/BackButton";
+import { nextDesktopShell } from "../components/utils/shellBreakpoints";
+import { shouldShowShellBack } from "../components/utils/navigationBack";
 import ReportScreen from "../screens/ReportScreen";
 import InterestScreen from "../screens/InterestScreen";
 import ReportSettings from "../screens/ReportSettings";
@@ -308,6 +311,10 @@ const WebShellHeader: React.FC<{
 }> = ({ navigation, hasPremium, onRequireUpgrade }) => {
   const { t } = useTranslation();
   const { user, signOut, isAuthenticated } = useAuth();
+  // Below ~1040px the full-size header needs more than the window offers (the desktop shell starts at
+  // 900px), which pushed "Upgrade" past the edge and caused horizontal scrolling. Tighten spacing instead.
+  const { width: windowWidth } = useWindowDimensions();
+  const compact = windowWidth < COMPACT_HEADER_MAX_WIDTH;
   const initial = (user?.name?.trim()?.[0] ?? user?.email?.trim()?.[0] ?? "A").toUpperCase();
   const [currentLanguage, setCurrentLanguage] = React.useState(
     (i18n.language ?? "en").split("-")[0].toLowerCase()
@@ -425,7 +432,7 @@ const WebShellHeader: React.FC<{
   }, [languageOpen, reportsOpen]);
 
   return (
-    <View style={webStyles.navbar}>
+    <View style={[webStyles.navbar, compact ? webCompact.navbar : null]}>
       {reportsOpen || languageOpen ? (
         <TouchableOpacity
           activeOpacity={1}
@@ -438,24 +445,24 @@ const WebShellHeader: React.FC<{
       ) : null}
       <View style={webStyles.navInner}>
         <TouchableOpacity style={webStyles.brand} onPress={() => goRoot("Main")}>
-          <Image source={icons.menuLogo} style={webStyles.brandLogo} />
+          <Image source={icons.menuLogo} style={[webStyles.brandLogo, compact ? webCompact.brandLogo : null]} />
         </TouchableOpacity>
 
-        <View style={webStyles.links}>
+        <View style={[webStyles.links, compact ? webCompact.links : null]}>
           <TouchableOpacity
-            style={[webStyles.linkBtn, isHomeActive ? webStyles.linkBtnActive : null]}
+            style={[webStyles.linkBtn, compact ? webCompact.linkBtn : null, isHomeActive ? webStyles.linkBtnActive : null]}
             onPress={() => goRoot("Main")}
           >
             <Text style={[webStyles.linkText, isHomeActive ? webStyles.linkTextActive : null]}>{t("home")}</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[webStyles.linkBtn, isPurchaseActive ? webStyles.linkBtnActive : null]}
+            style={[webStyles.linkBtn, compact ? webCompact.linkBtn : null, isPurchaseActive ? webStyles.linkBtnActive : null]}
             onPress={() => goRoot("Purchase")}
           >
             <Text style={[webStyles.linkText, isPurchaseActive ? webStyles.linkTextActive : null]}>{t("purchase")}</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[webStyles.linkBtn, isHistoryActive ? webStyles.linkBtnActive : null]}
+            style={[webStyles.linkBtn, compact ? webCompact.linkBtn : null, isHistoryActive ? webStyles.linkBtnActive : null]}
             onPress={() => {
               if (hasPremium) {
                 goRoot("HistoryScreen");
@@ -467,7 +474,7 @@ const WebShellHeader: React.FC<{
             <Text style={[webStyles.linkText, isHistoryActive ? webStyles.linkTextActive : null]}>{t("history")}</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[webStyles.linkBtn, isAboutActive ? webStyles.linkBtnActive : null]}
+            style={[webStyles.linkBtn, compact ? webCompact.linkBtn : null, isAboutActive ? webStyles.linkBtnActive : null]}
             onPress={() => goRoot("AboutAppScreen")}
           >
             <Text style={[webStyles.linkText, isAboutActive ? webStyles.linkTextActive : null]}>{t("about")}</Text>
@@ -475,7 +482,7 @@ const WebShellHeader: React.FC<{
 
           <View style={webStyles.dropdownWrap as any}>
             <TouchableOpacity
-              style={[webStyles.linkBtn, isReportsActive ? webStyles.linkBtnActive : null]}
+              style={[webStyles.linkBtn, compact ? webCompact.linkBtn : null, isReportsActive ? webStyles.linkBtnActive : null]}
               onPress={() => {
                 setLanguageOpen(false);
                 setReportsOpen((v) => !v);
@@ -546,13 +553,13 @@ const WebShellHeader: React.FC<{
 
         </View>
 
-        <View style={webStyles.right}>
+        <View style={[webStyles.right, compact ? webCompact.right : null]}>
           <TouchableOpacity style={webStyles.logoutPillBtn} onPress={handleLogout}>
             <Text style={webStyles.logoutPillText}>{isAuthenticated ? "Logout" : "Login"}</Text>
           </TouchableOpacity>
           <View style={webStyles.dropdownWrap as any}>
             <TouchableOpacity
-              style={webStyles.langPill}
+              style={[webStyles.langPill, compact ? webCompact.langPill : null]}
               onPress={() => {
                 setReportsOpen(false);
                 setLanguageOpen((v) => !v);
@@ -602,59 +609,87 @@ const WebShellHeader: React.FC<{
   );
 };
 
+// The page wrappers and the wrapped screens live at MODULE level on purpose. When they were created
+// inside WebNavigator, every render produced brand-new component types, so React Navigation
+// unmounted and remounted every screen on each render. DrawerNavigator re-renders on every window
+// resize (useWindowDimensions), so resizing the window wiped in-progress state (for example the
+// assessment answers). Stable identities keep screens mounted while the window is resized.
+const WebPage: React.FC<{ children: React.ReactNode; routeName?: string }> = ({ children, routeName }) => {
+  return (
+    <View style={webStyles.page}>
+      <View style={webStyles.pageInner}>
+        {shouldShowShellBack(routeName) ? (
+          <View style={webStyles.backRow}>
+            <BackButton fallback={{ name: "Main" }} />
+          </View>
+        ) : null}
+        {children}
+      </View>
+    </View>
+  );
+};
+const WebPageFullBleed: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Web scrolls this page via CSS (webStyles.page's overflowY), which has no
+  // native equivalent. Only HomeScreen (the sole user of this wrapper) has no
+  // ScrollView of its own, so wrapping in one here on native is safe — no
+  // risk of the nested-ScrollView collapse that would happen on the other
+  // (WebPage-wrapped) screens, which already scroll internally.
+  if (Platform.OS === "web") {
+    return (
+      <View style={[webStyles.page, webStyles.pageNoPadding]}>
+        <View style={webStyles.pageInnerFluid}>{children}</View>
+      </View>
+    );
+  }
+
+  return (
+    <ScrollView
+      style={[webStyles.page, webStyles.pageNoPadding]}
+      contentContainerStyle={{ flexGrow: 1 }}
+    >
+      <View style={webStyles.pageInnerFluid}>{children}</View>
+    </ScrollView>
+  );
+};
+
+const wrap = <P extends object>(Component: React.ComponentType<P>) => {
+  const Wrapped = (props: P) => (
+    <WebPage routeName={(props as any)?.route?.name}>
+      <Component {...props} />
+    </WebPage>
+  );
+  Wrapped.displayName = `WebPage(${Component.displayName ?? Component.name ?? "Screen"})`;
+  return Wrapped;
+};
+const wrapFullBleed = <P extends object>(Component: React.ComponentType<P>) => {
+  const Wrapped = (props: P) => (
+    <WebPageFullBleed>
+      <Component {...props} />
+    </WebPageFullBleed>
+  );
+  Wrapped.displayName = `WebPageFullBleed(${Component.displayName ?? Component.name ?? "Screen"})`;
+  return Wrapped;
+};
+
+const WebMainScreen = wrapFullBleed(HomeScreen as any);
+const WebCheckoutResultScreen = wrap(CheckoutResultScreen as any);
+const WebPurchaseScreen = wrap(PurchaseScreen as any);
+const WebHistoryScreen = wrap(HistoryScreen as any);
+const WebAboutAppScreen = wrap(AboutAppScreen as any);
+const WebReportSettingsScreen = wrap(ReportSettings as any);
+const WebPrintScreen = wrap(PrintScreen as any);
+const WebHealthAgeTestScreen = wrap(HealthAgeTest as any);
+const WebQuestionsScreen = wrap(QuestionsScreen as any);
+const WebInterestScreen = wrap(InterestScreen as any);
+const WebReportScreen = wrap(ReportScreen as any);
+const WebGroupDetailsScreen = wrap(GroupDetailsScreen as any);
+const WebFilterScreen = wrap(FilterScreen as any);
+
 const WebNavigator: React.FC = () => {
   const { isSubscribed } = useSubscription();
   const hasPremium = Boolean(isSubscribed);
   const [showUpgradeModal, setShowUpgradeModal] = React.useState(false);
   const navRef = React.useRef<any>(null);
-
-  const WebPage: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    return (
-      <View style={webStyles.page}>
-        <View style={webStyles.pageInner}>{children}</View>
-      </View>
-    );
-  };
-  const WebPageFullBleed: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    // Web scrolls this page via CSS (webStyles.page's overflowY), which has no
-    // native equivalent. Only HomeScreen (the sole user of this wrapper) has no
-    // ScrollView of its own, so wrapping in one here on native is safe — no
-    // risk of the nested-ScrollView collapse that would happen on the other
-    // (WebPage-wrapped) screens, which already scroll internally.
-    if (Platform.OS === "web") {
-      return (
-        <View style={[webStyles.page, webStyles.pageNoPadding]}>
-          <View style={webStyles.pageInnerFluid}>{children}</View>
-        </View>
-      );
-    }
-
-    return (
-      <ScrollView
-        style={[webStyles.page, webStyles.pageNoPadding]}
-        contentContainerStyle={{ flexGrow: 1 }}
-      >
-        <View style={webStyles.pageInnerFluid}>{children}</View>
-      </ScrollView>
-    );
-  };
-
-  const wrap =
-    <P extends object>(Component: React.ComponentType<P>) =>
-    (props: P) =>
-      (
-        <WebPage>
-          <Component {...props} />
-        </WebPage>
-      );
-  const wrapFullBleed =
-    <P extends object>(Component: React.ComponentType<P>) =>
-    (props: P) =>
-      (
-        <WebPageFullBleed>
-          <Component {...props} />
-        </WebPageFullBleed>
-      );
 
   return (
     <>
@@ -679,20 +714,20 @@ const WebNavigator: React.FC = () => {
           };
         }}
       >
-        <WebStack.Screen name="Main" component={wrapFullBleed(HomeScreen as any)} />
-        <WebStack.Screen name="success" component={wrap(CheckoutResultScreen as any)} />
-        <WebStack.Screen name="cancel" component={wrap(CheckoutResultScreen as any)} />
-        <WebStack.Screen name="Purchase" component={wrap(PurchaseScreen as any)} />
-        <WebStack.Screen name="HistoryScreen" component={wrap(HistoryScreen as any)} />
-        <WebStack.Screen name="AboutAppScreen" component={wrap(AboutAppScreen as any)} />
-        <WebStack.Screen name="ReportSettings" component={wrap(ReportSettings as any)} />
-        <WebStack.Screen name="PrintScreen" component={wrap(PrintScreen as any)} />
-        <WebStack.Screen name="healthAgeTest" component={wrap(HealthAgeTest as any)} />
-        <WebStack.Screen name="QuestionsScreen" component={wrap(QuestionsScreen as any)} />
-        <WebStack.Screen name="InterestScreen" component={wrap(InterestScreen as any)} />
-        <WebStack.Screen name="ReportScreen" component={wrap(ReportScreen as any)} />
-        <WebStack.Screen name="GroupDetailsScreen" component={wrap(GroupDetailsScreen as any)} />
-        <WebStack.Screen name="FilterScreen" component={wrap(FilterScreen as any)} />
+        <WebStack.Screen name="Main" component={WebMainScreen} />
+        <WebStack.Screen name="success" component={WebCheckoutResultScreen} />
+        <WebStack.Screen name="cancel" component={WebCheckoutResultScreen} />
+        <WebStack.Screen name="Purchase" component={WebPurchaseScreen} />
+        <WebStack.Screen name="HistoryScreen" component={WebHistoryScreen} />
+        <WebStack.Screen name="AboutAppScreen" component={WebAboutAppScreen} />
+        <WebStack.Screen name="ReportSettings" component={WebReportSettingsScreen} />
+        <WebStack.Screen name="PrintScreen" component={WebPrintScreen} />
+        <WebStack.Screen name="healthAgeTest" component={WebHealthAgeTestScreen} />
+        <WebStack.Screen name="QuestionsScreen" component={WebQuestionsScreen} />
+        <WebStack.Screen name="InterestScreen" component={WebInterestScreen} />
+        <WebStack.Screen name="ReportScreen" component={WebReportScreen} />
+        <WebStack.Screen name="GroupDetailsScreen" component={WebGroupDetailsScreen} />
+        <WebStack.Screen name="FilterScreen" component={WebFilterScreen} />
       </WebStack.Navigator>
 
       <UpgradeModal
@@ -707,6 +742,28 @@ const WebNavigator: React.FC = () => {
   );
 };
 
+// Hamburger + logo header used by the drawer screens, with a Back button in front of it when the
+// drawer has real history to return to (backBehavior="history" below). Main never shows it.
+const DrawerMenuHeaderLeft: React.FC<{ navigation: any }> = ({ navigation }) => (
+  <View
+    style={{
+      flexDirection: "row",
+      gap: 8,
+      justifyContent: "center",
+      alignItems: "center",
+      marginHorizontal: 20,
+    }}
+  >
+    {navigation.canGoBack?.() ? (
+      <BackButton iconOnly fallback={null} onPress={() => navigation.goBack()} />
+    ) : null}
+    <TouchableOpacity onPress={() => navigation.openDrawer()}>
+      <Image source={icons.menu} style={{ width: 32, height: 32 }}></Image>
+    </TouchableOpacity>
+    <Image source={icons.menuLogo} style={{ width: 111, height: 35 }}></Image>
+  </View>
+);
+
 const DrawerScreens: React.FC = () => {
   // React Navigation defaults drawerPosition to I18nManager.isRTL, which it reads
   // once when the navigator mounts. Because forceRTL() cannot re-layout a running
@@ -718,6 +775,9 @@ const DrawerScreens: React.FC = () => {
   return (
     <Drawer.Navigator
       id={undefined}
+      // "history" makes goBack() / Android back return to the screen the user came from instead of
+      // always jumping to the first route (Main).
+      backBehavior="history"
       screenOptions={{ drawerPosition: isRtl ? "right" : "left" }}
       drawerContent={(props) => <CustomDrawerContent {...props} />}
       initialRouteName="Main"
@@ -845,28 +905,7 @@ const DrawerScreens: React.FC = () => {
           },
           headerTitleAlign: "center",
           headerTitle: () => null,
-          headerLeft: () => (
-            <View
-              style={{
-                flexDirection: "row",
-                gap: 8,
-                justifyContent: "center",
-                alignItems: "center",
-                marginHorizontal: 20,
-              }}
-            >
-              <TouchableOpacity onPress={() => navigation.openDrawer()}>
-                <Image
-                  source={icons.menu}
-                  style={{ width: 32, height: 32 }}
-                ></Image>
-              </TouchableOpacity>
-              <Image
-                source={icons.menuLogo}
-                style={{ width: 111, height: 35 }}
-              ></Image>
-            </View>
-          ),
+          headerLeft: () => <DrawerMenuHeaderLeft navigation={navigation} />,
           headerRight: () => <HeaderRight navigation={navigation} />,
         })}
       />
@@ -882,28 +921,7 @@ const DrawerScreens: React.FC = () => {
           },
           headerTitleAlign: "center",
           headerTitle: () => null,
-          headerLeft: () => (
-            <View
-              style={{
-                flexDirection: "row",
-                gap: 8,
-                justifyContent: "center",
-                alignItems: "center",
-                marginHorizontal: 20,
-              }}
-            >
-              <TouchableOpacity onPress={() => navigation.openDrawer()}>
-                <Image
-                  source={icons.menu}
-                  style={{ width: 32, height: 32 }}
-                ></Image>
-              </TouchableOpacity>
-              <Image
-                source={icons.menuLogo}
-                style={{ width: 111, height: 35 }}
-              ></Image>
-            </View>
-          ),
+          headerLeft: () => <DrawerMenuHeaderLeft navigation={navigation} />,
           headerRight: () => null,
         })}
       />
@@ -919,28 +937,7 @@ const DrawerScreens: React.FC = () => {
           },
           headerTitleAlign: "center",
           headerTitle: () => null,
-          headerLeft: () => (
-            <View
-              style={{
-                flexDirection: "row",
-                gap: 8,
-                justifyContent: "center",
-                alignItems: "center",
-                marginHorizontal: 20,
-              }}
-            >
-              <TouchableOpacity onPress={() => navigation.openDrawer()}>
-                <Image
-                  source={icons.menu}
-                  style={{ width: 32, height: 32 }}
-                ></Image>
-              </TouchableOpacity>
-              <Image
-                source={icons.menuLogo}
-                style={{ width: 111, height: 35 }}
-              ></Image>
-            </View>
-          ),
+          headerLeft: () => <DrawerMenuHeaderLeft navigation={navigation} />,
           headerRight: () => <HeaderRight navigation={navigation} />,
         })}
       />
@@ -956,28 +953,7 @@ const DrawerScreens: React.FC = () => {
           },
           headerTitleAlign: "center",
           headerTitle: () => null,
-          headerLeft: () => (
-            <View
-              style={{
-                flexDirection: "row",
-                gap: 8,
-                justifyContent: "center",
-                alignItems: "center",
-                marginHorizontal: 20,
-              }}
-            >
-              <TouchableOpacity onPress={() => navigation.openDrawer()}>
-                <Image
-                  source={icons.menu}
-                  style={{ width: 32, height: 32 }}
-                ></Image>
-              </TouchableOpacity>
-              <Image
-                source={icons.menuLogo}
-                style={{ width: 111, height: 35 }}
-              ></Image>
-            </View>
-          ),
+          headerLeft: () => <DrawerMenuHeaderLeft navigation={navigation} />,
           headerRight: () => <HeaderRight navigation={navigation} />,
         })}
       />
@@ -1105,10 +1081,14 @@ const DrawerScreens: React.FC = () => {
 const DrawerNavigator: React.FC = () => {
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
-  const WEB_DESKTOP_MIN_WIDTH = 900;
+  // Hysteresis (900 to enter, 860 to leave) so dragging a window edge across the breakpoint does
+  // not flip shells back and forth; every flip swaps the navigator and remounts the screens.
+  const wasDesktopShell = React.useRef(false);
+  const desktopShell = nextDesktopShell(wasDesktopShell.current, width);
+  wasDesktopShell.current = desktopShell;
 
   // Web desktop gets the top navbar layout. Web narrow (mobile-sized) uses the normal drawer UI.
-  const isWebDesktop = Platform.OS === "web" && width >= WEB_DESKTOP_MIN_WIDTH;
+  const isWebDesktop = Platform.OS === "web" && desktopShell;
 
   // Mac Catalyst reports Platform.OS === "ios" (same as iPhone/iPad), so the check
   // above never matches it: the Mac app fell through to the phone-sized hamburger
@@ -1116,7 +1096,7 @@ const DrawerNavigator: React.FC = () => {
   // Guideline 4.2 "minimal/mobile-feeling" finding). isMacCatalyst() detects the
   // Mac Catalyst runtime specifically and is never true on iPhone/iPad/Android, so
   // this branch cannot change iOS or Android behavior.
-  const isMacDesktop = isMacCatalyst() && width >= WEB_DESKTOP_MIN_WIDTH;
+  const isMacDesktop = isMacCatalyst() && desktopShell;
 
   // Mac gets the same desktop navbar shell as wide web rather than a parallel
   // reimplementation (WebNavigator/WebShellHeader below have been audited and
@@ -1147,7 +1127,24 @@ const DrawerNavigator: React.FC = () => {
 
 export default DrawerNavigator;
 
+const COMPACT_HEADER_MAX_WIDTH = 1040;
+
+// Spacing overrides applied to the desktop header on narrower windows.
+const webCompact = StyleSheet.create({
+  navbar: { paddingHorizontal: 12 },
+  brandLogo: { width: 118, height: 34 },
+  links: { gap: 0 },
+  linkBtn: { paddingHorizontal: 7, gap: 4 },
+  right: { gap: 6 },
+  langPill: { paddingHorizontal: 8, gap: 6 },
+});
+
 const webStyles = StyleSheet.create({
+  backRow: {
+    paddingTop: 12,
+    paddingBottom: 4,
+    paddingHorizontal: 4,
+  },
   navbar: {
     height: 74,
     backgroundColor: "#FFFFFF",

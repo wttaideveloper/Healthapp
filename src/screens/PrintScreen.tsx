@@ -1,4 +1,5 @@
 import { Alert, Image, Platform, StyleSheet, TouchableOpacity, View } from "react-native";
+import { goBackOrFallback } from "../components/utils/navigationBack";
 import React, { useCallback } from "react";
 import Button from "../components/Button";
 import * as FileSystem from "expo-file-system";
@@ -433,7 +434,7 @@ const PrintScreen: React.FC<PrintScreenProps> = ({ navigation, route }) => {
           style={{ fontWeight: 700, fontSize: 20, color: "#262F40" }}
         />
         <TouchableOpacity
-          onPress={() => navigation.navigate("Main")}
+          onPress={() => goBackOrFallback(navigation, { name: "Main" })}
           style={{
             flexDirection: "row",
             gap: 4,

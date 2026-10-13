@@ -17,6 +17,7 @@ import { isValidEmail, isValidName } from "../components/utils/validation";
 import { icons } from "../components/images";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
+import BackButton from "../components/BackButton";
 import { useTranslation } from "react-i18next";
 import { flipIcon, textAlign } from "../components/utils/rtl";
 import { type ValidationError } from "../components/utils/localizedValidation";
@@ -205,6 +206,9 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
       <View style={styles.webShell}>
         <View style={styles.webFrame}>
           <View style={styles.webHero}>
+            <View style={{ marginBottom: 16 }}>
+              <BackButton fallback={{ name: "SignIn" }} />
+            </View>
             <Image source={icons.menuLogo} style={styles.webLogo} />
             <Text style={styles.webHeroTitle}>{t("joinHealthAge")}</Text>
             <Text style={styles.webHeroText}>{t("signUpHeroDesc")}</Text>
@@ -226,15 +230,11 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
       style={[styles.container, isNativeMobile ? styles.mobileContainer : null]}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      {isNativeMobile ? (
-        <View style={styles.mobileTopBackRow}>
-          <View style={styles.mobileTopBackInner}>
-            <TouchableOpacity style={styles.mobileBackButton} onPress={backToSignIn}>
-              <Ionicons name="arrow-back" size={18} color="#475569" style={flipIcon()} />
-            </TouchableOpacity>
-          </View>
+      <View style={styles.mobileTopBackRow}>
+        <View style={styles.mobileTopBackInner}>
+          <BackButton fallback={{ name: "SignIn" }} />
         </View>
-      ) : null}
+      </View>
       <View
         style={[
           styles.card,

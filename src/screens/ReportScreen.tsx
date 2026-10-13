@@ -28,6 +28,7 @@ import * as Sharing from "expo-sharing";
 import { useTranslation } from "react-i18next";
 import { calculateBMIValues } from "../components/utils/BmiCalculation";
 import { CommonActions, useFocusEffect } from "@react-navigation/native";
+import { previousRouteName, REPORT_RETURN_ROUTES } from "../components/utils/navigationBack";
 import { useAuth } from "../context/authContext";
 import { getApiRoot } from "../components/utils/api";
 import { deleteReports } from "../components/utils/reportService";
@@ -141,6 +142,17 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
     );
   }, [navigation]);
 
+  // Opened from History or a report group: go back to it. Opened from the assessment flow
+  // (Interests): keep returning Home so Back never lands on a screen that re-submits.
+  const closeReport = React.useCallback(() => {
+    const previous = previousRouteName(navigation.getState?.());
+    if (previous && REPORT_RETURN_ROUTES.includes(previous) && navigation.canGoBack()) {
+      navigation.goBack();
+      return;
+    }
+    goHomeFromReport();
+  }, [navigation, goHomeFromReport]);
+
   const getHtmlToPdf = React.useCallback(() => {
     if (Platform.OS === "web") {
       return null;
@@ -235,13 +247,13 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
   useFocusEffect(
     React.useCallback(() => {
       const backAction = () => {
-        goHomeFromReport();
+        closeReport();
         return true;
       };
 
       const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
       return () => backHandler.remove();
-    }, [goHomeFromReport])
+    }, [closeReport])
   );
   const { answers } = route?.params;
   const reportId = route?.params?.reportId;
@@ -774,7 +786,7 @@ const ReportScreen: React.FC<ReportScreenProps> = ({ navigation, route }) => {
             </TouchableOpacity>
           ) : null}
           <TouchableOpacity
-            onPress={goHomeFromReport}
+            onPress={closeReport}
             style={{
               flexDirection: "row",
               gap: 4,
