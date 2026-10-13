@@ -44,6 +44,8 @@ import { useTranslation } from "react-i18next";
 import UpgradeModal from "../components/upgradeModal";
 import { verifySubscriptionStatus } from "../components/utils/purchase";
 import { forwardIcon } from "../components/utils/rtl";
+import { notify } from "../components/utils/notify";
+import { EmptyGroupExportError } from "../components/utils/csvGenerator";
 
 // type HistoryScreenProps = {navigation: DrawerScreenProps<DrawerParamList, "HistoryScreen">}
 type NavigationProps = StackNavigationProp<StackParamList, "HistoryScreen">;
@@ -266,24 +268,24 @@ const HistoryScreen: React.FC<NavigationProps> = () => {
     }, [tab])
   );
 
+  const [exportingGroupId, setExportingGroupId] = React.useState<string | null>(
+    null
+  );
   const handleExport = async (groupId: string, groupName: string) => {
+    if (exportingGroupId) return;
+    setExportingGroupId(groupId);
     try {
-      const fileUri = await exportGroupReportsToCSV(groupId, groupName);
-      Alert.alert(t("success"), `${t("exportedTo")} ${fileUri}`, [
-        {
-          text: t("Fs_Close"),
-          onPress: () => null,
-          style: "cancel",
-        },
-      ]);
+      const location = await exportGroupReportsToCSV(groupId, groupName);
+      notify(t("success"), `${t("exportedTo")} ${location}`);
     } catch (error) {
-      Alert.alert(t("Error"), "", [
-        {
-          text: t("Fs_Close"),
-          onPress: () => null,
-          style: "cancel",
-        },
-      ]);
+      notify(
+        t("Error"),
+        error instanceof EmptyGroupExportError
+          ? t("csvExportEmptyGroup")
+          : t("csvExportFailed")
+      );
+    } finally {
+      setExportingGroupId(null);
     }
   };
   const { t } = useTranslation();
@@ -940,6 +942,32 @@ const HistoryScreen: React.FC<NavigationProps> = () => {
                       }}
                     ></Font>
                   </View>
+                  <View
+                    style={{ flexDirection: "row", alignItems: "center", gap: 16 }}
+                  >
+                    <TouchableOpacity
+                      onPress={() => handleExport(val.id, val.name)}
+                      disabled={exportingGroupId !== null}
+                      accessibilityRole="button"
+                      accessibilityLabel={`${t("exportCsv")}: ${val.name}`}
+                      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 4,
+                        opacity: exportingGroupId !== null ? 0.5 : 1,
+                      }}
+                    >
+                      <Image
+                        source={icons.csv}
+                        style={{ width: 16, height: 16 }}
+                        resizeMode="contain"
+                      />
+                      <Font
+                        text="exportCsv"
+                        style={{ color: "#0B9FD4", fontWeight: 500, fontSize: 13 }}
+                      ></Font>
+                    </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => {
                       navigation.navigate("GroupDetailsScreen", {
@@ -947,7 +975,6 @@ const HistoryScreen: React.FC<NavigationProps> = () => {
                         groupId: val.id,
                       });
                     }}
-                    // onPress={() => handleExport(val.id, val.name)}
                     // onPress={() =>
                     //   navigation.navigate("GroupDetailsScreen", {
                     //     groupName: val.name,
@@ -978,6 +1005,7 @@ const HistoryScreen: React.FC<NavigationProps> = () => {
                       }}
                     ></Image>
                   </TouchableOpacity>
+                  </View>
                 </View>
               </TouchableOpacity>
             ))

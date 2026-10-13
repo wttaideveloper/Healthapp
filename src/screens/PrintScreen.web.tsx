@@ -1,10 +1,13 @@
 import React from "react";
-import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { DrawerScreenProps } from "@react-navigation/drawer";
 import { Asset } from "expo-asset";
 import Button from "../components/Button";
 import Font from "../components/CustomisedFont";
 import { icons } from "../components/images";
+import { getSettings } from "../components/utils/reportService";
+import { brandTemplatePdf, stripDataUrlPrefix } from "../components/utils/pdfBranding";
+import { notify } from "../components/utils/notify";
 import { DrawerParamList } from "../navigation/DrawerNavigator";
 import i18n from "../components/i18n";
 import { useTranslation } from "react-i18next";
@@ -252,7 +255,48 @@ const questionnaireTemplates: Record<PaperSize, Record<LanguageCode, number>> = 
   },
 };
 
-const downloadAssetPdf = async (moduleId: number, fileName: string) => {
+type BrandingSettings = {
+  image?: string | null;
+  phoneNumber?: string | null;
+  address?: string | null;
+};
+
+const triggerBrowserDownload = (bytes: Uint8Array | ArrayBuffer, fileName: string) => {
+  const blob = new Blob([bytes as BlobPart], { type: "application/pdf" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = fileName;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+};
+
+/** data: URLs are used directly; blob:/http URLs are fetched and re-encoded as base64. */
+const loadLogoBase64 = async (uri: string): Promise<string | null> => {
+  if (/^data:/i.test(uri)) {
+    return stripDataUrlPrefix(uri);
+  }
+  try {
+    const res = await fetch(uri);
+    if (!res.ok) return null;
+    const bytes = new Uint8Array(await res.arrayBuffer());
+    let binary = "";
+    for (let i = 0; i < bytes.byteLength; i += 1) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary);
+  } catch {
+    return null;
+  }
+};
+
+type DownloadOutcome = { warnings: Array<"logo" | "contact"> };
+
+const downloadAssetPdf = async (
+  moduleId: number,
+  fileName: string,
+  settings: BrandingSettings | null
+): Promise<DownloadOutcome> => {
   const asset = Asset.fromModule(moduleId);
   await asset.downloadAsync();
   const res = await fetch(asset.uri);
@@ -260,13 +304,30 @@ const downloadAssetPdf = async (moduleId: number, fileName: string) => {
     throw new Error(`Failed to fetch PDF asset: ${res.status}`);
   }
   const ab = await res.arrayBuffer();
-  const blob = new Blob([ab], { type: "application/pdf" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = fileName;
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+  const hasBranding = Boolean(
+    settings?.image || settings?.phoneNumber?.trim() || settings?.address?.trim()
+  );
+  if (!hasBranding) {
+    triggerBrowserDownload(ab, fileName);
+    return { warnings: [] };
+  }
+
+  const warnings: DownloadOutcome["warnings"] = [];
+  let logo: string | null = null;
+  if (settings?.image) {
+    logo = await loadLogoBase64(settings.image);
+    if (!logo) warnings.push("logo");
+  }
+  const branded = await brandTemplatePdf(new Uint8Array(ab), {
+    logo,
+    address: settings?.address,
+    phoneNumber: settings?.phoneNumber,
+  });
+  if (branded.logoFailed && !warnings.includes("logo")) warnings.push("logo");
+  if (branded.contactCharsDropped) warnings.push("contact");
+  triggerBrowserDownload(branded.bytes, fileName);
+  return { warnings };
 };
 
 const PrintScreenWeb: React.FC<PrintScreenProps> = ({ navigation, route }) => {
@@ -286,11 +347,20 @@ const PrintScreenWeb: React.FC<PrintScreenProps> = ({ navigation, route }) => {
     try {
       const template = getTemplateAsset(paperSize);
       const fileName = `${docType.toLowerCase()}_${paperSize.toLowerCase()}_${language}.pdf`;
-      await downloadAssetPdf(template, fileName);
-      Alert.alert(t("downloaded"), fileName);
+      const settings = (await getSettings()) as BrandingSettings | null;
+      const { warnings } = await downloadAssetPdf(template, fileName, settings);
+      notify(t("downloaded"), fileName);
+      if (warnings.length) {
+        notify(
+          t("errorTitle"),
+          warnings
+            .map((w) => (w === "logo" ? t("brandingLogoInvalid") : t("brandingContactUnsupported")))
+            .join("\n")
+        );
+      }
     } catch (error) {
       const message = error instanceof Error ? error.message : "Download failed";
-      Alert.alert(t("errorTitle"), message);
+      notify(t("errorTitle"), message);
     }
   };
 

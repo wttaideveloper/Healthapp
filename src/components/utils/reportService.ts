@@ -4,7 +4,13 @@ import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
-import { generateCSV } from './csvGenerator';
+import {
+  buildCsvFileName,
+  buildReportRows,
+  CSV_BOM,
+  EmptyGroupExportError,
+  generateCSV,
+} from './csvGenerator';
 
 const isWeb = Platform.OS === "web";
 const webImpl = () => require("./reportService.web") as typeof import("./reportService.web");
@@ -102,6 +108,28 @@ export const getTodayReportCount = async (): Promise<number> => {
   } catch (error) {
     console.warn('Error fetching today\'s report count:', error);
     return 0;
+  }
+};
+
+
+// Like getTodayReportCount, but returns null when the count cannot be read so callers
+// enforcing the free-tier limit can fail closed instead of treating an error as 0.
+export const getTodayReportCountOrNull = async (): Promise<number | null> => {
+  try {
+    if (isWeb) {
+      return await webImpl().getTodayReportCount();
+    }
+    await waitForDatabase();
+    const db = getDatabase();
+    const todayDate = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+    const result = await db.getFirstAsync<{ count: number }>(
+      `SELECT COUNT(*) as count FROM reports WHERE date = ?`,
+      todayDate
+    );
+    return result?.count ?? 0;
+  } catch (error) {
+    console.warn("Error fetching today's report count:", error);
+    return null;
   }
 };
 
@@ -481,6 +509,7 @@ export const exportGroupReportsToCSV = async (groupId: string, groupName: string
     return webImpl().exportGroupReportsToCSV(groupId, groupName);
   }
   try {
+    await waitForDatabase();
     const db = getDatabase();
     // 1. Fetch reports
     const reports = await db.getAllAsync<ReportData>(`
@@ -491,34 +520,21 @@ export const exportGroupReportsToCSV = async (groupId: string, groupName: string
     `, groupId);
 
     if (!reports.length) {
-      throw new Error('No reports found in this group');
+      throw new EmptyGroupExportError();
     }
 
-    // 2. Format data
-    const formattedData = reports.map(report => {
-      const metrics = JSON.parse(report.report_data);
-      return {
-        'Report ID': report.id,
-        'User Name': report.user_name,
-        'User Email': report.user_email || '',
-        'Report Title': report.title,
-        'Date': report.date,
-        ...metrics, // Spread health metrics
-      };
-    });
+    // 2. Format + generate CSV (escaping lives in csvGenerator)
+    const csvContent = CSV_BOM + generateCSV(buildReportRows(reports));
 
-    // 3. Generate CSV
-    const csvContent = generateCSV(formattedData);
-
-    // 4. Save file
-    const fileName = `${groupName.replace(/[^a-z0-9]/gi, '_')}_Reports_${new Date().toISOString().split('T')[0]}.csv`;
+    // 3. Save file
+    const fileName = buildCsvFileName(groupName);
     const fileUri = `${FileSystem.documentDirectory}${fileName}`;
-    
+
     await FileSystem.writeAsStringAsync(fileUri, csvContent, {
       encoding: FileSystem.EncodingType.UTF8,
     });
 
-    // 5. Share file
+    // 4. Share file
     if (await Sharing.isAvailableAsync()) {
       await Sharing.shareAsync(fileUri, {
         mimeType: 'text/csv',

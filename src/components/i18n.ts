@@ -302,21 +302,37 @@ const resources = {
       unlockHealthAgePremium: "Unlock Health Age Premium",
 
       closeDialog: "Close",
+      exportCsv: "Export CSV",
+
+      csvExportEmptyGroup: "This group has no reports to export.",
+
+      csvExportFailed: "The CSV file could not be exported. Please try again.",
+
+      brandingLogoInvalid: "The selected logo could not be used. Please choose a PNG or JPG image.",
+
+      brandingContactUnsupported: "Some characters in your contact details can't be printed and were left out.",
+
+      dailyLimitCheckFailed: "We couldn't check your daily assessment limit. Please try again.",
+
+      purchasePending: "Purchase received",
+
+      purchasePendingDesc: "Your purchase went through, but we couldn't confirm it with our server yet. Premium unlocks once it is confirmed. Tap Refresh Status to try again.",
+
       premiumSubtitle: "Get more from your health assessments with Premium tools and reporting features.",
       unlimitedAssessmentsTitle: "Unlimited Health Assessments",
       unlimitedAssessmentsDesc: "Perform unlimited health-age assessments without the free daily assessment limit.",
       assessmentHistoryTitle: "Assessment History",
-      assessmentHistoryDesc: "Save and revisit your previous assessment results.",
+      assessmentHistoryDesc: "Save past results on this device, revisit them and organize them into groups.",
       organizedReportHistoryTitle: "Organized Report History",
       organizedReportHistoryDesc: "Access your saved reports and organize them into groups, where supported.",
       csvExportTitle: "CSV Export",
-      csvExportDesc: "Export supported assessment and report data to CSV for your records.",
-      printHealthReportsTitle: "Print Health Reports",
-      printHealthReportsDesc: "Print or share your health reports using the existing reporting functionality.",
+      csvExportDesc: "Export a group of saved reports to a CSV file.",
+      printHealthReportsTitle: "Printable Health Report Form",
+      printHealthReportsDesc: "Print a blank health report form to fill in by hand.",
       printableQuestionnaireTitle: "Printable Questionnaire",
       printableQuestionnaireDesc: "Access the existing printable health assessment questionnaire.",
       personalizedReportBrandingTitle: "Personalized Report Branding",
-      personalizedReportBrandingDesc: "Configure supported branding details, such as your logo and contact information, on exported or printed reports.",
+      personalizedReportBrandingDesc: "Add your logo and contact details to the printable forms.",
       annualSubscriptionSub: "Annual Premium subscription",
       autoRenewTerms: "Automatically renews yearly unless canceled in your store account settings at least 24 hours before the period ends. Cancel anytime.",
       upgradeToPremium: "Upgrade to Premium",
@@ -453,8 +469,8 @@ const resources = {
       proFeatureUnlimitedAssessments: "Unlimited Health Age assessments",
       proFeatureReportHistory: "Report history and groups",
       proFeatureCsvExport: "CSV export",
-      proFeaturePrinting: "Print questionnaires and reports",
-      proFeatureReportBranding: "Add your logo and contact information to printed reports",
+      proFeaturePrinting: "Print blank questionnaire and health report forms",
+      proFeatureReportBranding: "Add your logo and contact details to printable forms",
       signInRequired: "Sign in required",
       unableToOpenLink: "Unable to open link",
       subscriptionActive: "Subscription active",
@@ -511,7 +527,7 @@ const resources = {
       logo: "Logo",
       uploadLogoAction: "Upload logo",
       replaceLogo: "Replace logo",
-      webDownloadTemplatesNote: "Web downloads use the built-in PDF templates (no logo/address customization on web yet).",
+      webDownloadTemplatesNote: "Downloads use the built-in PDF templates. Your logo and contact details from Report Settings are added automatically.",
       downloaded: "Downloaded",
       downloadUsLetter: "Download US Letter",
       filtersNotSupportedWeb: "Filters are not supported on web yet.",
@@ -820,21 +836,39 @@ const resources = {
         "यह सुविधा हमारे प्रो सदस्यों के लिए आरक्षित है। शामिल होना चाहते हैं? अभी अपग्रेड करें और विशेष लाभों का आनंद लें जो विशेष रूप से आपके लिए तैयार किए गए हैं!",
 
       unlockHealthAgePremium: "Health Age Premium अनलॉक करें",
+      exportCsv: "CSV निर्यात करें",
+
+      csvExportEmptyGroup: "इस समूह में निर्यात करने के लिए कोई रिपोर्ट नहीं है।",
+
+      csvExportFailed: "CSV फ़ाइल निर्यात नहीं हो सकी। कृपया पुनः प्रयास करें।",
+
+      brandingLogoInvalid: "चुना गया लोगो उपयोग नहीं किया जा सका। कृपया PNG या JPG छवि चुनें।",
+
+      closeDialog: "बंद करें",
+
+      brandingContactUnsupported: "आपके संपर्क विवरण के कुछ अक्षर प्रिंट नहीं किए जा सकते और छोड़ दिए गए हैं।",
+
+      dailyLimitCheckFailed: "हम आपकी दैनिक आकलन सीमा की जाँच नहीं कर सके। कृपया पुनः प्रयास करें।",
+
+      purchasePending: "खरीद प्राप्त हुई",
+
+      purchasePendingDesc: "आपकी खरीद पूरी हो गई, लेकिन हम अभी इसे हमारे सर्वर पर पुष्टि नहीं कर सके। पुष्टि होते ही प्रीमियम अनलॉक हो जाएगा। दोबारा कोशिश करने के लिए 'स्थिति रीफ़्रेश करें' दबाएँ।",
+
       premiumSubtitle: "प्रीमियम टूल्स और रिपोर्टिंग सुविधाओं के साथ अपने स्वास्थ्य आकलनों से अधिक लाभ उठाएं।",
       unlimitedAssessmentsTitle: "असीमित स्वास्थ्य आकलन",
       unlimitedAssessmentsDesc: "निःशुल्क दैनिक सीमा के बिना असीमित हेल्थ-एज आकलन करें।",
       assessmentHistoryTitle: "आकलन इतिहास",
-      assessmentHistoryDesc: "अपने पिछले आकलन परिणामों को सहेजें और दोबारा देखें।",
+      assessmentHistoryDesc: "पिछले परिणाम इस डिवाइस पर सहेजें, दोबारा देखें और उन्हें समूहों में व्यवस्थित करें।",
       organizedReportHistoryTitle: "व्यवस्थित रिपोर्ट इतिहास",
       organizedReportHistoryDesc: "अपनी सहेजी गई रिपोर्टों तक पहुंचें और उन्हें समूहों में व्यवस्थित करें।",
       csvExportTitle: "CSV एक्सपोर्ट",
-      csvExportDesc: "अपने रिकॉर्ड के लिए समर्थित आकलन और रिपोर्ट डेटा को CSV में निर्यात करें।",
-      printHealthReportsTitle: "स्वास्थ्य रिपोर्ट प्रिंट करें",
-      printHealthReportsDesc: "मौजूदा रिपोर्टिंग कार्यक्षमता का उपयोग करके अपनी रिपोर्ट प्रिंट या साझा करें।",
+      csvExportDesc: "सहेजी गई रिपोर्टों के समूह को CSV फ़ाइल में निर्यात करें।",
+      printHealthReportsTitle: "प्रिंट करने योग्य स्वास्थ्य रिपोर्ट फ़ॉर्म",
+      printHealthReportsDesc: "हाथ से भरने के लिए खाली स्वास्थ्य रिपोर्ट फ़ॉर्म प्रिंट करें।",
       printableQuestionnaireTitle: "प्रिंट करने योग्य प्रश्नावली",
       printableQuestionnaireDesc: "मौजूदा प्रिंट करने योग्य स्वास्थ्य आकलन प्रश्नावली तक पहुंचें।",
       personalizedReportBrandingTitle: "व्यक्तिगत रिपोर्ट ब्रांडिंग",
-      personalizedReportBrandingDesc: "मुद्रित रिपोर्ट पर अपना लोगो और संपर्क जानकारी जैसे विवरण कॉन्फ़िगर करें।",
+      personalizedReportBrandingDesc: "प्रिंट करने योग्य फ़ॉर्म में अपना लोगो और संपर्क विवरण जोड़ें।",
       annualSubscriptionSub: "वार्षिक प्रीमियम सदस्यता",
       autoRenewTerms: "अवधि समाप्त होने से कम से कम 24 घंटे पहले स्टोर सेटिंग्स में रद्द न किए जाने पर स्वतः नवीनीकृत होती है। कभी भी रद्द करें।",
       upgradeToPremium: "प्रीमियम में अपग्रेड करें",
@@ -967,8 +1001,8 @@ const resources = {
       proFeatureUnlimitedAssessments: "असीमित Health Age आकलन",
       proFeatureReportHistory: "रिपोर्ट इतिहास और समूह",
       proFeatureCsvExport: "CSV एक्सपोर्ट",
-      proFeaturePrinting: "प्रश्नावली और रिपोर्ट प्रिंट करें",
-      proFeatureReportBranding: "प्रिंट की गई रिपोर्ट में अपना लोगो और संपर्क जानकारी जोड़ें",
+      proFeaturePrinting: "खाली प्रश्नावली और स्वास्थ्य रिपोर्ट फ़ॉर्म प्रिंट करें",
+      proFeatureReportBranding: "प्रिंट करने योग्य फ़ॉर्म में अपना लोगो और संपर्क विवरण जोड़ें",
       signInRequired: "साइन इन आवश्यक",
       unableToOpenLink: "लिंक नहीं खोला जा सका",
       subscriptionActive: "सदस्यता सक्रिय",
@@ -1025,7 +1059,7 @@ const resources = {
       logo: "लोगो",
       uploadLogoAction: "लोगो अपलोड करें",
       replaceLogo: "लोगो बदलें",
-      webDownloadTemplatesNote: "वेब डाउनलोड अंतर्निहित PDF टेम्पलेट का उपयोग करते हैं (वेब पर अभी लोगो/पता अनुकूलन उपलब्ध नहीं है)।",
+      webDownloadTemplatesNote: "डाउनलोड अंतर्निहित PDF टेम्पलेट का उपयोग करते हैं। रिपोर्ट सेटिंग्स में दिया गया आपका लोगो और संपर्क विवरण अपने आप जुड़ जाता है।",
       downloaded: "डाउनलोड हो गया",
       downloadUsLetter: "US Letter डाउनलोड करें",
       filtersNotSupportedWeb: "फ़िल्टर अभी वेब पर समर्थित नहीं हैं।",
@@ -1317,21 +1351,39 @@ const resources = {
         "Esta función está reservada para nuestros Miembros Pro. ¿Quieres unirte? ¡Actualiza ahora y disfruta de beneficios exclusivos diseñados solo para ti!",
 
       unlockHealthAgePremium: "Desbloquea Health Age Premium",
+      exportCsv: "Exportar CSV",
+
+      csvExportEmptyGroup: "Este grupo no tiene informes para exportar.",
+
+      csvExportFailed: "No se pudo exportar el archivo CSV. Inténtalo de nuevo.",
+
+      brandingLogoInvalid: "No se pudo usar el logotipo seleccionado. Elige una imagen PNG o JPG.",
+
+      closeDialog: "Cerrar",
+
+      brandingContactUnsupported: "Algunos caracteres de tus datos de contacto no se pueden imprimir y se omitieron.",
+
+      dailyLimitCheckFailed: "No pudimos comprobar tu límite diario de evaluaciones. Inténtalo de nuevo.",
+
+      purchasePending: "Compra recibida",
+
+      purchasePendingDesc: "Tu compra se realizó, pero aún no pudimos confirmarla con nuestro servidor. Premium se desbloqueará al confirmarse. Toca «Actualizar estado» para reintentar.",
+
       premiumSubtitle: "Aprovecha al máximo tus evaluaciones con herramientas y funciones de informes Premium.",
       unlimitedAssessmentsTitle: "Evaluaciones ilimitadas",
       unlimitedAssessmentsDesc: "Realiza evaluaciones ilimitadas sin el límite diario gratuito.",
       assessmentHistoryTitle: "Historial de evaluaciones",
-      assessmentHistoryDesc: "Guarda y consulta tus resultados de evaluaciones anteriores.",
+      assessmentHistoryDesc: "Guarda resultados anteriores en este dispositivo, consúltalos y organízalos en grupos.",
       organizedReportHistoryTitle: "Historial de informes organizado",
       organizedReportHistoryDesc: "Accede a tus informes guardados y organízalos en grupos.",
       csvExportTitle: "Exportación a CSV",
-      csvExportDesc: "Exporta datos de evaluaciones e informes a CSV para tus registros.",
-      printHealthReportsTitle: "Imprimir informes de salud",
-      printHealthReportsDesc: "Imprime o comparte tus informes de salud con la función existente.",
+      csvExportDesc: "Exporta un grupo de informes guardados a un archivo CSV.",
+      printHealthReportsTitle: "Formulario imprimible de informe de salud",
+      printHealthReportsDesc: "Imprime un formulario de informe de salud en blanco para rellenarlo a mano.",
       printableQuestionnaireTitle: "Cuestionario imprimible",
       printableQuestionnaireDesc: "Accede al cuestionario de evaluación de salud imprimible.",
       personalizedReportBrandingTitle: "Marca personalizada en informes",
-      personalizedReportBrandingDesc: "Configura detalles como tu logotipo y datos de contacto en los informes.",
+      personalizedReportBrandingDesc: "Añade tu logotipo y datos de contacto a los formularios imprimibles.",
       annualSubscriptionSub: "Suscripción Premium anual",
       autoRenewTerms: "Se renueva anualmente de forma automática a menos que se cancele al menos 24 horas antes del final del período. Cancela en cualquier momento.",
       upgradeToPremium: "Mejorar a Premium",
@@ -1451,8 +1503,8 @@ const resources = {
       proFeatureUnlimitedAssessments: "Evaluaciones ilimitadas de Health Age",
       proFeatureReportHistory: "Historial de informes y grupos",
       proFeatureCsvExport: "Exportación a CSV",
-      proFeaturePrinting: "Impresión de cuestionarios e informes",
-      proFeatureReportBranding: "Añade tu logo y tus datos de contacto a los informes impresos",
+      proFeaturePrinting: "Imprime cuestionarios y formularios de informe de salud en blanco",
+      proFeatureReportBranding: "Añade tu logotipo y datos de contacto a los formularios imprimibles",
       signInRequired: "Se requiere iniciar sesión",
       unableToOpenLink: "No se pudo abrir el enlace",
       subscriptionActive: "Suscripción activa",
@@ -1509,7 +1561,7 @@ const resources = {
       logo: "Logotipo",
       uploadLogoAction: "Subir logotipo",
       replaceLogo: "Reemplazar logotipo",
-      webDownloadTemplatesNote: "Las descargas web usan las plantillas PDF integradas (aún no hay personalización de logotipo/dirección en la web).",
+      webDownloadTemplatesNote: "Las descargas usan las plantillas PDF integradas. Tu logotipo y tus datos de contacto de Ajustes de informes se añaden automáticamente.",
       downloaded: "Descargado",
       downloadUsLetter: "Descargar US Letter",
       filtersNotSupportedWeb: "Los filtros aún no son compatibles en la web.",
@@ -1797,21 +1849,39 @@ const resources = {
         "この機能はProメンバー限定です。ご希望ですか？今すぐアップグレードして、あなただけの特別な特典をお楽しみください！",
 
       unlockHealthAgePremium: "Health Age Premium をアンロック",
+      exportCsv: "CSVをエクスポート",
+
+      csvExportEmptyGroup: "このグループにはエクスポートできるレポートがありません。",
+
+      csvExportFailed: "CSVファイルをエクスポートできませんでした。もう一度お試しください。",
+
+      brandingLogoInvalid: "選択したロゴを使用できませんでした。PNGまたはJPG画像を選択してください。",
+
+      closeDialog: "閉じる",
+
+      brandingContactUnsupported: "連絡先の一部の文字は印刷できないため省略されました。",
+
+      dailyLimitCheckFailed: "1日の評価回数の上限を確認できませんでした。もう一度お試しください。",
+
+      purchasePending: "購入を受け付けました",
+
+      purchasePendingDesc: "購入は完了しましたが、サーバーでの確認がまだできていません。確認が取れ次第プレミアムが有効になります。「ステータスを更新」をタップして再試行してください。",
+
       premiumSubtitle: "プレミアムツールとレポート機能で健康評価をさらに活用しましょう。",
       unlimitedAssessmentsTitle: "無制限の健康評価",
       unlimitedAssessmentsDesc: "毎日の無料制限なしで無制限に健康年齢評価を実行できます。",
       assessmentHistoryTitle: "評価履歴",
-      assessmentHistoryDesc: "過去の評価結果を保存し、いつでも確認できます。",
+      assessmentHistoryDesc: "過去の結果をこのデバイスに保存して見直し、グループに整理できます。",
       organizedReportHistoryTitle: "整理されたレポート履歴",
       organizedReportHistoryDesc: "保存したレポートにアクセスし、グループに整理できます。",
       csvExportTitle: "CSVエクスポート",
-      csvExportDesc: "評価とレポートのデータを記録用にCSVへ書き出せます。",
-      printHealthReportsTitle: "健康レポートの印刷",
-      printHealthReportsDesc: "既存のレポート機能を使用して健康レポートを印刷または共有できます。",
+      csvExportDesc: "保存したレポートのグループをCSVファイルにエクスポートします。",
+      printHealthReportsTitle: "印刷用健康レポートフォーム",
+      printHealthReportsDesc: "手書きで記入できる空白の健康レポートフォームを印刷します。",
       printableQuestionnaireTitle: "印刷可能な質問票",
       printableQuestionnaireDesc: "印刷可能な健康評価質問票にアクセスできます。",
       personalizedReportBrandingTitle: "レポートのカスタムブランディング",
-      personalizedReportBrandingDesc: "印刷するレポートにロゴや連絡先情報を設定できます。",
+      personalizedReportBrandingDesc: "印刷用フォームにロゴと連絡先を追加できます。",
       annualSubscriptionSub: "年間プレミアムサブスクリプション",
       autoRenewTerms: "期間終了の24時間前までにストア設定で解約しない限り、毎年自動更新されます。いつでも解約可能です。",
       upgradeToPremium: "プレミアムにアップグレード",
@@ -1932,8 +2002,8 @@ const resources = {
       proFeatureUnlimitedAssessments: "無制限のHealth Age評価",
       proFeatureReportHistory: "レポート履歴とグループ",
       proFeatureCsvExport: "CSVエクスポート",
-      proFeaturePrinting: "質問票とレポートの印刷",
-      proFeatureReportBranding: "印刷するレポートにロゴと連絡先情報を追加",
+      proFeaturePrinting: "空白の質問票と健康レポートフォームを印刷",
+      proFeatureReportBranding: "印刷用フォームにロゴと連絡先を追加",
       signInRequired: "サインインが必要です",
       unableToOpenLink: "リンクを開けません",
       subscriptionActive: "サブスクリプション有効",
@@ -1990,7 +2060,7 @@ const resources = {
       logo: "ロゴ",
       uploadLogoAction: "ロゴをアップロード",
       replaceLogo: "ロゴを差し替え",
-      webDownloadTemplatesNote: "ウェブでのダウンロードは組み込みのPDFテンプレートを使用します（ウェブではロゴ・住所のカスタマイズは未対応です）。",
+      webDownloadTemplatesNote: "ダウンロードには内蔵のPDFテンプレートが使われます。レポート設定のロゴと連絡先は自動的に追加されます。",
       downloaded: "ダウンロードしました",
       downloadUsLetter: "US Letter をダウンロード",
       filtersNotSupportedWeb: "フィルターはまだウェブに対応していません。",
@@ -2307,21 +2377,39 @@ const resources = {
         "Cette fonctionnalité est réservée à nos Membres Pro. Vous voulez en faire partie ? Mettez à niveau maintenant et profitez d'avantages exclusifs conçus spécialement pour vous !",
 
       unlockHealthAgePremium: "Débloquez Health Age Premium",
+      exportCsv: "Exporter en CSV",
+
+      csvExportEmptyGroup: "Ce groupe ne contient aucun rapport à exporter.",
+
+      csvExportFailed: "Impossible d'exporter le fichier CSV. Veuillez réessayer.",
+
+      brandingLogoInvalid: "Impossible d'utiliser le logo sélectionné. Choisissez une image PNG ou JPG.",
+
+      closeDialog: "Fermer",
+
+      brandingContactUnsupported: "Certains caractères de vos coordonnées ne peuvent pas être imprimés et ont été omis.",
+
+      dailyLimitCheckFailed: "Impossible de vérifier votre limite quotidienne d'évaluations. Veuillez réessayer.",
+
+      purchasePending: "Achat reçu",
+
+      purchasePendingDesc: "Votre achat a bien été effectué, mais nous n'avons pas encore pu le confirmer auprès de notre serveur. Premium se débloquera une fois confirmé. Touchez « Actualiser le statut » pour réessayer.",
+
       premiumSubtitle: "Tirez le meilleur parti de vos évaluations avec des outils et rapports Premium.",
       unlimitedAssessmentsTitle: "Évaluations de santé illimitées",
       unlimitedAssessmentsDesc: "Effectuez des évaluations illimitées sans la limite quotidienne gratuite.",
       assessmentHistoryTitle: "Historique des évaluations",
-      assessmentHistoryDesc: "Enregistrez et consultez vos résultats d'évaluations précédents.",
+      assessmentHistoryDesc: "Enregistrez vos résultats passés sur cet appareil, consultez-les et organisez-les en groupes.",
       organizedReportHistoryTitle: "Historique des rapports organisé",
       organizedReportHistoryDesc: "Accédez à vos rapports enregistrés et organisez-les en groupes.",
       csvExportTitle: "Export CSV",
-      csvExportDesc: "Exportez les données d'évaluation et de rapport au format CSV.",
-      printHealthReportsTitle: "Imprimer les rapports de santé",
-      printHealthReportsDesc: "Imprimez ou partagez vos rapports de santé avec les fonctionnalités existantes.",
+      csvExportDesc: "Exportez un groupe de rapports enregistrés dans un fichier CSV.",
+      printHealthReportsTitle: "Formulaire de rapport de santé imprimable",
+      printHealthReportsDesc: "Imprimez un formulaire de rapport de santé vierge à remplir à la main.",
       printableQuestionnaireTitle: "Questionnaire imprimable",
       printableQuestionnaireDesc: "Accédez au questionnaire d'évaluation de santé imprimable.",
       personalizedReportBrandingTitle: "Personnalisation des rapports",
-      personalizedReportBrandingDesc: "Configurez votre logo et vos coordonnées sur les rapports imprimés.",
+      personalizedReportBrandingDesc: "Ajoutez votre logo et vos coordonnées aux formulaires imprimables.",
       annualSubscriptionSub: "Abonnement annuel Premium",
       autoRenewTerms: "Renouvellement automatique annuel sauf résiliation au moins 24 h avant la fin de la période dans les réglages. Résiliable à tout moment.",
       upgradeToPremium: "Passer à Premium",
@@ -2454,8 +2542,8 @@ const resources = {
       proFeatureUnlimitedAssessments: "Évaluations Health Age illimitées",
       proFeatureReportHistory: "Historique des rapports et groupes",
       proFeatureCsvExport: "Export CSV",
-      proFeaturePrinting: "Impression des questionnaires et rapports",
-      proFeatureReportBranding: "Ajoutez votre logo et vos coordonnées aux rapports imprimés",
+      proFeaturePrinting: "Imprimer des questionnaires et formulaires de rapport de santé vierges",
+      proFeatureReportBranding: "Ajoutez votre logo et vos coordonnées aux formulaires imprimables",
       signInRequired: "Connexion requise",
       unableToOpenLink: "Impossible d'ouvrir le lien",
       subscriptionActive: "Abonnement actif",
@@ -2512,7 +2600,7 @@ const resources = {
       logo: "Logo",
       uploadLogoAction: "Téléverser un logo",
       replaceLogo: "Remplacer le logo",
-      webDownloadTemplatesNote: "Les téléchargements web utilisent les modèles PDF intégrés (pas encore de personnalisation du logo ni de l'adresse sur le web).",
+      webDownloadTemplatesNote: "Les téléchargements utilisent les modèles PDF intégrés. Votre logo et vos coordonnées des paramètres du rapport sont ajoutés automatiquement.",
       downloaded: "Téléchargé",
       downloadUsLetter: "Télécharger au format US Letter",
       filtersNotSupportedWeb: "Les filtres ne sont pas encore pris en charge sur le web.",
@@ -2797,21 +2885,39 @@ const resources = {
         "此功能仅限Pro会员使用。想体验吗？立即升级，享受为您量身定制的专属权益！",
 
       unlockHealthAgePremium: "解锁 Health Age Premium",
+      exportCsv: "导出 CSV",
+
+      csvExportEmptyGroup: "此分组中没有可导出的报告。",
+
+      csvExportFailed: "无法导出 CSV 文件，请重试。",
+
+      brandingLogoInvalid: "无法使用所选标志，请选择 PNG 或 JPG 图片。",
+
+      closeDialog: "关闭",
+
+      brandingContactUnsupported: "联系信息中的部分字符无法打印，已被省略。",
+
+      dailyLimitCheckFailed: "无法检查您的每日评估次数上限，请重试。",
+
+      purchasePending: "已收到购买",
+
+      purchasePendingDesc: "您的购买已完成，但我们暂时无法在服务器上确认。确认后将解锁 Premium。请点击“刷新状态”重试。",
+
       premiumSubtitle: "通过高级工具和报告功能，充分利用您的健康评估。",
       unlimitedAssessmentsTitle: "无限次健康评估",
       unlimitedAssessmentsDesc: "无每日免费评估限制，尽享无限次健康年龄评估。",
       assessmentHistoryTitle: "评估历史记录",
-      assessmentHistoryDesc: "保存并随时查看先前的评估结果。",
+      assessmentHistoryDesc: "在此设备上保存过往结果，随时回看，并整理到分组中。",
       organizedReportHistoryTitle: "有序的报告历史",
       organizedReportHistoryDesc: "访问已保存的报告并按组进行分类整理。",
       csvExportTitle: "CSV 导出",
-      csvExportDesc: "将支持的评估和报告数据导出为 CSV 以备记录。",
-      printHealthReportsTitle: "打印健康报告",
-      printHealthReportsDesc: "利用现有报告功能打印或分享您的健康报告。",
+      csvExportDesc: "将一组已保存的报告导出为 CSV 文件。",
+      printHealthReportsTitle: "可打印健康报告表格",
+      printHealthReportsDesc: "打印空白健康报告表格，手动填写。",
       printableQuestionnaireTitle: "可打印的问卷",
       printableQuestionnaireDesc: "获取可打印的健康评估问卷。",
       personalizedReportBrandingTitle: "个性化报告品牌",
-      personalizedReportBrandingDesc: "在打印或导出的报告上配置您的徽标和联系方式。",
+      personalizedReportBrandingDesc: "在可打印表格上添加您的标志和联系信息。",
       annualSubscriptionSub: "年度 Premium 订阅",
       autoRenewTerms: "每年自动续订，除非在当前周期结束前至少 24 小时在商店账户中取消。可随时取消。",
       upgradeToPremium: "升级至 Premium",
@@ -2931,8 +3037,8 @@ const resources = {
       proFeatureUnlimitedAssessments: "无限次健康年龄评估",
       proFeatureReportHistory: "报告历史记录和分组",
       proFeatureCsvExport: "CSV 导出",
-      proFeaturePrinting: "打印问卷和报告",
-      proFeatureReportBranding: "在打印的报告中添加您的徽标和联系方式",
+      proFeaturePrinting: "打印空白问卷和健康报告表格",
+      proFeatureReportBranding: "在可打印表格上添加您的标志和联系信息",
       signInRequired: "需要登录",
       unableToOpenLink: "无法打开链接",
       subscriptionActive: "订阅已激活",
@@ -2989,7 +3095,7 @@ const resources = {
       logo: "徽标",
       uploadLogoAction: "上传徽标",
       replaceLogo: "更换徽标",
-      webDownloadTemplatesNote: "网页下载使用内置 PDF 模板（网页端暂不支持徽标/地址自定义）。",
+      webDownloadTemplatesNote: "下载使用内置的 PDF 模板。报告设置中的标志和联系信息会自动添加。",
       downloaded: "已下载",
       downloadUsLetter: "下载 US Letter",
       filtersNotSupportedWeb: "网页端暂不支持筛选功能。",
@@ -3279,21 +3385,39 @@ const resources = {
         "هذه الميزة مخصصة لأعضاء PRO لدينا. هل ترغب في الانضمام؟ قم بالترقية الآن واستمتع بالمزايا الحصرية المصممة خصيصًا لك!",
 
       unlockHealthAgePremium: "فتح Health Age Premium",
+      exportCsv: "تصدير CSV",
+
+      csvExportEmptyGroup: "لا توجد تقارير في هذه المجموعة للتصدير.",
+
+      csvExportFailed: "تعذّر تصدير ملف CSV. يُرجى المحاولة مرة أخرى.",
+
+      brandingLogoInvalid: "تعذّر استخدام الشعار المحدد. يُرجى اختيار صورة PNG أو JPG.",
+
+      closeDialog: "إغلاق",
+
+      brandingContactUnsupported: "تعذّرت طباعة بعض الأحرف في بيانات الاتصال وتم حذفها.",
+
+      dailyLimitCheckFailed: "تعذّر التحقق من حد التقييمات اليومي. يُرجى المحاولة مرة أخرى.",
+
+      purchasePending: "تم استلام الشراء",
+
+      purchasePendingDesc: "تمت عملية الشراء، لكن تعذّر تأكيدها مع خادمنا حتى الآن. سيتم فتح Premium بعد التأكيد. اضغط على «تحديث الحالة» للمحاولة مرة أخرى.",
+
       premiumSubtitle: "احصل على المزيد من تقييماتك الصحية مع أدوات وتقارير بريميوم المتقدمة.",
       unlimitedAssessmentsTitle: "تقييمات صحية غير محدودة",
       unlimitedAssessmentsDesc: "قم بإجراء تقييمات غير محدودة للعمر الصحي بدون التقيد بالحد اليومي المجاني.",
       assessmentHistoryTitle: "سجل التقييمات",
-      assessmentHistoryDesc: "احفظ نتائج تقييماتك السابقة واطلع عليها في أي وقت.",
+      assessmentHistoryDesc: "احفظ النتائج السابقة على هذا الجهاز وراجعها ونظّمها في مجموعات.",
       organizedReportHistoryTitle: "سجل تقارير منظم",
       organizedReportHistoryDesc: "الوصول إلى تقاريرك المحفوظة وتنظيمها في مجموعات.",
       csvExportTitle: "تصدير بتنسيق CSV",
-      csvExportDesc: "قم بتصدير بيانات التقييمات والتقارير إلى ملفات CSV لسجلاتك.",
-      printHealthReportsTitle: "طباعة التقارير الصحية",
-      printHealthReportsDesc: "اطبع أو شارك تقاريرك الصحية باستخدام وظائف التقارير الحالية.",
+      csvExportDesc: "صدّر مجموعة من التقارير المحفوظة إلى ملف CSV.",
+      printHealthReportsTitle: "نموذج تقرير صحي قابل للطباعة",
+      printHealthReportsDesc: "اطبع نموذج تقرير صحي فارغًا لتعبئته يدويًا.",
       printableQuestionnaireTitle: "استبيان قابل للطباعة",
       printableQuestionnaireDesc: "الوصول إلى استبيان التقييم الصحي القابل للطباعة.",
       personalizedReportBrandingTitle: "تخصيص العلامة التجارية للتقرير",
-      personalizedReportBrandingDesc: "أضف شعارك ومعلومات الاتصال الخاصة بك إلى التقارير المطبوعة.",
+      personalizedReportBrandingDesc: "أضف شعارك وبيانات الاتصال إلى النماذج القابلة للطباعة.",
       annualSubscriptionSub: "اشتراك سنوي في بريميوم",
       autoRenewTerms: "يتجدد تلقائيًا سنويًا ما لم يتم الإلغاء قبل 24 ساعة من انتهاء الفترة من إعدادات المتجر. يمكنك الإلغاء في أي وقت.",
       upgradeToPremium: "الترقية إلى بريميوم",
@@ -3598,21 +3722,39 @@ const resources = {
         "Questa funzionalità è riservata ai nostri membri Pro. Vuoi farne parte? Aggiorna ora e goditi vantaggi esclusivi pensati apposta per te!",
 
       unlockHealthAgePremium: "Sblocca Health Age Premium",
+      exportCsv: "Esporta CSV",
+
+      csvExportEmptyGroup: "Questo gruppo non contiene report da esportare.",
+
+      csvExportFailed: "Impossibile esportare il file CSV. Riprova.",
+
+      brandingLogoInvalid: "Impossibile usare il logo selezionato. Scegli un'immagine PNG o JPG.",
+
+      closeDialog: "Chiudi",
+
+      brandingContactUnsupported: "Alcuni caratteri dei tuoi contatti non possono essere stampati e sono stati omessi.",
+
+      dailyLimitCheckFailed: "Impossibile verificare il limite giornaliero di valutazioni. Riprova.",
+
+      purchasePending: "Acquisto ricevuto",
+
+      purchasePendingDesc: "Il tuo acquisto è andato a buon fine, ma non siamo ancora riusciti a confermarlo con il nostro server. Premium si sbloccherà dopo la conferma. Tocca «Aggiorna stato» per riprovare.",
+
       premiumSubtitle: "Ottieni di più dalle tue valutazioni con strumenti e report Premium.",
       unlimitedAssessmentsTitle: "Valutazioni di salute illimitate",
       unlimitedAssessmentsDesc: "Effettua valutazioni illimitate dell'età biologica senza il limite giornaliero gratuito.",
       assessmentHistoryTitle: "Cronologia valutazioni",
-      assessmentHistoryDesc: "Salva e consulta i risultati delle tue valutazioni precedenti.",
+      assessmentHistoryDesc: "Salva i risultati passati su questo dispositivo, rivedili e organizzali in gruppi.",
       organizedReportHistoryTitle: "Cronologia report organizzata",
       organizedReportHistoryDesc: "Accedi ai report salvati e organizzali in gruppi.",
       csvExportTitle: "Esportazione CSV",
-      csvExportDesc: "Esporta i dati delle valutazioni e dei report in CSV per i tuoi archivi.",
-      printHealthReportsTitle: "Stampa report di salute",
-      printHealthReportsDesc: "Stampa o condividi i tuoi report di salute usando la funzionalità esistente.",
+      csvExportDesc: "Esporta un gruppo di report salvati in un file CSV.",
+      printHealthReportsTitle: "Modulo stampabile del report sanitario",
+      printHealthReportsDesc: "Stampa un modulo di report sanitario vuoto da compilare a mano.",
       printableQuestionnaireTitle: "Questionario stampabile",
       printableQuestionnaireDesc: "Accedi al questionario di valutazione della salute stampabile.",
       personalizedReportBrandingTitle: "Personalizzazione dei report",
-      personalizedReportBrandingDesc: "Configura il tuo logo e i dati di contatto sui report stampati.",
+      personalizedReportBrandingDesc: "Aggiungi il tuo logo e i tuoi contatti ai moduli stampabili.",
       annualSubscriptionSub: "Abbonamento annuale Premium",
       autoRenewTerms: "Si rinnova automaticamente ogni anno a meno che non venga annullato almeno 24 ore prima della fine del periodo. Annulla in qualsiasi momento.",
       upgradeToPremium: "Passa a Premium",
@@ -3928,21 +4070,39 @@ const resources = {
         "이 기능은 Pro 멤버 전용입니다. 지금 업그레이드하고 나만을 위한 특별한 혜택을 누리세요!",
 
       unlockHealthAgePremium: "Health Age Premium 잠금 해제",
+      exportCsv: "CSV 내보내기",
+
+      csvExportEmptyGroup: "이 그룹에는 내보낼 보고서가 없습니다.",
+
+      csvExportFailed: "CSV 파일을 내보낼 수 없습니다. 다시 시도해 주세요.",
+
+      brandingLogoInvalid: "선택한 로고를 사용할 수 없습니다. PNG 또는 JPG 이미지를 선택하세요.",
+
+      closeDialog: "닫기",
+
+      brandingContactUnsupported: "연락처 정보의 일부 문자는 인쇄할 수 없어 제외되었습니다.",
+
+      dailyLimitCheckFailed: "일일 평가 한도를 확인할 수 없습니다. 다시 시도해 주세요.",
+
+      purchasePending: "구매가 접수되었습니다",
+
+      purchasePendingDesc: "구매는 완료되었지만 아직 서버에서 확인하지 못했습니다. 확인되면 프리미엄이 활성화됩니다. '상태 새로고침'을 눌러 다시 시도하세요.",
+
       premiumSubtitle: "프리미엄 도구와 보고서 기능으로 건강 평가를 더욱 효과적으로 활용하세요.",
       unlimitedAssessmentsTitle: "무제한 건강 평가",
       unlimitedAssessmentsDesc: "일일 무료 제한 없이 무제한으로 건강 나이 평가를 진행하세요.",
       assessmentHistoryTitle: "평가 기록",
-      assessmentHistoryDesc: "이전 평가 결과를 저장하고 언제든지 다시 확인하세요.",
+      assessmentHistoryDesc: "이전 결과를 이 기기에 저장하고 다시 확인하며 그룹으로 정리하세요.",
       organizedReportHistoryTitle: "체계적인 보고서 관리",
       organizedReportHistoryDesc: "저장된 보고서에 접근하고 그룹별로 깔끔하게 정리하세요.",
       csvExportTitle: "CSV 내보내기",
-      csvExportDesc: "기록 보관을 위해 평가 및 보고서 데이터를 CSV로 내보내세요.",
-      printHealthReportsTitle: "건강 보고서 인쇄",
-      printHealthReportsDesc: "기존 보고서 기능을 사용하여 건강 보고서를 인쇄하거나 공유하세요.",
+      csvExportDesc: "저장된 보고서 그룹을 CSV 파일로 내보냅니다.",
+      printHealthReportsTitle: "인쇄용 건강 보고서 양식",
+      printHealthReportsDesc: "직접 작성할 수 있는 빈 건강 보고서 양식을 인쇄합니다.",
       printableQuestionnaireTitle: "인쇄 가능한 설문지",
       printableQuestionnaireDesc: "인쇄 가능한 건강 평가 설문지를 이용할 수 있습니다.",
       personalizedReportBrandingTitle: "맞춤 보고서 브랜딩",
-      personalizedReportBrandingDesc: "인쇄된 보고서에 로고 및 연락처 정보를 맞춤 설정하세요.",
+      personalizedReportBrandingDesc: "인쇄용 양식에 로고와 연락처 정보를 추가하세요.",
       annualSubscriptionSub: "연간 프리미엄 구독",
       autoRenewTerms: "기간 종료 최소 24시간 전에 스토어 설정에서 취소하지 않는 한 매년 자동 갱신됩니다. 언제든지 취소 가능합니다.",
       upgradeToPremium: "프리미엄으로 업그레이드",
@@ -4063,8 +4223,8 @@ const resources = {
       proFeatureUnlimitedAssessments: "무제한 Health Age 평가",
       proFeatureReportHistory: "보고서 기록 및 그룹",
       proFeatureCsvExport: "CSV 내보내기",
-      proFeaturePrinting: "설문지 및 보고서 인쇄",
-      proFeatureReportBranding: "인쇄된 보고서에 로고 및 연락처 정보 추가",
+      proFeaturePrinting: "빈 설문지 및 건강 보고서 양식 인쇄",
+      proFeatureReportBranding: "인쇄용 양식에 로고와 연락처 정보 추가",
       signInRequired: "로그인이 필요합니다",
       unableToOpenLink: "링크를 열 수 없습니다",
       subscriptionActive: "구독 활성화됨",
@@ -4121,7 +4281,7 @@ const resources = {
       logo: "로고",
       uploadLogoAction: "로고 업로드",
       replaceLogo: "로고 교체",
-      webDownloadTemplatesNote: "웹 다운로드는 기본 제공 PDF 템플릿을 사용합니다(웹에서는 아직 로고/주소 사용자 지정을 지원하지 않습니다).",
+      webDownloadTemplatesNote: "다운로드에는 기본 제공 PDF 템플릿이 사용됩니다. 보고서 설정의 로고와 연락처 정보가 자동으로 추가됩니다.",
       downloaded: "다운로드됨",
       downloadUsLetter: "US Letter 다운로드",
       filtersNotSupportedWeb: "필터는 아직 웹에서 지원되지 않습니다.",
@@ -4433,21 +4593,39 @@ const resources = {
         "Эта функция доступна только нашим Pro-участникам. Хотите получить доступ? Обновитесь сейчас и наслаждайтесь эксклюзивными преимуществами, созданными специально для вас!",
 
       unlockHealthAgePremium: "Разблокируйте Health Age Premium",
+      exportCsv: "Экспорт в CSV",
+
+      csvExportEmptyGroup: "В этой группе нет отчётов для экспорта.",
+
+      csvExportFailed: "Не удалось экспортировать файл CSV. Повторите попытку.",
+
+      brandingLogoInvalid: "Не удалось использовать выбранный логотип. Выберите изображение PNG или JPG.",
+
+      closeDialog: "Закрыть",
+
+      brandingContactUnsupported: "Некоторые символы в контактных данных нельзя напечатать, поэтому они были пропущены.",
+
+      dailyLimitCheckFailed: "Не удалось проверить дневной лимит оценок. Повторите попытку.",
+
+      purchasePending: "Покупка получена",
+
+      purchasePendingDesc: "Покупка прошла, но пока не удалось подтвердить её на нашем сервере. Premium откроется после подтверждения. Нажмите «Обновить статус», чтобы повторить попытку.",
+
       premiumSubtitle: "Получите максимум от оценок здоровья с премиальными инструментами и отчетами.",
       unlimitedAssessmentsTitle: "Неограниченные оценки здоровья",
       unlimitedAssessmentsDesc: "Проходите неограниченное количество оценок без бесплатного дневного лимита.",
       assessmentHistoryTitle: "История оценок",
-      assessmentHistoryDesc: "Сохраняйте и просматривайте результаты ваших предыдущих оценок.",
+      assessmentHistoryDesc: "Сохраняйте прошлые результаты на этом устройстве, просматривайте их и группируйте.",
       organizedReportHistoryTitle: "Упорядоченная история отчетов",
       organizedReportHistoryDesc: "Получайте доступ к сохраненным отчетам и упорядочивайте их по группам.",
       csvExportTitle: "Экспорт в CSV",
-      csvExportDesc: "Экспортируйте данные оценок и отчетов в CSV для ведения записей.",
-      printHealthReportsTitle: "Печать отчетов о здоровье",
-      printHealthReportsDesc: "Печатайте или делитесь отчетами о здоровье с помощью существующей функции.",
+      csvExportDesc: "Экспортируйте группу сохранённых отчётов в файл CSV.",
+      printHealthReportsTitle: "Печатная форма отчёта о здоровье",
+      printHealthReportsDesc: "Распечатайте пустую форму отчёта о здоровье для заполнения от руки.",
       printableQuestionnaireTitle: "Печатная анкета",
       printableQuestionnaireDesc: "Получите доступ к печатной анкете оценки здоровья.",
       personalizedReportBrandingTitle: "Персонализация отчетов",
-      personalizedReportBrandingDesc: "Настройте свой логотип и контактные данные в печатных отчетах.",
+      personalizedReportBrandingDesc: "Добавьте свой логотип и контактные данные в печатные формы.",
       annualSubscriptionSub: "Годовая подписка Premium",
       autoRenewTerms: "Продлевается автоматически каждый год, если не отменено как минимум за 24 часа до окончания срока. Отмена в любое время.",
       upgradeToPremium: "Перейти на Premium",
@@ -4570,8 +4748,8 @@ const resources = {
       proFeatureUnlimitedAssessments: "Неограниченные оценки Health Age",
       proFeatureReportHistory: "История отчётов и группы",
       proFeatureCsvExport: "Экспорт в CSV",
-      proFeaturePrinting: "Печать опросников и отчётов",
-      proFeatureReportBranding: "Добавление логотипа и контактных данных в печатные отчёты",
+      proFeaturePrinting: "Печать пустых анкет и форм отчёта о здоровье",
+      proFeatureReportBranding: "Добавьте свой логотип и контактные данные в печатные формы",
       signInRequired: "Требуется вход",
       unableToOpenLink: "Не удалось открыть ссылку",
       subscriptionActive: "Подписка активна",
@@ -4628,7 +4806,7 @@ const resources = {
       logo: "Логотип",
       uploadLogoAction: "Загрузить логотип",
       replaceLogo: "Заменить логотип",
-      webDownloadTemplatesNote: "Загрузки в вебе используют встроенные шаблоны PDF (настройка логотипа и адреса в вебе пока недоступна).",
+      webDownloadTemplatesNote: "Для загрузки используются встроенные шаблоны PDF. Логотип и контактные данные из настроек отчёта добавляются автоматически.",
       downloaded: "Загружено",
       downloadUsLetter: "Скачать в формате US Letter",
       filtersNotSupportedWeb: "Фильтры пока не поддерживаются в веб-версии.",
@@ -4948,21 +5126,39 @@ const resources = {
         "Este recurso é reservado para nossos Membros Pro. Quer participar? Atualize agora e aproveite benefícios exclusivos feitos só para você!",
 
       unlockHealthAgePremium: "Desbloqueie o Health Age Premium",
+      exportCsv: "Exportar CSV",
+
+      csvExportEmptyGroup: "Este grupo não tem relatórios para exportar.",
+
+      csvExportFailed: "Não foi possível exportar o ficheiro CSV. Tente novamente.",
+
+      brandingLogoInvalid: "Não foi possível usar o logótipo selecionado. Escolha uma imagem PNG ou JPG.",
+
+      closeDialog: "Fechar",
+
+      brandingContactUnsupported: "Alguns caracteres dos seus contactos não podem ser impressos e foram omitidos.",
+
+      dailyLimitCheckFailed: "Não foi possível verificar o seu limite diário de avaliações. Tente novamente.",
+
+      purchasePending: "Compra recebida",
+
+      purchasePendingDesc: "A sua compra foi concluída, mas ainda não conseguimos confirmá-la com o nosso servidor. O Premium será desbloqueado após a confirmação. Toque em «Atualizar estado» para tentar novamente.",
+
       premiumSubtitle: "Aproveite melhor suas avaliações com ferramentas e relatórios Premium.",
       unlimitedAssessmentsTitle: "Avaliações de saúde ilimitadas",
       unlimitedAssessmentsDesc: "Realize avaliações ilimitadas sem o limite diário gratuito.",
       assessmentHistoryTitle: "Histórico de avaliações",
-      assessmentHistoryDesc: "Salve e consulte seus resultados de avaliações anteriores.",
+      assessmentHistoryDesc: "Guarde resultados anteriores neste dispositivo, reveja-os e organize-os em grupos.",
       organizedReportHistoryTitle: "Histórico de relatórios organizado",
       organizedReportHistoryDesc: "Acesse seus relatórios salvos e organize-os em grupos.",
       csvExportTitle: "Exportação em CSV",
-      csvExportDesc: "Exporte dados de avaliações e relatórios para CSV para seus registros.",
-      printHealthReportsTitle: "Imprimir relatórios de saúde",
-      printHealthReportsDesc: "Imprima ou compartilhe seus relatórios usando a funcionalidade existente.",
+      csvExportDesc: "Exporte um grupo de relatórios guardados para um ficheiro CSV.",
+      printHealthReportsTitle: "Formulário imprimível de relatório de saúde",
+      printHealthReportsDesc: "Imprima um formulário de relatório de saúde em branco para preencher à mão.",
       printableQuestionnaireTitle: "Questionário imprimível",
       printableQuestionnaireDesc: "Acesse o questionário de avaliação de saúde imprimível.",
       personalizedReportBrandingTitle: "Personalização de relatórios",
-      personalizedReportBrandingDesc: "Configure seu logotipo e dados de contato nos relatórios impressos.",
+      personalizedReportBrandingDesc: "Adicione o seu logótipo e contactos aos formulários imprimíveis.",
       annualSubscriptionSub: "Assinatura anual Premium",
       autoRenewTerms: "Renova anualmente de forma automática, a menos que seja cancelada pelo menos 24 horas antes do término. Cancele quando quiser.",
       upgradeToPremium: "Atualizar para o Premium",
@@ -5096,8 +5292,8 @@ const resources = {
       proFeatureUnlimitedAssessments: "Avaliações ilimitadas de Health Age",
       proFeatureReportHistory: "Histórico de relatórios e grupos",
       proFeatureCsvExport: "Exportação em CSV",
-      proFeaturePrinting: "Impressão de questionários e relatórios",
-      proFeatureReportBranding: "Adicione seu logotipo e informações de contato aos relatórios impressos",
+      proFeaturePrinting: "Imprimir questionários e formulários de relatório de saúde em branco",
+      proFeatureReportBranding: "Adicione o seu logótipo e contactos aos formulários imprimíveis",
       signInRequired: "Login necessário",
       unableToOpenLink: "Não foi possível abrir o link",
       subscriptionActive: "Assinatura ativa",
@@ -5154,7 +5350,7 @@ const resources = {
       logo: "Logotipo",
       uploadLogoAction: "Enviar logotipo",
       replaceLogo: "Substituir logotipo",
-      webDownloadTemplatesNote: "Os downloads na web usam os modelos de PDF integrados (ainda sem personalização de logotipo/endereço na web).",
+      webDownloadTemplatesNote: "Os downloads usam os modelos PDF integrados. O seu logótipo e contactos das Definições do relatório são adicionados automaticamente.",
       downloaded: "Baixado",
       downloadUsLetter: "Baixar US Letter",
       filtersNotSupportedWeb: "Os filtros ainda não são compatíveis na web.",
@@ -5444,21 +5640,39 @@ const resources = {
         "Diese Funktion ist unseren Pro-Mitgliedern vorbehalten. Willst du dabei sein? Upgrade jetzt und genieße exklusive Vorteile, die nur für dich gemacht sind!",
 
       unlockHealthAgePremium: "Health Age Premium freischalten",
+      exportCsv: "CSV exportieren",
+
+      csvExportEmptyGroup: "Diese Gruppe enthält keine Berichte zum Exportieren.",
+
+      csvExportFailed: "Die CSV-Datei konnte nicht exportiert werden. Bitte versuche es erneut.",
+
+      brandingLogoInvalid: "Das ausgewählte Logo konnte nicht verwendet werden. Bitte wähle ein PNG- oder JPG-Bild.",
+
+      closeDialog: "Schließen",
+
+      brandingContactUnsupported: "Einige Zeichen in deinen Kontaktdaten können nicht gedruckt werden und wurden weggelassen.",
+
+      dailyLimitCheckFailed: "Dein tägliches Auswertungslimit konnte nicht geprüft werden. Bitte versuche es erneut.",
+
+      purchasePending: "Kauf eingegangen",
+
+      purchasePendingDesc: "Dein Kauf wurde abgeschlossen, konnte aber noch nicht mit unserem Server bestätigt werden. Premium wird nach der Bestätigung freigeschaltet. Tippe auf „Status aktualisieren“, um es erneut zu versuchen.",
+
       premiumSubtitle: "Holen Sie mehr aus Ihren Gesundheitsbewertungen mit Premium-Tools und Berichten heraus.",
       unlimitedAssessmentsTitle: "Unbegrenzte Gesundheitsbewertungen",
       unlimitedAssessmentsDesc: "Führen Sie unbegrenzt viele Bewertungen ohne das kostenlose Tageslimit durch.",
       assessmentHistoryTitle: "Bewertungshistorie",
-      assessmentHistoryDesc: "Speichern und überprüfen Sie Ihre früheren Bewertungsergebnisse.",
+      assessmentHistoryDesc: "Speichere frühere Ergebnisse auf diesem Gerät, rufe sie erneut auf und ordne sie in Gruppen.",
       organizedReportHistoryTitle: "Organisierte Berichtshistorie",
       organizedReportHistoryDesc: "Greifen Sie auf gespeicherte Berichte zu und ordnen Sie diese in Gruppen.",
       csvExportTitle: "CSV-Export",
-      csvExportDesc: "Exportieren Sie Bewertungs- und Berichtsdaten zur Dokumentation als CSV.",
-      printHealthReportsTitle: "Gesundheitsberichte drucken",
-      printHealthReportsDesc: "Drucken oder teilen Sie Ihre Berichte mit der vorhandenen Funktion.",
+      csvExportDesc: "Exportiere eine Gruppe gespeicherter Berichte als CSV-Datei.",
+      printHealthReportsTitle: "Druckbares Gesundheitsbericht-Formular",
+      printHealthReportsDesc: "Drucke ein leeres Gesundheitsbericht-Formular zum handschriftlichen Ausfüllen.",
       printableQuestionnaireTitle: "Druckbarer Fragebogen",
       printableQuestionnaireDesc: "Greifen Sie auf den druckbaren Gesundheitsfragebogen zu.",
       personalizedReportBrandingTitle: "Personalisiertes Berichts-Branding",
-      personalizedReportBrandingDesc: "Fügen Sie Ihr Logo und Ihre Kontaktdaten zu gedruckten Berichten hinzu.",
+      personalizedReportBrandingDesc: "Füge den druckbaren Formularen dein Logo und deine Kontaktdaten hinzu.",
       annualSubscriptionSub: "Jährliches Premium-Abonnement",
       autoRenewTerms: "Verlängert sich jährlich automatisch, sofern nicht mindestens 24 Stunden vor Ablauf gekündigt wird. Jederzeit kündbar.",
       upgradeToPremium: "Auf Premium upgraden",
@@ -5581,8 +5795,8 @@ const resources = {
       proFeatureUnlimitedAssessments: "Unbegrenzte Health Age-Bewertungen",
       proFeatureReportHistory: "Berichtsverlauf und Gruppen",
       proFeatureCsvExport: "CSV-Export",
-      proFeaturePrinting: "Drucken von Fragebögen und Berichten",
-      proFeatureReportBranding: "Fügen Sie Ihr Logo und Ihre Kontaktdaten zu gedruckten Berichten hinzu",
+      proFeaturePrinting: "Leere Fragebögen und Gesundheitsbericht-Formulare drucken",
+      proFeatureReportBranding: "Füge druckbaren Formularen dein Logo und deine Kontaktdaten hinzu",
       signInRequired: "Anmeldung erforderlich",
       unableToOpenLink: "Link konnte nicht geöffnet werden",
       subscriptionActive: "Abonnement aktiv",
@@ -5639,7 +5853,7 @@ const resources = {
       logo: "Logo",
       uploadLogoAction: "Logo hochladen",
       replaceLogo: "Logo ersetzen",
-      webDownloadTemplatesNote: "Web-Downloads verwenden die integrierten PDF-Vorlagen (Logo-/Adressanpassung im Web noch nicht verfügbar).",
+      webDownloadTemplatesNote: "Downloads verwenden die integrierten PDF-Vorlagen. Dein Logo und deine Kontaktdaten aus den Berichtseinstellungen werden automatisch hinzugefügt.",
       downloaded: "Heruntergeladen",
       downloadUsLetter: "US Letter herunterladen",
       filtersNotSupportedWeb: "Filter werden im Web noch nicht unterstützt.",
@@ -5951,21 +6165,39 @@ const resources = {
         "E karakterístika aki ta reservá pa nos Miembronan Pro. Kier partisipá? Hasi upgrade awor i disfruta di benefisionan eksklusivo, spesialmente pa bo!",
 
       unlockHealthAgePremium: "Desblokiá Health Age Premium",
+      exportCsv: "Exportá CSV",
+
+      csvExportEmptyGroup: "E grupo aki no tin reporte pa exportá.",
+
+      csvExportFailed: "No por a exportá e archivo CSV. Purba di nobo.",
+
+      brandingLogoInvalid: "No por a usa e logo selekshoná. Skohe un imágen PNG òf JPG.",
+
+      closeDialog: "Sera",
+
+      brandingContactUnsupported: "Algun karakter den bo dato di kontakto no por wòrdu imprimí i a wòrdu laga afó.",
+
+      dailyLimitCheckFailed: "No por a verifiká bo limite diario di evaluashon. Purba di nobo.",
+
+      purchasePending: "Kompra risibí",
+
+      purchasePendingDesc: "Bo kompra a pasa, pero nos no por a konfirmá e ketu ku nos servidor ainda. Premium lo habri ora e konfirmashon yega. Primi “Aktualisá estado” pa purba di nobo.",
+
       premiumSubtitle: "Saka mas probecho di bo evaluashonnan ku hèrmèntnan i rapòrtnan Premium.",
       unlimitedAssessmentsTitle: "Evaluashonnan di Salú Sin Límite",
       unlimitedAssessmentsDesc: "Hasi evaluashonnan sin e límite diario grátis.",
       assessmentHistoryTitle: "Historial di Evaluashon",
-      assessmentHistoryDesc: "Warda i revisá bo resultadonan anterior.",
+      assessmentHistoryDesc: "Warda resultado anterior riba e aparato aki, wak nan atrobe i organisa nan den grupo.",
       organizedReportHistoryTitle: "Historial di Rapòrt Organisá",
       organizedReportHistoryDesc: "Aksedé na bo rapòrtnan wardá i organisá nan den grupo.",
       csvExportTitle: "Eksportashon CSV",
-      csvExportDesc: "Eksportá datonan di evaluashon i rapòrt na CSV.",
-      printHealthReportsTitle: "Prent Rapòrtnan di Salú",
-      printHealthReportsDesc: "Prent òf kompartí bo rapòrtnan ku e funshon existente.",
+      csvExportDesc: "Exportá un grupo di reporte warda na un archivo CSV.",
+      printHealthReportsTitle: "Formulario di reporte di salud pa imprimí",
+      printHealthReportsDesc: "Imprimí un formulario di reporte di salud blanku pa yena ku man.",
       printableQuestionnaireTitle: "Kuestionario pa Prent",
       printableQuestionnaireDesc: "Aksedé na e kuestionario di salú pa prent.",
       personalizedReportBrandingTitle: "Personalisa Bo Rapòrt",
-      personalizedReportBrandingDesc: "Konfigurá bo logo i kontakto riba rapòrtnan prentá.",
+      personalizedReportBrandingDesc: "Agregá bo logo i dato di kontakto na e formularionan pa imprimí.",
       annualSubscriptionSub: "Suskripshon anual Premium",
       autoRenewTerms: "Ta renobá outomátikamente tur aña a ménos ku kenselá por lo ménos 24 ora promé ku e periodo kaba. Kenselá na kualke momento.",
       upgradeToPremium: "Upgréd na Premium",
@@ -6269,21 +6501,39 @@ const resources = {
         "Tính năng này được dành riêng cho thành viên Pro của chúng tôi. Muốn tham gia? Nâng cấp ngay và tận hưởng các đặc quyền dành riêng cho bạn!",
 
       unlockHealthAgePremium: "Mở khóa Health Age Premium",
+      exportCsv: "Xuất CSV",
+
+      csvExportEmptyGroup: "Nhóm này không có báo cáo nào để xuất.",
+
+      csvExportFailed: "Không thể xuất tệp CSV. Vui lòng thử lại.",
+
+      brandingLogoInvalid: "Không thể sử dụng logo đã chọn. Vui lòng chọn ảnh PNG hoặc JPG.",
+
+      closeDialog: "Đóng",
+
+      brandingContactUnsupported: "Một số ký tự trong thông tin liên hệ không thể in được và đã bị bỏ qua.",
+
+      dailyLimitCheckFailed: "Không thể kiểm tra giới hạn đánh giá hằng ngày của bạn. Vui lòng thử lại.",
+
+      purchasePending: "Đã nhận giao dịch mua",
+
+      purchasePendingDesc: "Giao dịch mua của bạn đã hoàn tất nhưng chúng tôi chưa thể xác nhận với máy chủ. Premium sẽ được mở khóa sau khi xác nhận. Nhấn “Làm mới trạng thái” để thử lại.",
+
       premiumSubtitle: "Khai thác tối đa các bài đánh giá sức khỏe với công cụ và báo cáo Premium.",
       unlimitedAssessmentsTitle: "Đánh giá sức khỏe không giới hạn",
       unlimitedAssessmentsDesc: "Thực hiện đánh giá tuổi sức khỏe không giới hạn mà không bị giới hạn hàng ngày.",
       assessmentHistoryTitle: "Lịch sử đánh giá",
-      assessmentHistoryDesc: "Lưu và xem lại kết quả các bài đánh giá trước đây của bạn.",
+      assessmentHistoryDesc: "Lưu kết quả trước đây trên thiết bị này, xem lại và sắp xếp chúng vào các nhóm.",
       organizedReportHistoryTitle: "Lịch sử báo cáo có tổ chức",
       organizedReportHistoryDesc: "Truy cập các báo cáo đã lưu và sắp xếp chúng thành các nhóm.",
       csvExportTitle: "Xuất CSV",
-      csvExportDesc: "Xuất dữ liệu đánh giá và báo cáo ra tệp CSV để lưu trữ.",
-      printHealthReportsTitle: "In báo cáo sức khỏe",
-      printHealthReportsDesc: "In hoặc chia sẻ báo cáo sức khỏe bằng tính năng sẵn có.",
+      csvExportDesc: "Xuất một nhóm báo cáo đã lưu ra tệp CSV.",
+      printHealthReportsTitle: "Mẫu báo cáo sức khỏe có thể in",
+      printHealthReportsDesc: "In mẫu báo cáo sức khỏe trống để điền bằng tay.",
       printableQuestionnaireTitle: "Bản câu hỏi có thể in",
       printableQuestionnaireDesc: "Truy cập bản câu hỏi đánh giá sức khỏe có thể in.",
       personalizedReportBrandingTitle: "Thương hiệu báo cáo cá nhân hóa",
-      personalizedReportBrandingDesc: "Thêm logo và thông tin liên hệ của bạn vào các báo cáo in.",
+      personalizedReportBrandingDesc: "Thêm logo và thông tin liên hệ của bạn vào các mẫu có thể in.",
       annualSubscriptionSub: "Gói đăng ký Premium hàng năm",
       autoRenewTerms: "Tự động gia hạn hàng năm trừ khi được hủy trong cài đặt cửa hàng ít nhất 24 giờ trước khi kết thúc kỳ. Hủy bất cứ lúc nào.",
       upgradeToPremium: "Nâng cấp lên Premium",
@@ -6417,8 +6667,8 @@ const resources = {
       proFeatureUnlimitedAssessments: "Đánh giá Health Age không giới hạn",
       proFeatureReportHistory: "Lịch sử báo cáo và nhóm",
       proFeatureCsvExport: "Xuất CSV",
-      proFeaturePrinting: "In bảng câu hỏi và báo cáo",
-      proFeatureReportBranding: "Thêm logo và thông tin liên hệ của bạn vào báo cáo in",
+      proFeaturePrinting: "In bảng câu hỏi và mẫu báo cáo sức khỏe trống",
+      proFeatureReportBranding: "Thêm logo và thông tin liên hệ vào các mẫu có thể in",
       signInRequired: "Cần đăng nhập",
       unableToOpenLink: "Không thể mở liên kết",
       subscriptionActive: "Gói đăng ký đang hoạt động",
@@ -6475,7 +6725,7 @@ const resources = {
       logo: "Logo",
       uploadLogoAction: "Tải logo lên",
       replaceLogo: "Thay logo",
-      webDownloadTemplatesNote: "Tải xuống trên web sử dụng mẫu PDF tích hợp (chưa hỗ trợ tùy chỉnh logo/địa chỉ trên web).",
+      webDownloadTemplatesNote: "Tệp tải xuống dùng mẫu PDF tích hợp sẵn. Logo và thông tin liên hệ trong Cài đặt báo cáo được thêm tự động.",
       downloaded: "Đã tải xuống",
       downloadUsLetter: "Tải xuống khổ US Letter",
       filtersNotSupportedWeb: "Bộ lọc chưa được hỗ trợ trên web.",
@@ -6795,21 +7045,39 @@ const resources = {
         "Ity endri-javatra ity dia natokana ho an'ny Mpikambana Pro. Te hiditra? Havaozy dieny izao ary ankafizo ireo tombontsoa manokana natao ho anao!",
 
       unlockHealthAgePremium: "Sokafy ny Health Age Premium",
+      exportCsv: "Avoaka CSV",
+
+      csvExportEmptyGroup: "Tsy misy tatitra azo avoaka ao amin'ity vondrona ity.",
+
+      csvExportFailed: "Tsy afaka nampivoaka ny rakitra CSV. Andramo indray azafady.",
+
+      brandingLogoInvalid: "Tsy afaka nampiasa ny logo nofidina. Misafidiana sary PNG na JPG azafady.",
+
+      closeDialog: "Akatony",
+
+      brandingContactUnsupported: "Misy tarehintsoratra amin'ny fampahalalana fifandraisanao tsy azo atonta ka nesorina.",
+
+      dailyLimitCheckFailed: "Tsy afaka nanamarina ny fetran'ny fanombanana isan'andro. Andramo indray azafady.",
+
+      purchasePending: "Voaray ny fividianana",
+
+      purchasePendingDesc: "Tontosa ny fividianananao, saingy mbola tsy azonay nohamarinina tamin'ny mpizara. Hovohana ny Premium rehefa voamarina. Tsindrio ny “Havaozy ny toe-javatra” hanandrana indray.",
+
       premiumSubtitle: "Mahazoa tombony bebe kokoa amin'ny fanombanana miaraka amin'ny fitaovana Premium.",
       unlimitedAssessmentsTitle: "Fanombanana ara-pahasalamana tsy voafetra",
       unlimitedAssessmentsDesc: "Manaova fanombanana tsy misy fetra isan'andro maimaim-poana.",
       assessmentHistoryTitle: "Tantaran'ny fanombanana",
-      assessmentHistoryDesc: "Tehirizo sy jereo indray ny valin'ny fanombanana teo aloha.",
+      assessmentHistoryDesc: "Tehirizo eto amin'ity fitaovana ity ny valiny taloha, jereo indray ary alamino ao anaty vondrona.",
       organizedReportHistoryTitle: "Tantaran'ny tatitra voalamina",
       organizedReportHistoryDesc: "Midira amin'ireo tatitra voatahiry ary alamino ho vondrona.",
       csvExportTitle: "Famoahana CSV",
-      csvExportDesc: "Avoahy ho rakitra CSV ny angon-drakitra fanombanana sy tatitra.",
-      printHealthReportsTitle: "Manonta tatitra ara-pahasalamana",
-      printHealthReportsDesc: "Atontao na zarao ny tatitra ara-pahasalamana misy anao.",
+      csvExportDesc: "Avoaka ho rakitra CSV ny vondrona tatitra voatahiry.",
+      printHealthReportsTitle: "Taratasy tatitra fahasalamana azo atonta",
+      printHealthReportsDesc: "Atonta ny taratasy tatitra fahasalamana foana hofenoina an-tanana.",
       printableQuestionnaireTitle: "Fanontaniana azo atonta",
       printableQuestionnaireDesc: "Midira amin'ny fanontaniana fanombanana ara-pahasalamana azo atonta.",
       personalizedReportBrandingTitle: "Famantarana manokana ny tatitra",
-      personalizedReportBrandingDesc: "Ampidiro ny sary famantarana sy ny fifandraisana amin'ny tatitra atonta.",
+      personalizedReportBrandingDesc: "Ampio ny logo sy ny fampahalalana fifandraisanao amin'ireo taratasy azo atonta.",
       annualSubscriptionSub: "Famandrihana Premium isan-taona",
       autoRenewTerms: "Mihavao ho azy isan-taona raha tsy foanana 24 ora mialoha amin'ny firafitry ny fivarotana. Azo foanana amin'ny fotoana rehetra.",
       upgradeToPremium: "Havaozy ho Premium",
@@ -6933,8 +7201,8 @@ const resources = {
       proFeatureUnlimitedAssessments: "Fanombanana Health Age tsy voafetra",
       proFeatureReportHistory: "Tantaran'ny tatitra sy vondrona",
       proFeatureCsvExport: "Fanondranana CSV",
-      proFeaturePrinting: "Fanontana fanontaniana sy tatitra",
-      proFeatureReportBranding: "Ampio ny logo sy ny antsipirianao momba ny fifandraisana amin'ny tatitra voapirinty",
+      proFeaturePrinting: "Atonta ny taratasy fanontaniana sy tatitra fahasalamana foana",
+      proFeatureReportBranding: "Ampio ny logo sy ny fampahalalana fifandraisanao amin'ny taratasy azo atonta",
       signInRequired: "Ilaina ny fidirana",
       unableToOpenLink: "Tsy afaka manokatra ny rohy",
       subscriptionActive: "Mavitrika ny famandrihana",
@@ -6991,7 +7259,7 @@ const resources = {
       logo: "Logo",
       uploadLogoAction: "Ampidiro ny logo",
       replaceLogo: "Soloy ny logo",
-      webDownloadTemplatesNote: "Ny fisintonana an-tserasera dia mampiasa ny endrika PDF efa ao anatiny (mbola tsy misy fanamboarana logo/adiresy amin'ny tranonkala).",
+      webDownloadTemplatesNote: "Ny fampidinana dia mampiasa ny maodely PDF efa misy. Ny logo sy ny fampahalalana fifandraisanao ao amin'ny Fanamboarana tatitra dia ampiana ho azy.",
       downloaded: "Voasintona",
       downloadUsLetter: "Sintomy US Letter",
       filtersNotSupportedWeb: "Mbola tsy tohanana amin'ny tranonkala ny sivana.",
@@ -7273,21 +7541,39 @@ const resources = {
         "Denne funktion er forbeholdt vores Pro-medlemmer. Vil du være med? Opgrader nu og nyd eksklusive fordele skræddersyet til dig!",
 
       unlockHealthAgePremium: "Lås op for Health Age Premium",
+      exportCsv: "Eksportér CSV",
+
+      csvExportEmptyGroup: "Denne gruppe har ingen rapporter at eksportere.",
+
+      csvExportFailed: "CSV-filen kunne ikke eksporteres. Prøv igen.",
+
+      brandingLogoInvalid: "Det valgte logo kunne ikke bruges. Vælg et PNG- eller JPG-billede.",
+
+      closeDialog: "Luk",
+
+      brandingContactUnsupported: "Nogle tegn i dine kontaktoplysninger kan ikke udskrives og blev udeladt.",
+
+      dailyLimitCheckFailed: "Vi kunne ikke kontrollere din daglige grænse for vurderinger. Prøv igen.",
+
+      purchasePending: "Køb modtaget",
+
+      purchasePendingDesc: "Dit køb er gennemført, men vi kunne endnu ikke bekræfte det med vores server. Premium låses op, når det er bekræftet. Tryk på “Opdater status” for at prøve igen.",
+
       premiumSubtitle: "Få mere ud af dine sundhedsvurderinger med Premium-værktøjer og rapporter.",
       unlimitedAssessmentsTitle: "Ubegrænsede sundhedsvurderinger",
       unlimitedAssessmentsDesc: "Udfør ubegrænsede helbredsalder-vurderinger uden den gratis daglige grænse.",
       assessmentHistoryTitle: "Vurderingshistorik",
-      assessmentHistoryDesc: "Gem og gense dine tidligere vurderingsresultater.",
+      assessmentHistoryDesc: "Gem tidligere resultater på denne enhed, se dem igen og organiser dem i grupper.",
       organizedReportHistoryTitle: "Organiseret rapporthistorik",
       organizedReportHistoryDesc: "Få adgang til dine gemte rapporter og organiser dem i grupper.",
       csvExportTitle: "CSV-eksport",
-      csvExportDesc: "Eksportér vurderings- og rapportdata til CSV til dine optegnelser.",
-      printHealthReportsTitle: "Udskriv sundhedsrapporter",
-      printHealthReportsDesc: "Udskriv eller del dine sundhedsrapporter med den eksisterende funktion.",
+      csvExportDesc: "Eksportér en gruppe af gemte rapporter til en CSV-fil.",
+      printHealthReportsTitle: "Printbar sundhedsrapportformular",
+      printHealthReportsDesc: "Udskriv en tom sundhedsrapportformular til udfyldning i hånden.",
       printableQuestionnaireTitle: "Udskrivbart spørgeskema",
       printableQuestionnaireDesc: "Få adgang til det udskrivbare spørgeskema til sundhedsvurdering.",
       personalizedReportBrandingTitle: "Personlig rapportbranding",
-      personalizedReportBrandingDesc: "Konfigurer logo og kontaktoplysninger på udskrevne rapporter.",
+      personalizedReportBrandingDesc: "Tilføj dit logo og dine kontaktoplysninger til de printbare formularer.",
       annualSubscriptionSub: "Årligt Premium-abonnement",
       autoRenewTerms: "Fornyes automatisk årligt, medmindre det opsiges mindst 24 timer før periodens udløb. Opsig når som helst.",
       upgradeToPremium: "Opgrader til Premium",
@@ -7409,8 +7695,8 @@ const resources = {
       proFeatureUnlimitedAssessments: "Ubegrænsede Health Age-vurderinger",
       proFeatureReportHistory: "Rapporthistorik og grupper",
       proFeatureCsvExport: "CSV-eksport",
-      proFeaturePrinting: "Udskrivning af spørgeskemaer og rapporter",
-      proFeatureReportBranding: "Tilføj dit logo og dine kontaktoplysninger til udskrevne rapporter",
+      proFeaturePrinting: "Udskriv tomme spørgeskemaer og sundhedsrapportformularer",
+      proFeatureReportBranding: "Tilføj dit logo og dine kontaktoplysninger til printbare formularer",
       signInRequired: "Log ind påkrævet",
       unableToOpenLink: "Kan ikke åbne link",
       subscriptionActive: "Abonnement aktivt",
@@ -7467,7 +7753,7 @@ const resources = {
       logo: "Logo",
       uploadLogoAction: "Upload logo",
       replaceLogo: "Erstat logo",
-      webDownloadTemplatesNote: "Webdownloads bruger de indbyggede PDF-skabeloner (ingen tilpasning af logo/adresse på nettet endnu).",
+      webDownloadTemplatesNote: "Downloads bruger de indbyggede PDF-skabeloner. Dit logo og dine kontaktoplysninger fra Rapportindstillinger tilføjes automatisk.",
       downloaded: "Downloadet",
       downloadUsLetter: "Download US Letter",
       filtersNotSupportedWeb: "Filtre understøttes endnu ikke på nettet.",
@@ -7788,21 +8074,39 @@ const resources = {
         "இந்த அம்சம் எங்கள் ப்ரோ உறுப்பினர்களுக்காக மட்டுமே. சேர விருப்பமா? இப்போது மேம்படுத்தி, உங்கள் தேவைகளுக்கேற்ப வடிவமைக்கப்பட்ட சிறப்பு நன்மைகளை அனுபவியுங்கள்!",
 
       unlockHealthAgePremium: "Health Age Premium ஐ திறக்கவும்",
+      exportCsv: "CSV ஏற்றுமதி",
+
+      csvExportEmptyGroup: "இந்தக் குழுவில் ஏற்றுமதி செய்ய அறிக்கைகள் இல்லை.",
+
+      csvExportFailed: "CSV கோப்பை ஏற்றுமதி செய்ய முடியவில்லை. மீண்டும் முயலவும்.",
+
+      brandingLogoInvalid: "தேர்ந்தெடுத்த லோகோவைப் பயன்படுத்த முடியவில்லை. PNG அல்லது JPG படத்தைத் தேர்ந்தெடுக்கவும்.",
+
+      closeDialog: "மூடு",
+
+      brandingContactUnsupported: "உங்கள் தொடர்பு விவரங்களில் சில எழுத்துகளை அச்சிட முடியாததால் விடப்பட்டன.",
+
+      dailyLimitCheckFailed: "உங்கள் தினசரி மதிப்பீட்டு வரம்பைச் சரிபார்க்க முடியவில்லை. மீண்டும் முயலவும்.",
+
+      purchasePending: "கொள்முதல் பெறப்பட்டது",
+
+      purchasePendingDesc: "உங்கள் கொள்முதல் முடிந்தது, ஆனால் எங்கள் சேவையகத்தில் இன்னும் உறுதிப்படுத்த முடியவில்லை. உறுதிசெய்யப்பட்டதும் பிரீமியம் திறக்கும். மீண்டும் முயல “நிலையைப் புதுப்பி” என்பதைத் தட்டவும்.",
+
       premiumSubtitle: "பிரீமியம் கருவிகள் மற்றும் அறிக்கை அம்சங்களுடன் கூடுதல் பலன்களைப் பெறுங்கள்.",
       unlimitedAssessmentsTitle: "வரம்பற்ற சுகாதார மதிப்பீடுகள்",
       unlimitedAssessmentsDesc: "இலவச தினசரி வரம்பு இல்லாமல் வரம்பற்ற சுகாதார வயது மதிப்பீடுகளைச் செய்யுங்கள்.",
       assessmentHistoryTitle: "மதிப்பீட்டு வரலாறு",
-      assessmentHistoryDesc: "முந்தைய மதிப்பீட்டு முடிவுகளைச் சேமித்து மீண்டும் பார்வையிடவும்.",
+      assessmentHistoryDesc: "முந்தைய முடிவுகளை இந்தச் சாதனத்தில் சேமித்து, மீண்டும் பார்த்து, குழுக்களாக ஒழுங்கமைக்கவும்.",
       organizedReportHistoryTitle: "ஒழுங்கமைக்கப்பட்ட அறிக்கை வரலாறு",
       organizedReportHistoryDesc: "சேமிக்கப்பட்ட அறிக்கைகளை அணுகி குழுக்களாக ஒழுங்கமைக்கவும்.",
       csvExportTitle: "CSV ஏற்றுமதி",
-      csvExportDesc: "உங்கள் பதிவுகளுக்காக மதிப்பீடு மற்றும் அறிக்கை தரவை CSV ஆக ஏற்றுமதி செய்யுங்கள்.",
-      printHealthReportsTitle: "சுகாதார அறிக்கைகளை அச்சிடவும்",
-      printHealthReportsDesc: "தற்போதுள்ள அம்சத்தைப் பயன்படுத்தி உங்கள் அறிக்கைகளை அச்சிடவும் அல்லது பகிரவும்.",
+      csvExportDesc: "சேமித்த அறிக்கைகளின் குழுவை CSV கோப்பாக ஏற்றுமதி செய்யவும்.",
+      printHealthReportsTitle: "அச்சிடக்கூடிய சுகாதார அறிக்கைப் படிவம்",
+      printHealthReportsDesc: "கையால் நிரப்புவதற்கு வெற்று சுகாதார அறிக்கைப் படிவத்தை அச்சிடவும்.",
       printableQuestionnaireTitle: "அச்சிடக்கூடிய வினாத்தாள்",
       printableQuestionnaireDesc: "அச்சிடக்கூடிய சுகாதார மதிப்பீட்டு வினாத்தாளை அணுகவும்.",
       personalizedReportBrandingTitle: "தனிப்பயனாக்கப்பட்ட அறிக்கை பிராண்டிங்",
-      personalizedReportBrandingDesc: "அச்சிடப்பட்ட அறிக்கைகளில் லோகோ மற்றும் தொடர்பு விவரங்களைச் சேர்க்கவும்.",
+      personalizedReportBrandingDesc: "அச்சிடக்கூடிய படிவங்களில் உங்கள் லோகோ மற்றும் தொடர்பு விவரங்களைச் சேர்க்கவும்.",
       annualSubscriptionSub: "ஆண்டு பிரீமியம் சந்தா",
       autoRenewTerms: "காலக்கெடு முடிவதற்கு குறைந்தது 24 மணி நேரத்திற்கு முன் ரத்து செய்யாவிட்டால் தானாகப் புதுப்பிக்கப்படும். எப்போது வேண்டுமானாலும் ரத்து செய்யலாம்.",
       upgradeToPremium: "பிரீமியத்திற்கு மேம்படுத்தவும்",
@@ -7927,8 +8231,8 @@ const resources = {
       proFeatureUnlimitedAssessments: "வரம்பற்ற Health Age மதிப்பீடுகள்",
       proFeatureReportHistory: "அறிக்கை வரலாறு மற்றும் குழுக்கள்",
       proFeatureCsvExport: "CSV ஏற்றுமதி",
-      proFeaturePrinting: "கேள்வித்தாள்கள் மற்றும் அறிக்கைகளை அச்சிடுதல்",
-      proFeatureReportBranding: "அச்சிடப்பட்ட அறிக்கைகளில் உங்கள் லோகோ மற்றும் தொடர்பு தகவலைச் சேர்க்கவும்",
+      proFeaturePrinting: "வெற்று கேள்வித்தாள் மற்றும் சுகாதார அறிக்கைப் படிவங்களை அச்சிடவும்",
+      proFeatureReportBranding: "அச்சிடக்கூடிய படிவங்களில் உங்கள் லோகோ மற்றும் தொடர்பு விவரங்களைச் சேர்க்கவும்",
       signInRequired: "உள்நுழைவு தேவை",
       unableToOpenLink: "இணைப்பைத் திறக்க முடியவில்லை",
       subscriptionActive: "சந்தா செயலில் உள்ளது",
@@ -7985,7 +8289,7 @@ const resources = {
       logo: "லோகோ",
       uploadLogoAction: "லோகோவைப் பதிவேற்று",
       replaceLogo: "லோகோவை மாற்று",
-      webDownloadTemplatesNote: "இணையப் பதிவிறக்கங்கள் உள்ளமைந்த PDF வார்ப்புருக்களைப் பயன்படுத்துகின்றன (இணையத்தில் இன்னும் லோகோ/முகவரி தனிப்பயனாக்கம் இல்லை).",
+      webDownloadTemplatesNote: "பதிவிறக்கங்கள் உள்ளமைந்த PDF வார்ப்புருக்களைப் பயன்படுத்துகின்றன. அறிக்கை அமைப்புகளில் உள்ள உங்கள் லோகோ மற்றும் தொடர்பு விவரங்கள் தானாகச் சேர்க்கப்படும்.",
       downloaded: "பதிவிறக்கப்பட்டது",
       downloadUsLetter: "US Letter பதிவிறக்கு",
       filtersNotSupportedWeb: "வடிப்பான்கள் இணையத்தில் இன்னும் ஆதரிக்கப்படவில்லை.",
@@ -8265,21 +8569,39 @@ const resources = {
         "এই সুবিধাটি শুধুমাত্র আমাদের প্রো সদস্যদের জন্য সংরক্ষিত। যোগ দিতে চান? এখনই আপগ্রেড করুন এবং আপনার জন্য বিশেষভাবে তৈরি সুবিধাগুলো উপভোগ করুন!",
 
       unlockHealthAgePremium: "Health Age Premium আনলক করুন",
+      exportCsv: "CSV এক্সপোর্ট",
+
+      csvExportEmptyGroup: "এই গ্রুপে এক্সপোর্ট করার মতো কোনো রিপোর্ট নেই।",
+
+      csvExportFailed: "CSV ফাইল এক্সপোর্ট করা যায়নি। আবার চেষ্টা করুন।",
+
+      brandingLogoInvalid: "নির্বাচিত লোগো ব্যবহার করা যায়নি। অনুগ্রহ করে PNG বা JPG ছবি বেছে নিন।",
+
+      closeDialog: "বন্ধ করুন",
+
+      brandingContactUnsupported: "আপনার যোগাযোগের তথ্যের কিছু অক্ষর প্রিন্ট করা যায়নি এবং বাদ দেওয়া হয়েছে।",
+
+      dailyLimitCheckFailed: "আপনার দৈনিক মূল্যায়নের সীমা যাচাই করা যায়নি। আবার চেষ্টা করুন।",
+
+      purchasePending: "ক্রয় গৃহীত হয়েছে",
+
+      purchasePendingDesc: "আপনার ক্রয় সম্পন্ন হয়েছে, কিন্তু আমাদের সার্ভারে এখনও নিশ্চিত করা যায়নি। নিশ্চিত হলে প্রিমিয়াম আনলক হবে। আবার চেষ্টা করতে “স্ট্যাটাস রিফ্রেশ” চাপুন।",
+
       premiumSubtitle: "প্রিমিয়াম সরঞ্জাম এবং রিপোর্টিং বৈশিষ্ট্যের মাধ্যমে আরও বেশি সুবিধা পান।",
       unlimitedAssessmentsTitle: "সীমাহীন স্বাস্থ্য মূল্যায়ন",
       unlimitedAssessmentsDesc: "দৈনিক ফ্রি সীমা ছাড়াই সীমাহীন স্বাস্থ্য বয়স মূল্যায়ন করুন।",
       assessmentHistoryTitle: "মূল্যায়ন ইতিহাস",
-      assessmentHistoryDesc: "আপনার আগের মূল্যায়নের ফলাফল সংরক্ষণ করুন এবং পুনরায় দেখুন।",
+      assessmentHistoryDesc: "আগের ফলাফল এই ডিভাইসে সংরক্ষণ করুন, আবার দেখুন এবং গ্রুপে সাজান।",
       organizedReportHistoryTitle: "সংগঠিত রিপোর্ট ইতিহাস",
       organizedReportHistoryDesc: "সংরক্ষিত রিপোর্ট অ্যাক্সেস করুন এবং সেগুলিকে গ্রুপে সংগঠিত করুন।",
       csvExportTitle: "CSV এক্সপোর্ট",
-      csvExportDesc: "আপনার রেকর্ডের জন্য মূল্যায়ন এবং রিপোর্ট ডেটা CSV তে এক্সপোর্ট করুন।",
-      printHealthReportsTitle: "স্বাস্থ্য রিপোর্ট প্রিন্ট করুন",
-      printHealthReportsDesc: "বিদ্যমান রিপোর্টিং বৈশিষ্ট্য ব্যবহার করে আপনার রিপোর্ট প্রিন্ট বা শেয়ার করুন।",
+      csvExportDesc: "সংরক্ষিত রিপোর্টের একটি গ্রুপ CSV ফাইলে এক্সপোর্ট করুন।",
+      printHealthReportsTitle: "প্রিন্টযোগ্য স্বাস্থ্য রিপোর্ট ফর্ম",
+      printHealthReportsDesc: "হাতে পূরণ করার জন্য একটি ফাঁকা স্বাস্থ্য রিপোর্ট ফর্ম প্রিন্ট করুন।",
       printableQuestionnaireTitle: "প্রিন্টযোগ্য প্রশ্নাবলী",
       printableQuestionnaireDesc: "প্রিন্টযোগ্য স্বাস্থ্য মূল্যায়ন প্রশ্নাবলী অ্যাক্সেস করুন।",
       personalizedReportBrandingTitle: "ব্যক্তিগতকৃত রিপোর্ট ব্র্যান্ডিং",
-      personalizedReportBrandingDesc: "প্রিন্ট করা রিপোর্টে আপনার লোগো এবং যোগাযোগের তথ্য যুক্ত করুন।",
+      personalizedReportBrandingDesc: "প্রিন্টযোগ্য ফর্মে আপনার লোগো ও যোগাযোগের তথ্য যোগ করুন।",
       annualSubscriptionSub: "বার্ষিক প্রিমিয়াম সাবস্ক্রিপশন",
       autoRenewTerms: "মেয়াদ শেষ হওয়ার অন্তত ২৪ ঘণ্টা আগে স্টোর সেটিংসে বাতিল না করা হলে প্রতি বছর স্বয়ংক্রিয়ভাবে পুনর্নবীকরণ হয়। যেকোনো সময় বাতিলযোগ্য।",
       upgradeToPremium: "প্রিমিয়ামে আপগ্রেড করুন",
@@ -8399,8 +8721,8 @@ const resources = {
       proFeatureUnlimitedAssessments: "সীমাহীন Health Age মূল্যায়ন",
       proFeatureReportHistory: "রিপোর্ট ইতিহাস এবং গ্রুপ",
       proFeatureCsvExport: "CSV এক্সপোর্ট",
-      proFeaturePrinting: "প্রশ্নমালা এবং রিপোর্ট প্রিন্ট করা",
-      proFeatureReportBranding: "প্রিন্ট করা রিপোর্টে আপনার লোগো এবং যোগাযোগের তথ্য যুক্ত করুন",
+      proFeaturePrinting: "ফাঁকা প্রশ্নাবলি ও স্বাস্থ্য রিপোর্ট ফর্ম প্রিন্ট করুন",
+      proFeatureReportBranding: "প্রিন্টযোগ্য ফর্মে আপনার লোগো ও যোগাযোগের তথ্য যোগ করুন",
       signInRequired: "সাইন ইন প্রয়োজন",
       unableToOpenLink: "লিঙ্ক খোলা যায়নি",
       subscriptionActive: "সাবস্ক্রিপশন সক্রিয়",
@@ -8457,7 +8779,7 @@ const resources = {
       logo: "লোগো",
       uploadLogoAction: "লোগো আপলোড করুন",
       replaceLogo: "লোগো পরিবর্তন করুন",
-      webDownloadTemplatesNote: "ওয়েব ডাউনলোড অন্তর্নির্মিত PDF টেমপ্লেট ব্যবহার করে (ওয়েবে এখনও লোগো/ঠিকানা কাস্টমাইজেশন নেই)।",
+      webDownloadTemplatesNote: "ডাউনলোডে বিল্ট-ইন PDF টেমপ্লেট ব্যবহার হয়। রিপোর্ট সেটিংসে দেওয়া আপনার লোগো ও যোগাযোগের তথ্য স্বয়ংক্রিয়ভাবে যোগ হয়।",
       downloaded: "ডাউনলোড হয়েছে",
       downloadUsLetter: "US Letter ডাউনলোড করুন",
       filtersNotSupportedWeb: "ফিল্টার এখনও ওয়েবে সমর্থিত নয়।",
@@ -8738,21 +9060,39 @@ const resources = {
         "Fitur ini khusus untuk Anggota Pro kami. Ingin bergabung? Tingkatkan sekarang dan nikmati manfaat eksklusif yang dirancang khusus untuk Anda!",
 
       unlockHealthAgePremium: "Buka Health Age Premium",
+      exportCsv: "Ekspor CSV",
+
+      csvExportEmptyGroup: "Grup ini tidak memiliki laporan untuk diekspor.",
+
+      csvExportFailed: "File CSV tidak dapat diekspor. Silakan coba lagi.",
+
+      brandingLogoInvalid: "Logo yang dipilih tidak dapat digunakan. Pilih gambar PNG atau JPG.",
+
+      closeDialog: "Tutup",
+
+      brandingContactUnsupported: "Beberapa karakter pada detail kontak Anda tidak dapat dicetak dan dihilangkan.",
+
+      dailyLimitCheckFailed: "Kami tidak dapat memeriksa batas penilaian harian Anda. Silakan coba lagi.",
+
+      purchasePending: "Pembelian diterima",
+
+      purchasePendingDesc: "Pembelian Anda berhasil, tetapi kami belum dapat mengonfirmasinya ke server kami. Premium akan terbuka setelah dikonfirmasi. Ketuk “Segarkan Status” untuk mencoba lagi.",
+
       premiumSubtitle: "Dapatkan lebih banyak dari penilaian kesehatan Anda dengan fitur Premium.",
       unlimitedAssessmentsTitle: "Penilaian Kesehatan Tanpa Batas",
       unlimitedAssessmentsDesc: "Lakukan penilaian usia kesehatan tanpa batas batas harian gratis.",
       assessmentHistoryTitle: "Riwayat Penilaian",
-      assessmentHistoryDesc: "Simpan dan lihat kembali hasil penilaian Anda sebelumnya.",
+      assessmentHistoryDesc: "Simpan hasil sebelumnya di perangkat ini, lihat kembali, dan atur ke dalam grup.",
       organizedReportHistoryTitle: "Riwayat Laporan Terorganisir",
       organizedReportHistoryDesc: "Akses laporan tersimpan dan atur ke dalam grup.",
       csvExportTitle: "Ekspor CSV",
-      csvExportDesc: "Ekspor data penilaian dan laporan ke CSV untuk catatan Anda.",
-      printHealthReportsTitle: "Cetak Laporan Kesehatan",
-      printHealthReportsDesc: "Cetak atau bagikan laporan kesehatan menggunakan fitur yang tersedia.",
+      csvExportDesc: "Ekspor satu grup laporan tersimpan ke file CSV.",
+      printHealthReportsTitle: "Formulir Laporan Kesehatan yang Dapat Dicetak",
+      printHealthReportsDesc: "Cetak formulir laporan kesehatan kosong untuk diisi dengan tangan.",
       printableQuestionnaireTitle: "Kuesioner yang Dapat Dicetak",
       printableQuestionnaireDesc: "Akses kuesioner penilaian kesehatan yang dapat dicetak.",
       personalizedReportBrandingTitle: "Branding Laporan yang Dipersonalisasi",
-      personalizedReportBrandingDesc: "Konfigurasikan logo dan info kontak pada laporan yang dicetak.",
+      personalizedReportBrandingDesc: "Tambahkan logo dan detail kontak Anda ke formulir yang dapat dicetak.",
       annualSubscriptionSub: "Langganan Premium Tahunan",
       autoRenewTerms: "Diperbarui otomatis setiap tahun kecuali dibatalkan di pengaturan toko setidaknya 24 jam sebelum periode berakhir. Batalkan kapan saja.",
       upgradeToPremium: "Tingkatkan ke Premium",
@@ -8872,8 +9212,8 @@ const resources = {
       proFeatureUnlimitedAssessments: "Penilaian Health Age tanpa batas",
       proFeatureReportHistory: "Riwayat laporan dan grup",
       proFeatureCsvExport: "Ekspor CSV",
-      proFeaturePrinting: "Mencetak kuesioner dan laporan",
-      proFeatureReportBranding: "Tambahkan logo dan informasi kontak Anda ke laporan yang dicetak",
+      proFeaturePrinting: "Cetak kuesioner dan formulir laporan kesehatan kosong",
+      proFeatureReportBranding: "Tambahkan logo dan detail kontak ke formulir yang dapat dicetak",
       signInRequired: "Perlu masuk",
       unableToOpenLink: "Tidak dapat membuka tautan",
       subscriptionActive: "Langganan aktif",
@@ -8930,7 +9270,7 @@ const resources = {
       logo: "Logo",
       uploadLogoAction: "Unggah logo",
       replaceLogo: "Ganti logo",
-      webDownloadTemplatesNote: "Unduhan web menggunakan templat PDF bawaan (belum ada kustomisasi logo/alamat di web).",
+      webDownloadTemplatesNote: "Unduhan menggunakan templat PDF bawaan. Logo dan detail kontak Anda dari Pengaturan Laporan ditambahkan secara otomatis.",
       downloaded: "Telah diunduh",
       downloadUsLetter: "Unduh US Letter",
       filtersNotSupportedWeb: "Filter belum didukung di web.",
@@ -9210,21 +9550,39 @@ const resources = {
         "Bu özellik yalnızca Pro Üyelerimize özeldir. Katılmak ister misiniz? Hemen yükseltin ve size özel hazırlanmış ayrıcalıkların keyfini çıkarın!",
 
       unlockHealthAgePremium: "Health Age Premium'un Kilidini Açın",
+      exportCsv: "CSV Dışa Aktar",
+
+      csvExportEmptyGroup: "Bu grupta dışa aktarılacak rapor yok.",
+
+      csvExportFailed: "CSV dosyası dışa aktarılamadı. Lütfen tekrar deneyin.",
+
+      brandingLogoInvalid: "Seçilen logo kullanılamadı. Lütfen PNG veya JPG görseli seçin.",
+
+      closeDialog: "Kapat",
+
+      brandingContactUnsupported: "İletişim bilgilerinizdeki bazı karakterler yazdırılamadığı için atlandı.",
+
+      dailyLimitCheckFailed: "Günlük değerlendirme sınırınız kontrol edilemedi. Lütfen tekrar deneyin.",
+
+      purchasePending: "Satın alma alındı",
+
+      purchasePendingDesc: "Satın alma işleminiz tamamlandı ancak sunucumuzla henüz doğrulanamadı. Doğrulandığında Premium açılacak. Yeniden denemek için “Durumu Yenile”ye dokunun.",
+
       premiumSubtitle: "Premium araçlar ve raporlama özellikleri ile sağlık değerlendirmelerinizden daha fazlasını alın.",
       unlimitedAssessmentsTitle: "Sınırsız Sağlık Değerlendirmesi",
       unlimitedAssessmentsDesc: "Ücretsiz günlük limit olmadan sınırsız sağlık yaşı değerlendirmesi yapın.",
       assessmentHistoryTitle: "Değerlendirme Geçmişi",
-      assessmentHistoryDesc: "Önceki değerlendirme sonuçlarınızı kaydedin ve tekrar inceleyin.",
+      assessmentHistoryDesc: "Geçmiş sonuçları bu cihazda kaydedin, yeniden görüntüleyin ve gruplar halinde düzenleyin.",
       organizedReportHistoryTitle: "Düzenli Rapor Geçmişi",
       organizedReportHistoryDesc: "Kayıtlı raporlarınıza erişin ve bunları gruplar halinde düzenleyin.",
       csvExportTitle: "CSV Dışa Aktarma",
-      csvExportDesc: "Kayıtlarınız için değerlendirme ve rapor verilerini CSV olarak dışa aktarın.",
-      printHealthReportsTitle: "Sağlık Raporlarını Yazdırın",
-      printHealthReportsDesc: "Mevcut raporlama özelliğini kullanarak raporlarınızı yazdırın veya paylaşın.",
+      csvExportDesc: "Kayıtlı raporlardan oluşan bir grubu CSV dosyası olarak dışa aktarın.",
+      printHealthReportsTitle: "Yazdırılabilir Sağlık Raporu Formu",
+      printHealthReportsDesc: "Elle doldurmak için boş bir sağlık raporu formu yazdırın.",
       printableQuestionnaireTitle: "Yazdırılabilir Anket",
       printableQuestionnaireDesc: "Yazdırılabilir sağlık değerlendirme anketine erişin.",
       personalizedReportBrandingTitle: "Kişiselleştirilmiş Rapor Markalaması",
-      personalizedReportBrandingDesc: "Yazdırılan raporlara logonuzu ve iletişim bilgilerinizi ekleyin.",
+      personalizedReportBrandingDesc: "Yazdırılabilir formlara logonuzu ve iletişim bilgilerinizi ekleyin.",
       annualSubscriptionSub: "Yıllık Premium Abonelik",
       autoRenewTerms: "Dönem bitiminden en az 24 saat önce mağaza ayarlarından iptal edilmediği sürece her yıl otomatik yenilenir. İstediğiniz zaman iptal edin.",
       upgradeToPremium: "Premium'a Yükselt",
@@ -9344,8 +9702,8 @@ const resources = {
       proFeatureUnlimitedAssessments: "Sınırsız Health Age değerlendirmeleri",
       proFeatureReportHistory: "Rapor geçmişi ve gruplar",
       proFeatureCsvExport: "CSV dışa aktarma",
-      proFeaturePrinting: "Anket ve rapor yazdırma",
-      proFeatureReportBranding: "Yazdırılan raporlara logonuzu ve iletişim bilgilerinizi ekleyin",
+      proFeaturePrinting: "Boş anket ve sağlık raporu formlarını yazdırın",
+      proFeatureReportBranding: "Yazdırılabilir formlara logonuzu ve iletişim bilgilerinizi ekleyin",
       signInRequired: "Giriş gerekli",
       unableToOpenLink: "Bağlantı açılamıyor",
       subscriptionActive: "Abonelik etkin",
@@ -9402,7 +9760,7 @@ const resources = {
       logo: "Logo",
       uploadLogoAction: "Logo yükle",
       replaceLogo: "Logoyu değiştir",
-      webDownloadTemplatesNote: "Web indirmeleri yerleşik PDF şablonlarını kullanır (web'de henüz logo/adres özelleştirmesi yoktur).",
+      webDownloadTemplatesNote: "İndirmeler yerleşik PDF şablonlarını kullanır. Rapor Ayarları'ndaki logonuz ve iletişim bilgileriniz otomatik olarak eklenir.",
       downloaded: "İndirildi",
       downloadUsLetter: "US Letter İndir",
       filtersNotSupportedWeb: "Filtreler web'de henüz desteklenmiyor.",
@@ -9682,21 +10040,39 @@ const resources = {
         "ఈ ఫీచర్ మా ప్రో సభ్యుల కోసం మాత్రమే. చేరాలనుకుంటున్నారా? ఇప్పుడే అప్‌గ్రేడ్ చేసి మీ కోసం ప్రత్యేకంగా రూపొందించిన ప్రయోజనాలను ఆస్వాదించండి!",
 
       unlockHealthAgePremium: "Health Age Premium ని అన్‌లాక్ చేయండి",
+      exportCsv: "CSV ఎగుమతి",
+
+      csvExportEmptyGroup: "ఈ సమూహంలో ఎగుమతి చేయడానికి నివేదికలు లేవు.",
+
+      csvExportFailed: "CSV ఫైల్‌ను ఎగుమతి చేయలేకపోయాం. దయచేసి మళ్లీ ప్రయత్నించండి.",
+
+      brandingLogoInvalid: "ఎంచుకున్న లోగోను ఉపయోగించలేకపోయాం. దయచేసి PNG లేదా JPG చిత్రాన్ని ఎంచుకోండి.",
+
+      closeDialog: "మూసివేయి",
+
+      brandingContactUnsupported: "మీ సంప్రదింపు వివరాలలోని కొన్ని అక్షరాలను ముద్రించలేకపోయినందున వాటిని వదిలేశాం.",
+
+      dailyLimitCheckFailed: "మీ రోజువారీ అంచనా పరిమితిని తనిఖీ చేయలేకపోయాం. దయచేసి మళ్లీ ప్రయత్నించండి.",
+
+      purchasePending: "కొనుగోలు అందింది",
+
+      purchasePendingDesc: "మీ కొనుగోలు పూర్తయింది, కానీ మా సర్వర్‌తో ఇంకా నిర్ధారించలేకపోయాం. నిర్ధారణ అయ్యాక ప్రీమియం అన్‌లాక్ అవుతుంది. మళ్లీ ప్రయత్నించడానికి “స్థితిని రిఫ్రెష్ చేయండి” నొక్కండి.",
+
       premiumSubtitle: "ప్రీమియం టూల్స్ మరియు రిపోర్టింగ్ ఫీచర్లతో మరిన్ని ప్రయోజనాలను పొందండి.",
       unlimitedAssessmentsTitle: "అపరిమిత ఆరోగ్య అంచనాలు",
       unlimitedAssessmentsDesc: "ఉచిత రోజువారీ పరిమితి లేకుండా అపరిమిత ఆరోగ్య వయస్సు అంచనాలను చేయండి.",
       assessmentHistoryTitle: "అంచనాల చరిత్ర",
-      assessmentHistoryDesc: "మీ మునుపటి అంచనా ఫలితాలను సేవ్ చేసుకోండి మరియు మళ్లీ చూడండి.",
+      assessmentHistoryDesc: "గత ఫలితాలను ఈ పరికరంలో సేవ్ చేసి, మళ్లీ చూడండి, వాటిని సమూహాలుగా నిర్వహించండి.",
       organizedReportHistoryTitle: "వ్యవస్థీకృత నివేదికల చరిత్ర",
       organizedReportHistoryDesc: "సేవ్ చేసిన నివేదికలను యాక్సెస్ చేయండి మరియు వాటిని సమూహాలుగా నిర్వహించండి.",
       csvExportTitle: "CSV ఎగుమతి",
-      csvExportDesc: "మీ రికార్డుల కోసం అంచనా మరియు నివేదిక డేటాను CSV కి ఎగుమతి చేయండి.",
-      printHealthReportsTitle: "ఆరోగ్య నివేదికలను ముద్రించండి",
-      printHealthReportsDesc: "ప్రస్తుత రిపోర్టింగ్ ఫంక్షనాలిటీని ఉపయోగించి మీ నివేదికలను ప్రింట్ చేయండి లేదా షేర్ చేయండి.",
+      csvExportDesc: "సేవ్ చేసిన నివేదికల సమూహాన్ని CSV ఫైల్‌గా ఎగుమతి చేయండి.",
+      printHealthReportsTitle: "ముద్రించదగిన ఆరోగ్య నివేదిక ఫారమ్",
+      printHealthReportsDesc: "చేతితో నింపడానికి ఖాళీ ఆరోగ్య నివేదిక ఫారమ్‌ను ముద్రించండి.",
       printableQuestionnaireTitle: "ప్రింట్ చేయదగిన ప్రశ్నాపత్రం",
       printableQuestionnaireDesc: "ప్రింట్ చేయగల ఆరోగ్య అంచనా ప్రశ్నాపత్రాన్ని యాక్సెస్ చేయండి.",
       personalizedReportBrandingTitle: "వ్యక్తిగతీకరించిన నివేదిక బ్రాండింగ్",
-      personalizedReportBrandingDesc: "ప్రింట్ చేసిన నివేదికలపై మీ లోగో మరియు సంప్రదింపు సమాచారాన్ని జోడించండి.",
+      personalizedReportBrandingDesc: "ముద్రించదగిన ఫారమ్‌లకు మీ లోగో మరియు సంప్రదింపు వివరాలను జోడించండి.",
       annualSubscriptionSub: "వార్షిక ప్రీమియం సభ్యత్వం",
       autoRenewTerms: "గడువు ముగియడానికి కనీసం 24 గంటల ముందు స్టోర్ సెట్టింగ్లలో రద్దు చేయకపోతే స్వయంచాలకంగా పునరుద్ధరించబడుతుంది. ఎప్పుడైనా రద్దు చేయవచ్చు.",
       upgradeToPremium: "ప్రీమియంకు అప్‌గ్రేడ్ చేయండి",
@@ -9816,8 +10192,8 @@ const resources = {
       proFeatureUnlimitedAssessments: "అపరిమిత Health Age మూల్యాంకనాలు",
       proFeatureReportHistory: "నివేదిక చరిత్ర మరియు గ్రూపులు",
       proFeatureCsvExport: "CSV ఎగుమతి",
-      proFeaturePrinting: "ప్రశ్నావళులు మరియు నివేదికలను ముద్రించడం",
-      proFeatureReportBranding: "ముద్రించిన నివేదికలకు మీ లోగో మరియు సంప్రదింపు సమాచారాన్ని జోడించండి",
+      proFeaturePrinting: "ఖాళీ ప్రశ్నావళి మరియు ఆరోగ్య నివేదిక ఫారమ్‌లను ముద్రించండి",
+      proFeatureReportBranding: "ముద్రించదగిన ఫారమ్‌లకు మీ లోగో మరియు సంప్రదింపు వివరాలను జోడించండి",
       signInRequired: "సైన్ ఇన్ అవసరం",
       unableToOpenLink: "లింక్‌ను తెరవలేకపోయాము",
       subscriptionActive: "సబ్‌స్క్రిప్షన్ యాక్టివ్",
@@ -9874,7 +10250,7 @@ const resources = {
       logo: "లోగో",
       uploadLogoAction: "లోగోను అప్‌లోడ్ చేయండి",
       replaceLogo: "లోగోను భర్తీ చేయండి",
-      webDownloadTemplatesNote: "వెబ్ డౌన్‌లోడ్‌లు అంతర్నిర్మిత PDF టెంప్లేట్‌లను ఉపయోగిస్తాయి (వెబ్‌లో ఇంకా లోగో/చిరునామా అనుకూలీకరణ లేదు).",
+      webDownloadTemplatesNote: "డౌన్‌లోడ్‌లు అంతర్నిర్మిత PDF టెంప్లేట్‌లను ఉపయోగిస్తాయి. నివేదిక సెట్టింగ్‌లలోని మీ లోగో మరియు సంప్రదింపు వివరాలు స్వయంచాలకంగా జోడించబడతాయి.",
       downloaded: "డౌన్‌లోడ్ అయింది",
       downloadUsLetter: "US Letter డౌన్‌లోడ్ చేయండి",
       filtersNotSupportedWeb: "ఫిల్టర్లు వెబ్‌లో ఇంకా మద్దతు ఇవ్వబడలేదు.",
@@ -10154,21 +10530,39 @@ const resources = {
         "ਇਹ ਸਹੂਲਤ ਸਿਰਫ਼ ਸਾਡੇ ਪ੍ਰੋ ਮੈਂਬਰਾਂ ਲਈ ਹੈ। ਸ਼ਾਮਲ ਹੋਣਾ ਚਾਹੁੰਦੇ ਹੋ? ਹੁਣੇ ਅੱਪਗ੍ਰੇਡ ਕਰੋ ਅਤੇ ਤੁਹਾਡੇ ਲਈ ਖ਼ਾਸ ਤਿਆਰ ਕੀਤੇ ਲਾਭਾਂ ਦਾ ਆਨੰਦ ਲਓ!",
 
       unlockHealthAgePremium: "Health Age Premium ਨੂੰ ਅਨਲੌਕ ਕਰੋ",
+      exportCsv: "CSV ਐਕਸਪੋਰਟ ਕਰੋ",
+
+      csvExportEmptyGroup: "ਇਸ ਸਮੂਹ ਵਿੱਚ ਐਕਸਪੋਰਟ ਕਰਨ ਲਈ ਕੋਈ ਰਿਪੋਰਟ ਨਹੀਂ ਹੈ।",
+
+      csvExportFailed: "CSV ਫ਼ਾਈਲ ਐਕਸਪੋਰਟ ਨਹੀਂ ਹੋ ਸਕੀ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।",
+
+      brandingLogoInvalid: "ਚੁਣਿਆ ਲੋਗੋ ਵਰਤਿਆ ਨਹੀਂ ਜਾ ਸਕਿਆ। ਕਿਰਪਾ ਕਰਕੇ PNG ਜਾਂ JPG ਚਿੱਤਰ ਚੁਣੋ।",
+
+      closeDialog: "ਬੰਦ ਕਰੋ",
+
+      brandingContactUnsupported: "ਤੁਹਾਡੇ ਸੰਪਰਕ ਵੇਰਵਿਆਂ ਦੇ ਕੁਝ ਅੱਖਰ ਪ੍ਰਿੰਟ ਨਹੀਂ ਹੋ ਸਕੇ ਅਤੇ ਛੱਡ ਦਿੱਤੇ ਗਏ।",
+
+      dailyLimitCheckFailed: "ਤੁਹਾਡੀ ਰੋਜ਼ਾਨਾ ਮੁਲਾਂਕਣ ਸੀਮਾ ਦੀ ਜਾਂਚ ਨਹੀਂ ਹੋ ਸਕੀ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।",
+
+      purchasePending: "ਖਰੀਦ ਪ੍ਰਾਪਤ ਹੋਈ",
+
+      purchasePendingDesc: "ਤੁਹਾਡੀ ਖਰੀਦ ਪੂਰੀ ਹੋ ਗਈ, ਪਰ ਅਸੀਂ ਹਾਲੇ ਸਾਡੇ ਸਰਵਰ ਨਾਲ ਇਸਦੀ ਪੁਸ਼ਟੀ ਨਹੀਂ ਕਰ ਸਕੇ। ਪੁਸ਼ਟੀ ਹੋਣ 'ਤੇ ਪ੍ਰੀਮੀਅਮ ਅਨਲੌਕ ਹੋ ਜਾਵੇਗਾ। ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਲਈ “ਸਥਿਤੀ ਰਿਫ੍ਰੈਸ਼ ਕਰੋ” ਦਬਾਓ।",
+
       premiumSubtitle: "ਪ੍ਰੀਮੀਅਮ ਟੂਲਜ਼ ਅਤੇ ਰਿਪੋਰਟਿੰਗ ਵਿਸ਼ੇਸ਼ਤਾਵਾਂ ਨਾਲ ਵਧੇਰੇ ਲਾਭ ਪ੍ਰਾਪਤ ਕਰੋ।",
       unlimitedAssessmentsTitle: "ਅਸੀਮਤ ਸਿਹਤ ਮੁਲਾਂਕਣ",
       unlimitedAssessmentsDesc: "ਮੁਫ਼ਤ ਰੋਜ਼ਾਨਾ ਸੀਮਾ ਤੋਂ ਬਿਨਾਂ ਅਸੀਮਤ ਸਿਹਤ ਉਮਰ ਮੁਲਾਂਕਣ ਕਰੋ।",
       assessmentHistoryTitle: "ਮੁਲਾਂਕਣ ਇਤਿਹਾਸ",
-      assessmentHistoryDesc: "ਆਪਣੇ ਪਿਛਲੇ ਮੁਲਾਂਕਣ ਨਤੀਜਿਆਂ ਨੂੰ ਸੁਰੱਖਿਅਤ ਕਰੋ ਅਤੇ ਦੁਬਾਰਾ ਦੇਖੋ।",
+      assessmentHistoryDesc: "ਪਿਛਲੇ ਨਤੀਜੇ ਇਸ ਡਿਵਾਈਸ 'ਤੇ ਸੇਵ ਕਰੋ, ਦੁਬਾਰਾ ਦੇਖੋ ਅਤੇ ਉਨ੍ਹਾਂ ਨੂੰ ਸਮੂਹਾਂ ਵਿੱਚ ਵਿਵਸਥਿਤ ਕਰੋ।",
       organizedReportHistoryTitle: "ਸੰਗਠਿਤ ਰਿਪੋਰਟ ਇਤਿਹਾਸ",
       organizedReportHistoryDesc: "ਸੁਰੱਖਿਅਤ ਕੀਤੀਆਂ ਰਿਪੋਰਟਾਂ ਤੱਕ ਪਹੁੰਚ ਕਰੋ ਅਤੇ ਉਹਨਾਂ ਨੂੰ ਸਮੂਹਾਂ ਵਿੱਚ ਸੰਗਠਿਤ ਕਰੋ।",
       csvExportTitle: "CSV ਨਿਰਯਾਤ",
-      csvExportDesc: "ਆਪਣੇ ਰਿਕਾਰਡਾਂ ਲਈ ਮੁਲਾਂਕਣ ਅਤੇ ਰਿਪੋਰਟ ਡੇਟਾ ਨੂੰ CSV ਵਿੱਚ ਨਿਰਯਾਤ ਕਰੋ।",
-      printHealthReportsTitle: "ਸਿਹਤ ਰਿਪੋਰਟਾਂ ਪ੍ਰਿੰਟ ਕਰੋ",
-      printHealthReportsDesc: "ਮੌਜੂਦਾ ਰਿਪੋਰਟਿੰਗ ਕਾਰਜਕੁਸ਼ਲਤਾ ਦੀ ਵਰਤੋਂ ਕਰਕੇ ਆਪਣੀਆਂ ਰਿਪੋਰਟਾਂ ਪ੍ਰਿੰਟ ਕਰੋ ਜਾਂ ਸਾਂਝੀਆਂ ਕਰੋ।",
+      csvExportDesc: "ਸੇਵ ਕੀਤੀਆਂ ਰਿਪੋਰਟਾਂ ਦੇ ਸਮੂਹ ਨੂੰ CSV ਫ਼ਾਈਲ ਵਿੱਚ ਐਕਸਪੋਰਟ ਕਰੋ।",
+      printHealthReportsTitle: "ਪ੍ਰਿੰਟ ਕਰਨ ਯੋਗ ਸਿਹਤ ਰਿਪੋਰਟ ਫਾਰਮ",
+      printHealthReportsDesc: "ਹੱਥ ਨਾਲ ਭਰਨ ਲਈ ਖਾਲੀ ਸਿਹਤ ਰਿਪੋਰਟ ਫਾਰਮ ਪ੍ਰਿੰਟ ਕਰੋ।",
       printableQuestionnaireTitle: "ਪ੍ਰਿੰਟ ਕਰਨ ਯੋਗ ਪ੍ਰਸ਼ਨਾਵਲੀ",
       printableQuestionnaireDesc: "ਪ੍ਰਿੰਟ ਕਰਨ ਯੋਗ ਸਿਹਤ ਮੁਲਾਂਕਣ ਪ੍ਰਸ਼ਨਾਵਲੀ ਤੱਕ ਪਹੁੰਚ ਕਰੋ।",
       personalizedReportBrandingTitle: "ਨਿੱਜੀ ਰਿਪੋਰਟ ਬ੍ਰਾਂਡਿੰਗ",
-      personalizedReportBrandingDesc: "ਪ੍ਰਿੰਟ ਕੀਤੀਆਂ ਰਿਪੋਰਟਾਂ 'ਤੇ ਆਪਣਾ ਲੋਗੋ ਅਤੇ ਸੰਪਰਕ ਜਾਣਕਾਰੀ ਸ਼ਾਮਲ ਕਰੋ।",
+      personalizedReportBrandingDesc: "ਪ੍ਰਿੰਟ ਕਰਨ ਯੋਗ ਫਾਰਮਾਂ ਵਿੱਚ ਆਪਣਾ ਲੋਗੋ ਅਤੇ ਸੰਪਰਕ ਵੇਰਵੇ ਜੋੜੋ।",
       annualSubscriptionSub: "ਸਾਲਾਨਾ ਪ੍ਰੀਮੀਅਮ ਗਾਹਕੀ",
       autoRenewTerms: "ਮਿਆਦ ਖਤਮ ਹੋਣ ਤੋਂ ਘੱਟੋ-ਘੱਟ 24 ਘੰਟੇ ਪਹਿਲਾਂ ਸਟੋਰ ਸੈਟਿੰਗਾਂ ਵਿੱਚ ਰੱਦ ਨਾ ਕੀਤੇ ਜਾਣ 'ਤੇ ਆਪਣੇ ਆਪ ਨਵਿਆਇਆ ਜਾਂਦਾ ਹੈ। ਕਦੇ ਵੀ ਰੱਦ ਕਰੋ।",
       upgradeToPremium: "ਪ੍ਰੀਮੀਅਮ ਵਿੱਚ ਅੱਪਗ੍ਰੇਡ ਕਰੋ",
@@ -10288,8 +10682,8 @@ const resources = {
       proFeatureUnlimitedAssessments: "ਅਸੀਮਤ Health Age ਮੁਲਾਂਕਣ",
       proFeatureReportHistory: "ਰਿਪੋਰਟ ਇਤਿਹਾਸ ਅਤੇ ਗਰੁੱਪ",
       proFeatureCsvExport: "CSV ਐਕਸਪੋਰਟ",
-      proFeaturePrinting: "ਪ੍ਰਸ਼ਨਾਵਲੀ ਅਤੇ ਰਿਪੋਰਟਾਂ ਛਾਪਣਾ",
-      proFeatureReportBranding: "ਛਾਪੀਆਂ ਰਿਪੋਰਟਾਂ ਵਿੱਚ ਆਪਣਾ ਲੋਗੋ ਅਤੇ ਸੰਪਰਕ ਜਾਣਕਾਰੀ ਸ਼ਾਮਲ ਕਰੋ",
+      proFeaturePrinting: "ਖਾਲੀ ਪ੍ਰਸ਼ਨਾਵਲੀ ਅਤੇ ਸਿਹਤ ਰਿਪੋਰਟ ਫਾਰਮ ਪ੍ਰਿੰਟ ਕਰੋ",
+      proFeatureReportBranding: "ਪ੍ਰਿੰਟ ਕਰਨ ਯੋਗ ਫਾਰਮਾਂ ਵਿੱਚ ਆਪਣਾ ਲੋਗੋ ਅਤੇ ਸੰਪਰਕ ਵੇਰਵੇ ਜੋੜੋ",
       signInRequired: "ਸਾਈਨ ਇਨ ਲੋੜੀਂਦਾ",
       unableToOpenLink: "ਲਿੰਕ ਨਹੀਂ ਖੁੱਲ੍ਹ ਸਕਿਆ",
       subscriptionActive: "ਸਬਸਕ੍ਰਿਪਸ਼ਨ ਸਰਗਰਮ",
@@ -10346,7 +10740,7 @@ const resources = {
       logo: "ਲੋਗੋ",
       uploadLogoAction: "ਲੋਗੋ ਅੱਪਲੋਡ ਕਰੋ",
       replaceLogo: "ਲੋਗੋ ਬਦਲੋ",
-      webDownloadTemplatesNote: "ਵੈੱਬ ਡਾਊਨਲੋਡ ਬਿਲਟ-ਇਨ PDF ਟੈਂਪਲੇਟ ਵਰਤਦੇ ਹਨ (ਵੈੱਬ 'ਤੇ ਅਜੇ ਲੋਗੋ/ਪਤਾ ਅਨੁਕੂਲਨ ਨਹੀਂ ਹੈ)।",
+      webDownloadTemplatesNote: "ਡਾਊਨਲੋਡ ਵਿੱਚ ਅੰਦਰੂਨੀ PDF ਟੈਂਪਲੇਟ ਵਰਤੇ ਜਾਂਦੇ ਹਨ। ਰਿਪੋਰਟ ਸੈਟਿੰਗਾਂ ਵਿੱਚ ਦਿੱਤਾ ਤੁਹਾਡਾ ਲੋਗੋ ਅਤੇ ਸੰਪਰਕ ਵੇਰਵੇ ਆਪਣੇ-ਆਪ ਜੋੜ ਦਿੱਤੇ ਜਾਂਦੇ ਹਨ।",
       downloaded: "ਡਾਊਨਲੋਡ ਹੋ ਗਿਆ",
       downloadUsLetter: "US Letter ਡਾਊਨਲੋਡ ਕਰੋ",
       filtersNotSupportedWeb: "ਫਿਲਟਰ ਅਜੇ ਵੈੱਬ 'ਤੇ ਸਮਰਥਿਤ ਨਹੀਂ ਹਨ।",
@@ -10630,21 +11024,39 @@ const resources = {
         "این قابلیت تنها برای اعضای پرو ما در نظر گرفته شده است. می‌خواهید بپیوندید؟ همین حالا ارتقا دهید و از مزایای ویژه‌ای که برای شما آماده شده بهره‌مند شوید!",
 
       unlockHealthAgePremium: "باز کردن قفل Health Age Premium",
+      exportCsv: "صدور CSV",
+
+      csvExportEmptyGroup: "این گروه گزارشی برای صدور ندارد.",
+
+      csvExportFailed: "صدور فایل CSV انجام نشد. لطفاً دوباره تلاش کنید.",
+
+      brandingLogoInvalid: "لوگوی انتخاب‌شده قابل استفاده نبود. لطفاً تصویر PNG یا JPG انتخاب کنید.",
+
+      closeDialog: "بستن",
+
+      brandingContactUnsupported: "برخی نویسه‌های اطلاعات تماس شما قابل چاپ نبودند و حذف شدند.",
+
+      dailyLimitCheckFailed: "بررسی سقف روزانه ارزیابی‌ها ممکن نشد. لطفاً دوباره تلاش کنید.",
+
+      purchasePending: "خرید دریافت شد",
+
+      purchasePendingDesc: "خرید شما انجام شد، اما هنوز نتوانستیم آن را با سرور تأیید کنیم. پس از تأیید، پرمیوم فعال می‌شود. برای تلاش دوباره «تازه‌سازی وضعیت» را بزنید.",
+
       premiumSubtitle: "با ابزارها و قابلیت‌های گزارش‌دهی ویژه، بیشترین بهره را از ارزیابی‌های سلامت خود ببرید.",
       unlimitedAssessmentsTitle: "ارزیابی‌های سلامت نامحدود",
       unlimitedAssessmentsDesc: "ارزیابی‌های نامحدود سن سلامت را بدون محدودیت روزانه رایگان انجام دهید.",
       assessmentHistoryTitle: "تاریخچه ارزیابی‌ها",
-      assessmentHistoryDesc: "نتایج ارزیابی‌های قبلی خود را ذخیره و دوباره بررسی کنید.",
+      assessmentHistoryDesc: "نتایج قبلی را روی این دستگاه ذخیره کنید، دوباره ببینید و در گروه‌ها سازمان‌دهی کنید.",
       organizedReportHistoryTitle: "تاریخچه گزارش‌های سازمان‌یافته",
       organizedReportHistoryDesc: "به گزارش‌های ذخیره‌شده دسترسی پیدا کرده و آن‌ها را در گروه‌ها مرتب کنید.",
       csvExportTitle: "خروجی CSV",
-      csvExportDesc: "داده‌های ارزیابی و گزارش را برای سوابق خود به CSV صادر کنید.",
-      printHealthReportsTitle: "چاپ گزارش‌های سلامت",
-      printHealthReportsDesc: "با استفاده از قابلیت‌های موجود، گزارش‌های سلامت خود را چاپ یا به اشتراک بگذارید.",
+      csvExportDesc: "گروهی از گزارش‌های ذخیره‌شده را به فایل CSV صادر کنید.",
+      printHealthReportsTitle: "فرم گزارش سلامت قابل چاپ",
+      printHealthReportsDesc: "یک فرم گزارش سلامت خالی را برای پر کردن دستی چاپ کنید.",
       printableQuestionnaireTitle: "پرسشنامه قابل چاپ",
       printableQuestionnaireDesc: "به پرسشنامه ارزیابی سلامت قابل چاپ دسترسی داشته باشید.",
       personalizedReportBrandingTitle: "شخصی‌سازی برند گزارش‌ها",
-      personalizedReportBrandingDesc: "لوگو و اطلاعات تماس خود را در گزارش‌های چاپ‌شده پیکربندی کنید.",
+      personalizedReportBrandingDesc: "لوگو و اطلاعات تماس خود را به فرم‌های قابل چاپ اضافه کنید.",
       annualSubscriptionSub: "اشتراک سالانه پریمیوم",
       autoRenewTerms: "به طور خودکار سالانه تمدید می‌شود مگر اینکه حداقل ۲۴ ساعت قبل از پایان دوره در تنظیمات فروشگاه لغو شود. لغو در هر زمان.",
       upgradeToPremium: "ارتقا به پریمیوم",
@@ -10764,8 +11176,8 @@ const resources = {
       proFeatureUnlimitedAssessments: "ارزیابی‌های نامحدود Health Age",
       proFeatureReportHistory: "تاریخچه گزارش‌ها و گروه‌ها",
       proFeatureCsvExport: "خروجی CSV",
-      proFeaturePrinting: "چاپ پرسشنامه‌ها و گزارش‌ها",
-      proFeatureReportBranding: "افزودن لوگو و اطلاعات تماس خود به گزارش‌های چاپ‌شده",
+      proFeaturePrinting: "چاپ پرسشنامه و فرم‌های گزارش سلامت خالی",
+      proFeatureReportBranding: "افزودن لوگو و اطلاعات تماس به فرم‌های قابل چاپ",
       signInRequired: "ورود لازم است",
       unableToOpenLink: "امکان باز کردن پیوند نیست",
       subscriptionActive: "اشتراک فعال است",
@@ -10822,7 +11234,7 @@ const resources = {
       logo: "لوگو",
       uploadLogoAction: "بارگذاری لوگو",
       replaceLogo: "جایگزینی لوگو",
-      webDownloadTemplatesNote: "دانلودهای وب از قالب‌های PDF داخلی استفاده می‌کنند (هنوز شخصی‌سازی لوگو/نشانی در وب موجود نیست).",
+      webDownloadTemplatesNote: "دانلودها از قالب‌های PDF داخلی استفاده می‌کنند. لوگو و اطلاعات تماس شما از تنظیمات گزارش به‌طور خودکار اضافه می‌شود.",
       downloaded: "دانلود شد",
       downloadUsLetter: "دانلود US Letter",
       filtersNotSupportedWeb: "فیلترها هنوز در وب پشتیبانی نمی‌شوند.",
@@ -11102,21 +11514,39 @@ const resources = {
         "یہ سہولت صرف ہمارے پرو ممبرز کے لیے مخصوص ہے۔ شامل ہونا چاہتے ہیں؟ ابھی اپ گریڈ کریں اور خاص طور پر آپ کے لیے تیار کردہ فوائد سے لطف اٹھائیں!",
 
       unlockHealthAgePremium: "Health Age Premium انلاک کریں",
+      exportCsv: "CSV ایکسپورٹ کریں",
+
+      csvExportEmptyGroup: "اس گروپ میں ایکسپورٹ کرنے کے لیے کوئی رپورٹ نہیں ہے۔",
+
+      csvExportFailed: "CSV فائل ایکسپورٹ نہیں ہو سکی۔ براہ کرم دوبارہ کوشش کریں۔",
+
+      brandingLogoInvalid: "منتخب کردہ لوگو استعمال نہیں ہو سکا۔ براہ کرم PNG یا JPG تصویر منتخب کریں۔",
+
+      closeDialog: "بند کریں",
+
+      brandingContactUnsupported: "آپ کی رابطہ تفصیلات کے کچھ حروف پرنٹ نہیں ہو سکے اور چھوڑ دیے گئے۔",
+
+      dailyLimitCheckFailed: "آپ کی یومیہ تشخیص کی حد کی جانچ نہیں ہو سکی۔ براہ کرم دوبارہ کوشش کریں۔",
+
+      purchasePending: "خریداری موصول ہو گئی",
+
+      purchasePendingDesc: "آپ کی خریداری مکمل ہو گئی، لیکن ہم ابھی اسے اپنے سرور سے تصدیق نہیں کر سکے۔ تصدیق کے بعد پریمیم کھل جائے گا۔ دوبارہ کوشش کے لیے “اسٹیٹس ریفریش کریں” دبائیں۔",
+
       premiumSubtitle: "پریمیم ٹولز اور رپورٹنگ کی خصوصیات کے ساتھ اپنی صحت کے جائزوں سے بھرپور فائدہ اٹھائیں۔",
       unlimitedAssessmentsTitle: "صحت کے لامحدود جائزے",
       unlimitedAssessmentsDesc: "مفت روزانہ کی حد کے بغیر لامحدود ہیلتھ ایج جائزے انجام دیں۔",
       assessmentHistoryTitle: "جائزوں کی تاریخ",
-      assessmentHistoryDesc: "اپنے پچھلے جائزوں کے نتائج محفوظ کریں اور دوبارہ دیکھیں۔",
+      assessmentHistoryDesc: "پچھلے نتائج اس ڈیوائس پر محفوظ کریں، دوبارہ دیکھیں اور انہیں گروپس میں منظم کریں۔",
       organizedReportHistoryTitle: "منظم رپورٹ کی تاریخ",
       organizedReportHistoryDesc: "اپنی محفوظ شدہ رپورٹس تک رسائی حاصل کریں اور انہیں گروپس میں منظم کریں۔",
       csvExportTitle: "CSV ایکسپورٹ",
-      csvExportDesc: "اپنے ریکارڈ کے لیے جائزوں اور رپورٹ کے ڈیٹا کو CSV میں ایکسپورٹ کریں۔",
-      printHealthReportsTitle: "صحت کی رپورٹس پرنٹ کریں",
-      printHealthReportsDesc: "موجودہ رپورٹنگ فیچر کا استعمال کرتے ہوئے اپنی رپورٹس پرنٹ یا شیئر کریں۔",
+      csvExportDesc: "محفوظ شدہ رپورٹس کے ایک گروپ کو CSV فائل میں ایکسپورٹ کریں۔",
+      printHealthReportsTitle: "قابلِ پرنٹ ہیلتھ رپورٹ فارم",
+      printHealthReportsDesc: "ہاتھ سے بھرنے کے لیے خالی ہیلتھ رپورٹ فارم پرنٹ کریں۔",
       printableQuestionnaireTitle: "پرنٹ کے قابل سوالنامہ",
       printableQuestionnaireDesc: "پرنٹ کے قابل صحت کے جائزے کے سوالنامے تک رسائی حاصل کریں۔",
       personalizedReportBrandingTitle: "ذاتی نوعیت کی رپورٹ برانڈنگ",
-      personalizedReportBrandingDesc: "پرنٹ شدہ رپورٹس پر اپنا لوگو اور رابطے کی تفصیلات ترتیب دیں۔",
+      personalizedReportBrandingDesc: "قابلِ پرنٹ فارمز میں اپنا لوگو اور رابطے کی تفصیلات شامل کریں۔",
       annualSubscriptionSub: "سالانہ پریمیم سبسکرپشن",
       autoRenewTerms: "ہر سال خودکار طور پر تجدید ہوتی ہے جب تک کہ مدت ختم ہونے سے کم از کم 24 گھنٹے پہلے منسوخ نہ کی جائے۔ کسی بھی وقت منسوخ کریں۔",
       upgradeToPremium: "پریمیم میں اپ گریڈ کریں",
@@ -11236,8 +11666,8 @@ const resources = {
       proFeatureUnlimitedAssessments: "لامحدود Health Age جائزے",
       proFeatureReportHistory: "رپورٹ کی تاریخ اور گروپس",
       proFeatureCsvExport: "CSV ایکسپورٹ",
-      proFeaturePrinting: "سوالنامے اور رپورٹس پرنٹ کرنا",
-      proFeatureReportBranding: "پرنٹ شدہ رپورٹس میں اپنا لوگو اور رابطہ کی معلومات شامل کریں",
+      proFeaturePrinting: "خالی سوالنامہ اور ہیلتھ رپورٹ فارم پرنٹ کریں",
+      proFeatureReportBranding: "قابلِ پرنٹ فارمز میں اپنا لوگو اور رابطے کی تفصیلات شامل کریں",
       signInRequired: "سائن ان درکار ہے",
       unableToOpenLink: "لنک نہیں کھل سکا",
       subscriptionActive: "سبسکرپشن فعال",
@@ -11294,7 +11724,7 @@ const resources = {
       logo: "لوگو",
       uploadLogoAction: "لوگو اپ لوڈ کریں",
       replaceLogo: "لوگو تبدیل کریں",
-      webDownloadTemplatesNote: "ویب ڈاؤن لوڈز بلٹ ان PDF ٹیمپلیٹس استعمال کرتے ہیں (ویب پر ابھی لوگو/پتہ حسب ضرورت بنانا دستیاب نہیں)۔",
+      webDownloadTemplatesNote: "ڈاؤن لوڈ میں بلٹ اِن PDF ٹیمپلیٹس استعمال ہوتے ہیں۔ رپورٹ سیٹنگز میں دیا گیا آپ کا لوگو اور رابطے کی تفصیلات خود بخود شامل ہو جاتی ہیں۔",
       downloaded: "ڈاؤن لوڈ ہو گیا",
       downloadUsLetter: "US Letter ڈاؤن لوڈ کریں",
       filtersNotSupportedWeb: "فلٹرز ابھی ویب پر معاون نہیں ہیں۔",
@@ -11575,21 +12005,39 @@ const resources = {
         "תכונה זו שמורה לחברי הפרו שלנו. רוצה להצטרף? שדרג עכשיו ותיהנה מהטבות בלעדיות שהותאמו במיוחד עבורך!",
 
       unlockHealthAgePremium: "שחרור Health Age Premium",
+      exportCsv: "ייצוא CSV",
+
+      csvExportEmptyGroup: "אין בקבוצה זו דוחות לייצוא.",
+
+      csvExportFailed: "לא ניתן היה לייצא את קובץ ה-CSV. נסו שוב.",
+
+      brandingLogoInvalid: "לא ניתן היה להשתמש בלוגו שנבחר. בחרו תמונת PNG או JPG.",
+
+      closeDialog: "סגירה",
+
+      brandingContactUnsupported: "חלק מהתווים בפרטי הקשר שלכם אינם ניתנים להדפסה והושמטו.",
+
+      dailyLimitCheckFailed: "לא ניתן היה לבדוק את מגבלת ההערכות היומית שלכם. נסו שוב.",
+
+      purchasePending: "הרכישה התקבלה",
+
+      purchasePendingDesc: "הרכישה שלכם הושלמה, אך עדיין לא הצלחנו לאשר אותה מול השרת. פרימיום ייפתח לאחר האישור. הקישו על “רענון סטטוס” כדי לנסות שוב.",
+
       premiumSubtitle: "הפק את המרב מהערכות הבריאות שלך עם כלי פרימיום ודוחות מתקדמים.",
       unlimitedAssessmentsTitle: "הערכות בריאות ללא הגבלה",
       unlimitedAssessmentsDesc: "בצע הערכות גיל בריאות ללא הגבלה וללא מגבלה יומית חינמית.",
       assessmentHistoryTitle: "היסטוריית הערכות",
-      assessmentHistoryDesc: "שמור ועיין מחדש בתוצאות ההערכה הקודמות שלך.",
+      assessmentHistoryDesc: "שמרו תוצאות קודמות במכשיר זה, חזרו אליהן וארגנו אותן בקבוצות.",
       organizedReportHistoryTitle: "היסטוריית דוחות מאורגנת",
       organizedReportHistoryDesc: "גש לדוחות השמורים שלך וארגן אותם בקבוצות.",
       csvExportTitle: "ייצוא ל-CSV",
-      csvExportDesc: "ייצא נתוני הערכות ודוחות לקובץ CSV עבור התיעוד שלך.",
-      printHealthReportsTitle: "הדפסת דוחות בריאות",
-      printHealthReportsDesc: "הדפס או שתף את דוחות הבריאות שלך באמצעות הפונקציונליות הקיימת.",
+      csvExportDesc: "ייצאו קבוצת דוחות שמורים לקובץ CSV.",
+      printHealthReportsTitle: "טופס דוח בריאות להדפסה",
+      printHealthReportsDesc: "הדפיסו טופס דוח בריאות ריק למילוי ידני.",
       printableQuestionnaireTitle: "שאלון להדפסה",
       printableQuestionnaireDesc: "גש לשאלון הערכת הבריאות הניתן להדפסה.",
       personalizedReportBrandingTitle: "מיתוג דוחות בהתאמה אישית",
-      personalizedReportBrandingDesc: "הגדר לוגו ופרטי קשר שיופיעו בדוחות המודפסים.",
+      personalizedReportBrandingDesc: "הוסיפו את הלוגו ופרטי הקשר שלכם לטפסים להדפסה.",
       annualSubscriptionSub: "מנוי פרימיום שנתי",
       autoRenewTerms: "מתחדש אוטומטית מדי שנה אלא אם יבוטל בהגדרות החנות לפחות 24 שעות לפני סיום התקופה. ניתן לבטל בכל עת.",
       upgradeToPremium: "שדרג ל-Premium",
@@ -11709,8 +12157,8 @@ const resources = {
       proFeatureUnlimitedAssessments: "הערכות Health Age ללא הגבלה",
       proFeatureReportHistory: "היסטוריית דוחות וקבוצות",
       proFeatureCsvExport: "ייצוא ל-CSV",
-      proFeaturePrinting: "הדפסת שאלונים ודוחות",
-      proFeatureReportBranding: "הוספת הלוגו ופרטי הקשר שלך לדוחות מודפסים",
+      proFeaturePrinting: "הדפסת שאלונים וטפסי דוח בריאות ריקים",
+      proFeatureReportBranding: "הוספת לוגו ופרטי קשר לטפסים להדפסה",
       signInRequired: "נדרשת התחברות",
       unableToOpenLink: "לא ניתן לפתוח את הקישור",
       subscriptionActive: "המנוי פעיל",
@@ -11767,7 +12215,7 @@ const resources = {
       logo: "לוגו",
       uploadLogoAction: "העלאת לוגו",
       replaceLogo: "החלפת לוגו",
-      webDownloadTemplatesNote: "הורדות באינטרנט משתמשות בתבניות ה-PDF המובנות (אין עדיין התאמה אישית של לוגו/כתובת באינטרנט).",
+      webDownloadTemplatesNote: "ההורדות משתמשות בתבניות ה-PDF המובנות. הלוגו ופרטי הקשר שלכם מהגדרות הדוח מתווספים אוטומטית.",
       downloaded: "הורד",
       downloadUsLetter: "הורדת US Letter",
       filtersNotSupportedWeb: "המסננים אינם נתמכים עדיין באינטרנט.",

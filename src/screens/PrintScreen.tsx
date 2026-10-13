@@ -2,7 +2,7 @@ import { Alert, Image, Platform, StyleSheet, TouchableOpacity, View } from "reac
 import React, { useCallback } from "react";
 import Button from "../components/Button";
 import * as FileSystem from "expo-file-system";
-import { PDFDocument, rgb } from "pdf-lib";
+import { brandTemplatePdf } from "../components/utils/pdfBranding";
 import { Asset } from "expo-asset";
 import { icons } from "../components/images";
 import Font from "../components/CustomisedFont";
@@ -312,7 +312,9 @@ const PrintScreen: React.FC<PrintScreenProps> = ({ navigation, route }) => {
     return templates[paperSize][language] ?? templates[paperSize].en;
   };
 
-  const buildCustomizedPdf = async (paperSize: PaperSize): Promise<string> => {
+  const buildCustomizedPdf = async (
+    paperSize: PaperSize
+  ): Promise<{ path: string; warnings: string[] }> => {
     const templateModule = getTemplateAsset(paperSize);
     const templateAsset = Asset.fromModule(templateModule);
     await templateAsset.downloadAsync();
@@ -325,50 +327,29 @@ const PrintScreen: React.FC<PrintScreenProps> = ({ navigation, route }) => {
       encoding: FileSystem.EncodingType.Base64,
     });
 
-    const pdfDoc = await PDFDocument.load(base64Template);
-    const firstPage = pdfDoc.getPages()[0];
-
+    let logoBase64: string | null = null;
+    let logoReadFailed = false;
     if (customReport.imageUri) {
       try {
-        const imgBytes = await FileSystem.readAsStringAsync(customReport.imageUri, {
+        logoBase64 = await FileSystem.readAsStringAsync(customReport.imageUri, {
           encoding: FileSystem.EncodingType.Base64,
         });
-
-        let image;
-        try {
-          image = await pdfDoc.embedPng(imgBytes);
-        } catch {
-          image = await pdfDoc.embedJpg(imgBytes);
-        }
-
-        firstPage.drawImage(image, {
-          x: 5,
-          y: 0,
-          width: 30,
-          height: 30,
-        });
       } catch (error) {
-        console.error("Failed to embed logo:", error);
+        console.warn("Failed to read logo file:", error);
+        logoReadFailed = true;
       }
     }
 
-    const contactLine = [customReport.address, customReport.phoneNumber]
-      .map((value) => value?.trim())
-      .filter(Boolean)
-      .join("  |  ");
+    const branded = await brandTemplatePdf(base64Template, {
+      logo: logoBase64,
+      address: customReport.address,
+      phoneNumber: customReport.phoneNumber,
+    });
+    const modifiedPdfBytes = branded.bytes;
+    const warnings: string[] = [];
+    if (logoReadFailed || branded.logoFailed) warnings.push(t("brandingLogoInvalid"));
+    if (branded.contactCharsDropped) warnings.push(t("brandingContactUnsupported"));
 
-    if (contactLine) {
-      firstPage.drawText(contactLine, {
-        x: 70,
-        y: 15,
-        size: 10,
-        color: rgb(0, 0, 0),
-        maxWidth: 430,
-        lineHeight: 12,
-      });
-    }
-
-    const modifiedPdfBytes = await pdfDoc.save();
     const outputFileName =
       `${docType.toLowerCase()}_${paperSize.toLowerCase()}_${language}_${Date.now()}.pdf`;
     const outputPath = `${FileSystem.documentDirectory}${outputFileName}`;
@@ -377,7 +358,7 @@ const PrintScreen: React.FC<PrintScreenProps> = ({ navigation, route }) => {
       encoding: FileSystem.EncodingType.Base64,
     });
 
-    return outputPath;
+    return { path: outputPath, warnings };
   };
 
   const saveOrSharePdf = async (pdfPath: string) => {
@@ -425,9 +406,13 @@ const PrintScreen: React.FC<PrintScreenProps> = ({ navigation, route }) => {
 
   const handleGenerate = async (paperSize: PaperSize) => {
     try {
-      const outputPath = await buildCustomizedPdf(paperSize);
+      const { path: outputPath, warnings } = await buildCustomizedPdf(paperSize);
       await saveOrSharePdf(outputPath);
       setDownloadModal(false);
+      if (warnings.length) {
+        // The PDF was still produced; tell the user which branding was left out.
+        Alert.alert(t("Error"), warnings.join("\n"));
+      }
     } catch (error) {
       console.error("PDF generation failed:", error);
       Alert.alert(t("Error"));

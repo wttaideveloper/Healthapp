@@ -228,6 +228,10 @@ const InterestScreen: React.FC<InterestScreenProps> = ({
 
   const handleCalculate = async () => {
     const limitStatus = await getDailyLimitStatus(Boolean(isSubscribed));
+    if (!limitStatus.allowed && limitStatus.countUnavailable) {
+      Alert.alert(t("Error"), t("dailyLimitCheckFailed"));
+      return;
+    }
     if (!limitStatus.allowed) {
       Alert.alert(
         `${t("dailyLimit")} : ${limitStatus.used}/${FREE_DAILY_TASK_LIMIT}`,

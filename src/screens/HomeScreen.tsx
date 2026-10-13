@@ -77,14 +77,23 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     }, [])
   );
 
-  const onStartAssessment = () => {
+  const onStartAssessment = async () => {
     if (hasPremium) {
       navigation.navigate("healthAgeTest");
       return;
     }
 
-    if (count < FREE_DAILY_TASK_LIMIT) {
+    // Re-read the count so a stale value (or a failed read) can never grant access.
+    const status = await getDailyLimitStatus(false);
+    setCount(status.used);
+
+    if (status.allowed) {
       navigation.navigate("healthAgeTest");
+      return;
+    }
+
+    if (status.countUnavailable) {
+      Alert.alert(t("Error"), t("dailyLimitCheckFailed"));
       return;
     }
 

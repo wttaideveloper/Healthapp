@@ -1,5 +1,12 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import i18n from "../i18n";
+import {
+  buildCsvFileName,
+  buildReportRows,
+  CSV_BOM,
+  EmptyGroupExportError,
+  generateCSV,
+} from "./csvGenerator";
 
 // Web fallback implementation for reportService.
 // The native implementation uses SQLite. On web we use AsyncStorage for persistence and
@@ -355,6 +362,18 @@ export const getTodayReportCount = async (): Promise<number> => {
   return reports.filter((r) => r.date === today).length;
 };
 
+// Metro resolves "./reportService" to this file on web, so every export that usageLimit.ts imports
+// from reportService.ts must exist here too. Returns null (never 0) when the count cannot be read
+// so the free-tier limit fails closed.
+export const getTodayReportCountOrNull = async (): Promise<number | null> => {
+  try {
+    return await getTodayReportCount();
+  } catch (error) {
+    console.warn("Error fetching today's report count:", error);
+    return null;
+  }
+};
+
 export const getAllReports = async (
   filters: { name?: string; fromDate?: string; toDate?: string; gender?: string } = {},
   limit: number = 10,
@@ -504,10 +523,30 @@ export const updatePhoneNumber = async (phoneNumber: string) => saveSettings(nul
 export const updateAddress = async (address: string) => saveSettings(null, null, address);
 
 export const exportGroupReportsToCSV = async (
-  _groupId: string,
-  _groupName: string
+  groupId: string,
+  groupName: string
 ): Promise<string> => {
-  throw new Error("CSV export is not supported on web yet.");
+  const reports = await getReportsByGroup(groupId);
+  if (!reports.length) {
+    throw new EmptyGroupExportError();
+  }
+
+  const csv = CSV_BOM + generateCSV(buildReportRows(reports));
+  const fileName = buildCsvFileName(groupName);
+
+  if (typeof document === "undefined" || typeof Blob === "undefined") {
+    throw new Error("CSV download is not available in this environment.");
+  }
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  return fileName;
 };
 
 export const getTotalReportCount = async () => {

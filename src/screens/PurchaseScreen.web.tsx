@@ -21,6 +21,7 @@ import {
 } from "../components/utils/purchase";
 import { PRIVACY_POLICY_URL, TERMS_OF_USE_URL } from "../components/utils/legal";
 import { useTranslation } from "react-i18next";
+import { PRO_FEATURE_KEYS } from "../components/proFeatures";
 
 const PENDING_STRIPE_CHECKOUT_KEY = "pending_stripe_checkout_started_at";
 
@@ -224,22 +225,12 @@ const PurchaseScreenWeb: React.FC = () => {
                 {/* Left Column: Benefits (The "Why") */}
                 <View style={styles.card}>
                     <Text style={styles.cardTitle}>{t("proFeatures")}</Text>
-                    <View style={styles.featureRow}>
-                        <Text style={styles.check}>✓</Text>
-                        <Text style={styles.featureText}>{t("unlimitedDailyAssessments")}</Text>
-                    </View>
-                    <View style={styles.featureRow}>
-                        <Text style={styles.check}>✓</Text>
-                        <Text style={styles.featureText}>{t("detailedBiomarkerAnalysis")}</Text>
-                    </View>
-                    <View style={styles.featureRow}>
-                        <Text style={styles.check}>✓</Text>
-                        <Text style={styles.featureText}>{t("pdfReportExports")}</Text>
-                    </View>
-                    <View style={styles.featureRow}>
-                        <Text style={styles.check}>✓</Text>
-                        <Text style={styles.featureText}>{t("prioritySupport")}</Text>
-                    </View>
+                    {PRO_FEATURE_KEYS.map((key) => (
+                        <View key={key} style={styles.featureRow}>
+                            <Text style={styles.check}>✓</Text>
+                            <Text style={styles.featureText}>{t(key)}</Text>
+                        </View>
+                    ))}
                 </View>
 
                 {/* Middle Column: Subscription (The "Action") */}

@@ -21,6 +21,21 @@ type SettingsShape = {
   address?: string | null;
 };
 
+const toPersistentLogoUri = async (uri: string): Promise<string> => {
+  if (!uri.startsWith("blob:")) return uri;
+  try {
+    const blob = await (await fetch(uri)).blob();
+    return await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result));
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(blob);
+    });
+  } catch {
+    return uri;
+  }
+};
+
 const ReportSettingsWeb: React.FC = () => {
   const { t } = useTranslation();
   const [logoUri, setLogoUri] = useState<string | null>(null);
@@ -56,7 +71,9 @@ const ReportSettingsWeb: React.FC = () => {
     });
 
     if (!result.canceled) {
-      setLogoUri(result.assets[0].uri);
+      const picked = result.assets[0];
+      // blob: URLs die on reload; persist the logo as a data URL so branding survives.
+      setLogoUri(await toPersistentLogoUri(picked.uri));
     }
   };
 

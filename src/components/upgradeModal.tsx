@@ -56,11 +56,6 @@ const BENEFIT_ITEMS: BenefitItem[] = [
     descKey: "assessmentHistoryDesc",
   },
   {
-    icon: icons.report,
-    titleKey: "organizedReportHistoryTitle",
-    descKey: "organizedReportHistoryDesc",
-  },
-  {
     icon: icons.csv,
     titleKey: "csvExportTitle",
     descKey: "csvExportDesc",
@@ -146,14 +141,28 @@ const UpgradeModal: React.FC<upgradeModalProps> = ({
         return;
       }
 
+      let syncFailed = false;
       if (accessToken) {
-        await syncRevenueCatStatusToBackend(
-          accessToken,
-          user?.id ?? null,
-          "restore"
-        );
+        try {
+          await syncRevenueCatStatusToBackend(
+            accessToken,
+            user?.id ?? null,
+            "restore"
+          );
+        } catch (syncError) {
+          logStoreError("restoreModalSync", syncError);
+          syncFailed = true;
+        }
       }
-      await refreshSubscription(true);
+      await refreshSubscription(true).catch((refreshError) =>
+        logStoreError("restoreModalRefresh", refreshError)
+      );
+
+      if (syncFailed) {
+        // Found in the store but not confirmed by the backend: keep the modal open, no success claim.
+        Alert.alert(t("restorePending"), t("restorePendingDesc"));
+        return;
+      }
 
       Alert.alert(t("restoreComplete"), t("restoreCompleteDesc"));
       onClose();

@@ -39,21 +39,11 @@ import {
 } from "../components/utils/purchase";
 import { PRIVACY_POLICY_URL, TERMS_OF_USE_URL } from "../components/utils/legal";
 import { useTranslation } from "react-i18next";
+import { PRO_FEATURE_KEYS } from "../components/proFeatures";
 
 const FALLBACK_PLAN_PRICE = "$49/year";
 const FALLBACK_PLAN_DESCRIPTION = "Annual Pro subscription";
 
-// Guideline 3.1.2(c): the subscription must disclose what it actually
-// unlocks. Each key maps to a confirmed Premium-gated feature (see
-// BottomTabNavigator.tsx, CustomDrawer.tsx, HistoryScreen.tsx) — do not add
-// entries here that aren't backed by real gated functionality.
-const PRO_FEATURE_KEYS = [
-  "proFeatureUnlimitedAssessments",
-  "proFeatureReportHistory",
-  "proFeatureCsvExport",
-  "proFeaturePrinting",
-  "proFeatureReportBranding",
-] as const;
 
 const formatDate = (value: Date | null): string | null => {
   if (!value) return null;
@@ -361,11 +351,23 @@ const PurchaseScreen: React.FC = () => {
       await purchaseSubscription(packages, selectedPackageIdentifier);
       // Only signed-in users have a backend entitlement to sync to. Anonymous
       // purchases are carried by RevenueCat and picked up by refreshSubscription.
-      const syncedStatus = accessToken
-        ? await syncRevenueCatStatusToBackend(accessToken, user?.id ?? null, "purchase")
-        : null;
-      await refreshSubscription(true);
-      if (syncedStatus?.isValid || !accessToken) {
+      // The store charge has already succeeded here. If the backend cannot confirm it (for
+      // example HTTP 503 REVENUECAT_VERIFICATION_UNAVAILABLE) Premium stays locked, and we say so
+      // instead of reporting a failed purchase. "Refresh Status" is the retry path.
+      let syncedStatus: Awaited<ReturnType<typeof syncRevenueCatStatusToBackend>> = null;
+      let syncFailed = false;
+      if (accessToken) {
+        try {
+          syncedStatus = await syncRevenueCatStatusToBackend(accessToken, user?.id ?? null, "purchase");
+        } catch (syncError) {
+          logStoreError("subscribe-sync", syncError);
+          syncFailed = true;
+        }
+      }
+      await refreshSubscription(true).catch((refreshError) => logStoreError("subscribe-refresh", refreshError));
+      if (syncFailed) {
+        Alert.alert(t("purchasePending"), t("purchasePendingDesc"));
+      } else if (syncedStatus?.isValid || !accessToken) {
         Alert.alert(t("UpgradeComplete"), t("subscriptionActiveUnlocked"));
       } else {
         Alert.alert(t("purchaseSynced"), t("purchaseSyncedDesc"));
@@ -413,12 +415,22 @@ const PurchaseScreen: React.FC = () => {
         return;
       }
 
-      const syncedStatus = accessToken
-        ? await syncRevenueCatStatusToBackend(accessToken, user?.id ?? null, "restore")
-        : null;
-      await refreshSubscription(true);
+      let syncedStatus: Awaited<ReturnType<typeof syncRevenueCatStatusToBackend>> = null;
+      let syncFailed = false;
+      if (accessToken) {
+        try {
+          syncedStatus = await syncRevenueCatStatusToBackend(accessToken, user?.id ?? null, "restore");
+        } catch (syncError) {
+          logStoreError("restore-sync", syncError);
+          syncFailed = true;
+        }
+      }
+      await refreshSubscription(true).catch((refreshError) => logStoreError("restore-refresh", refreshError));
 
-      if (syncedStatus?.isValid || restoredStatus.isValid) {
+      if (syncFailed) {
+        // Found in the store but not confirmed by the backend: do not claim success.
+        Alert.alert(t("restorePending"), t("restorePendingDesc"));
+      } else if (syncedStatus?.isValid || restoredStatus.isValid) {
         Alert.alert(t("restoreComplete"), t("restoreCompleteDesc"));
       } else {
         Alert.alert(

@@ -8,6 +8,7 @@ import {
   View,
 } from "react-native";
 import { DrawerContentComponentProps } from "@react-navigation/drawer";
+import { useTranslation } from "react-i18next";
 import { icons } from "./images";
 import Font from "./CustomisedFont";
 import UpgradeModal from "./upgradeModal";
@@ -19,6 +20,7 @@ import { startEnd } from "./utils/rtl";
 export const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (
   props
 ) => {
+  const { t } = useTranslation();
   const { isSubscribed } = useSubscription();
   const { signOut, user, isAuthenticated } = useAuth();
   const hasPremium = isSubscribed;
