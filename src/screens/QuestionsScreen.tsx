@@ -478,7 +478,10 @@ const QuestionsScreen: React.FC<QuestionsProps> = ({ navigation, route }) => {
         style={[
           styles.navRow,
           isWebDesktop ? styles.webBottomRow : null,
-          { paddingBottom: 8 + insets.bottom },
+          // Same fix as healthAgeTest.tsx: a trailing inline paddingBottom here
+          // always wins over webBottomRow's own paddingBottom: 26, silently
+          // discarding it on desktop web.
+          { paddingBottom: (isWebDesktop ? 26 : 8) + insets.bottom },
         ]}
       >
         <TouchableOpacity

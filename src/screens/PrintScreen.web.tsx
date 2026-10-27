@@ -1,6 +1,6 @@
 import React from "react";
 import { goBackOrFallback } from "../components/utils/navigationBack";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { DrawerScreenProps } from "@react-navigation/drawer";
 import { Asset } from "expo-asset";
 import Button from "../components/Button";
@@ -366,7 +366,11 @@ const PrintScreenWeb: React.FC<PrintScreenProps> = ({ navigation, route }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.scrollView}
+      contentContainerStyle={styles.container}
+      showsVerticalScrollIndicator={false}
+    >
       <View style={styles.header}>
         <Font
           text={docType === "Report" ? "PrintReport" : "PrintQuestion"}
@@ -390,12 +394,13 @@ const PrintScreenWeb: React.FC<PrintScreenProps> = ({ navigation, route }) => {
       />
 
       <Text style={styles.note}>{t("webDownloadTemplatesNote")}</Text>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "white", paddingHorizontal: 20, paddingTop: 10 },
+  scrollView: { flex: 1, backgroundColor: "white" },
+  container: { paddingHorizontal: 20, paddingTop: 10, paddingBottom: 24, flexGrow: 1 },
   header: { marginVertical: 20, flexDirection: "row", justifyContent: "space-between" },
   headerTitle: { fontWeight: 700, fontSize: 20, color: "#262F40" },
   closeBtn: { flexDirection: "row", gap: 4, justifyContent: "center", alignItems: "center" },

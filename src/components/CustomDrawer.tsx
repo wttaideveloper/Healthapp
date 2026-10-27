@@ -138,7 +138,12 @@ export const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (
             <View style={styles.separator} />
             {e?.subTabs
               ? e?.subTabs.map((ee, index) => (
-                  <View style={{ width: "90%", marginStart: 30 }} key={index}>
+                  // `width: "90%"` plus an extra `marginStart: 30` reserved more
+                  // horizontal space than the row actually had on narrow drawers
+                  // (React Navigation's default drawer width can be as little as
+                  // ~264px), pushing content past the right edge. 100% width with
+                  // paddingStart keeps the indent inside the available box instead.
+                  <View style={{ width: "100%", paddingStart: 30 }} key={index}>
                     <TouchableOpacity
                       style={[
                         styles.drawerItem,
@@ -160,8 +165,10 @@ export const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (
                     >
                       <View
                         style={{
+                          flex: 1,
+                          minWidth: 0,
                           flexDirection: "row",
-                          justifyContent: "center",
+                          justifyContent: "flex-start",
                           alignItems: "center",
                         }}
                       >

@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Platform,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
@@ -127,7 +128,38 @@ const ChangeLanguage: React.FC<ChangeLanguageProps> = ({ navigation }) => {
     );
   }
   return (
-    <ScrollView contentContainerStyle={[styles.container, { paddingBottom: 24 + insets.bottom }]}>
+    <ScrollView
+      style={
+        [
+          styles.mobileScroll,
+          // @react-navigation/stack's CardSheet (node_modules/@react-navigation/stack/
+          // lib/module/views/Stack/CardSheet.js) deliberately drops its own `flex: 1,
+          // overflow: 'hidden'` for a full-height screen like this one, switching to
+          // `minHeight: '100%'` instead so document.body can scroll (its own comment:
+          // "necessary for mobile browsers to be able to hide address bar on scroll").
+          // But Expo's web template sets `body { overflow: hidden }` specifically so
+          // ScrollView owns all scrolling - the two assumptions conflict, leaving every
+          // ancestor (and this ScrollView) unbounded: sized to content, not viewport, so
+          // nothing ever actually overflows a box that has `overflow-y: auto`. Binding
+          // this ScrollView directly to the real viewport height side-steps that broken
+          // ancestor chain entirely. `--vh` is the same custom property CardSheet itself
+          // sets on `html` for exactly this (mobile address-bar-safe) viewport height; it
+          // falls back to plain `1vh` (i.e. this becomes plain 100vh) wherever CardSheet
+          // hasn't set it, e.g. desktop/non-touch.
+          //
+          // `height` alone is not enough: RNW's ScrollView always carries its own
+          // flex-grow/flex-shrink on the scroll node, and flex-grow can expand an
+          // item PAST an explicit `height` (height only sets the flex-basis) when
+          // the surrounding flex chain has no definite size to grow against - which
+          // is exactly this broken ancestor chain. Measured in a real headless
+          // Chromium run: with only `height` set, the node's computed height was
+          // still 1037px (= its content), not the intended 568px. `maxHeight` is
+          // clamped by the flexbox spec regardless of flex-grow, so it holds.
+          Platform.OS === "web" ? { maxHeight: "calc(var(--vh, 1vh) * 100)" } : null,
+        ] as any
+      }
+      contentContainerStyle={[styles.container, { paddingBottom: 24 + insets.bottom }]}
+    >
       <View style={{ alignSelf: "flex-start", marginBottom: 12 }}>
         <BackButton fallback={{ name: "InitialScreen" }} />
       </View>
@@ -219,8 +251,22 @@ const ChangeLanguage: React.FC<ChangeLanguageProps> = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
+  // The real fix: the ScrollView itself had no `style` prop, so it had no
+  // bounded height of its own and just grew to match its content - same as
+  // the rest of the page, since Expo's web template (dist/index.html) sets
+  // `body { overflow: hidden }` specifically so ScrollView owns all
+  // scrolling. With no bounded box, there was nothing for the browser to
+  // treat as "overflowing" and no document-level scroll to fall back on.
+  // Matches the desktop branch's own `webScroll: { flex: 1, ... }` below.
+  mobileScroll: {
     flex: 1,
+    backgroundColor: "#ffffff",
+  },
+  container: {
+    // contentContainerStyle: flexGrow (not flex) lets the content grow
+    // taller than the now-bounded ScrollView above when it doesn't fit,
+    // which is what the bounded box needs in order to actually scroll.
+    flexGrow: 1,
     flexDirection: "column",
     justifyContent: "center",
     backgroundColor: "#ffffff",

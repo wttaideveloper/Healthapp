@@ -374,5 +374,12 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     // flexDirection: "column",
     // justifyContent: "space-between",
+    // Unlike ReportSettings.web.tsx (capped at maxWidth 760), this native
+    // version had no width cap, so on the Mac Catalyst desktop-width shell
+    // (which bundles this file, not the .web.tsx one) the text inputs
+    // stretched to the full ~1180px shell width. Matches the web sibling's cap.
+    width: "100%",
+    maxWidth: 760,
+    alignSelf: "center",
   },
 });

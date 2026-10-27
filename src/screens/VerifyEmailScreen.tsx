@@ -134,6 +134,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   card: {
+    // Unlike SignIn/SignUp/ForgotPassword (which all cap their card at 420-560px),
+    // this screen had no width constraint at all, so it stretched edge-to-edge on
+    // a wide desktop window. Matches backRow's existing 420 cap above.
+    width: "100%",
+    maxWidth: 420,
+    alignSelf: "center",
     backgroundColor: "#ffffff",
     borderRadius: 16,
     padding: 18,

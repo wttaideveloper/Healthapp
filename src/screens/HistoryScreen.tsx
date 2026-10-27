@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   Alert,
   BackHandler,
+  useWindowDimensions,
 } from "react-native";
 import Font from "../components/CustomisedFont";
 import { icons } from "../components/images";
@@ -53,6 +54,7 @@ type NavigationProps = StackNavigationProp<StackParamList, "HistoryScreen">;
 const HistoryScreen: React.FC<NavigationProps> = () => {
   const navigation = useNavigation<NavigationProps>();
   const route = useRoute();
+  const { height: windowHeight } = useWindowDimensions();
   const [isModalVisible, setModalVisible] = React.useState(false);
   const [isUpgradeModalVisible, setIsUpgradeModalVisible] =
     React.useState(false);
@@ -1143,7 +1145,16 @@ const HistoryScreen: React.FC<NavigationProps> = () => {
           <View
             style={[
               styles.modalContent,
-              { ...{ height: isExistingGroupPressed ? 600 : "auto" } },
+              {
+                // A hardcoded 600 was taller than the viewport itself on small
+                // phones (e.g. 320x568) - this is a bottom-sheet modal, so the
+                // excess just pushed its top (title, search) off-screen. Capping
+                // to a fraction of the actual window height keeps it on-screen at
+                // any size while still giving the group list room to scroll.
+                height: isExistingGroupPressed
+                  ? Math.min(600, windowHeight * 0.75)
+                  : "auto",
+              },
             ]}
           >
           <Font

@@ -4,6 +4,7 @@ import {
   Image,
   Keyboard,
   KeyboardAvoidingView,
+  Modal,
   Platform,
   ScrollView,
   StyleSheet,
@@ -46,7 +47,16 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
   const fullPickerWidth = isWebDesktop
     ? 560
     : Math.max(240, width - contentGutter * 2);
+  // react-native-web has no implementation of Alert.alert - calling it is a silent
+  // no-op in a browser (no dialog, no error), which is why the Home button appeared
+  // unresponsive on web: this was the only path it took at step 1. Native keeps the
+  // platform Alert it already had; web shows the in-app modal declared below instead.
+  const [showExitConfirm, setShowExitConfirm] = React.useState(false);
   const confirmExit = () => {
+    if (Platform.OS === "web") {
+      setShowExitConfirm(true);
+      return;
+    }
     Alert.alert(
       t("leavePage"),
       t("leavePageConfirmation"),
@@ -420,7 +430,9 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
           ></Font>
           <View
             style={{
-              height: 300,
+              // Was a fixed height: 300 around 136px-tall cards, leaving ~164px of
+              // dead whitespace below them on every screen size. Sizing to content
+              // removes the gap without changing how the cards themselves look.
               flexDirection: "row",
               justifyContent: "center",
               alignItems: "flex-start",
@@ -2039,7 +2051,10 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
           style={[
             styles.navRow,
             isWebDesktop ? styles.webBottomRow : null,
-            { paddingBottom: 8 + insets.bottom },
+            // This paddingBottom always wins (last entry in the array), which was
+            // silently discarding webBottomRow's own paddingBottom: 26 on desktop web.
+            // Picking the base per-platform instead of a hardcoded 8 keeps both intents.
+            { paddingBottom: (isWebDesktop ? 26 : 8) + insets.bottom },
           ]}
         >
           <TouchableOpacity
@@ -2168,6 +2183,36 @@ const HealthAgeTest: React.FC<HealthAgeTestProps> = ({ navigation, route }) => {
         </View>
       </View>
     </View>
+    <Modal
+      transparent
+      visible={showExitConfirm}
+      animationType="fade"
+      onRequestClose={() => setShowExitConfirm(false)}
+    >
+      <View style={styles.exitConfirmOverlay}>
+        <View style={styles.exitConfirmCard}>
+          <Font text="leavePage" style={styles.exitConfirmTitle} />
+          <Font text="leavePageConfirmation" style={styles.exitConfirmMessage} />
+          <View style={styles.exitConfirmActions}>
+            <TouchableOpacity
+              style={styles.exitConfirmCancelBtn}
+              onPress={() => setShowExitConfirm(false)}
+            >
+              <Font text="Hs_Cancel" style={styles.exitConfirmCancelText} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.exitConfirmHomeBtn}
+              onPress={() => {
+                setShowExitConfirm(false);
+                navigation.navigate("Main");
+              }}
+            >
+              <Font text="home" style={styles.exitConfirmHomeText} />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </Modal>
     </KeyboardAvoidingView>
   );
 };
@@ -2255,6 +2300,58 @@ const styles = StyleSheet.create({
     color: "#B42318",
     fontSize: 13,
     fontWeight: "600",
+  },
+  exitConfirmOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 24,
+  },
+  exitConfirmCard: {
+    width: "100%",
+    maxWidth: 360,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 20,
+  },
+  exitConfirmTitle: {
+    fontSize: 17,
+    fontWeight: "700",
+    color: "#1F2A44",
+    marginBottom: 8,
+  },
+  exitConfirmMessage: {
+    fontSize: 14,
+    color: "#475569",
+    lineHeight: 20,
+  },
+  exitConfirmActions: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    gap: 10,
+    marginTop: 20,
+  },
+  exitConfirmCancelBtn: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 999,
+  },
+  exitConfirmCancelText: {
+    color: "#64748B",
+    fontWeight: "600",
+    fontSize: 14,
+  },
+  exitConfirmHomeBtn: {
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 999,
+    backgroundColor: "#0C9FD5",
+  },
+  exitConfirmHomeText: {
+    color: "#FFFFFF",
+    fontWeight: "700",
+    fontSize: 14,
   },
   itemContainer: {
     justifyContent: "center",
