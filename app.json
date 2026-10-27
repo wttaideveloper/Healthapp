@@ -49,6 +49,9 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
+    "experiments": {
+  "baseUrl": "/app"
+},
     "plugins": [
       "expo-localization",
       "expo-sqlite",
