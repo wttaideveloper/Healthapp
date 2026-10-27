@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import AppNavigator from "./src/navigation/AppNavigator";
+import { buildLinkingConfig } from "./src/navigation/linking";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { SubscriptionProvider } from "./src/context/subScriptionContext";
 import { AuthProvider } from "./src/context/authContext";
@@ -20,30 +21,7 @@ const App: React.FC = () => {
   const bootStartRef = React.useRef<number>(Date.now());
 
   const linking = React.useMemo(
-    () => ({
-      prefixes: [],
-      config: {
-        screens: {
-          InitialScreen: {
-            path: "",
-            screens: {
-              Main: "",
-              Purchase: "purchase",
-              HistoryScreen: "history",
-              AboutAppScreen: "about",
-              ReportSettings: "report-settings",
-              success: "success",
-              cancel: "cancel",
-            },
-          },
-          ChangeLanguage: "change-language",
-          SignIn: "signin",
-          SignUp: "signup",
-          ForgotPassword: "forgot-password",
-          VerifyEmail: "verify-email",
-        },
-      },
-    }),
+    () => buildLinkingConfig(Platform.OS === "web" && typeof window !== "undefined" ? window.location.pathname : ""),
     []
   );
 
