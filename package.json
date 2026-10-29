@@ -20,7 +20,9 @@
     "dist:win:arm64": "npm run generate:appx-assets && npm run build:web && electron-builder --win nsis --arm64",
     "dist:win:store": "npm run generate:appx-assets && npm run build:web && electron-builder --win appx --x64",
     "dist:win:store:arm64": "npm run generate:appx-assets && npm run build:web && electron-builder --win appx --arm64",
-    "dist:win:all": "npm run generate:appx-assets && npm run build:web && electron-builder --win nsis appx --x64"
+    "dist:win:all": "npm run generate:appx-assets && npm run build:web && electron-builder --win nsis appx --x64",
+    "dist:mac:arm64": "node scripts/assert-production-api.cjs && npm run build:web && electron-builder --mac dmg --arm64",
+    "dist:mac:x64": "node scripts/assert-production-api.cjs && npm run build:web && electron-builder --mac dmg --x64"
   },
   "dependencies": {
     "@expo/metro-runtime": "~5.0.5",
@@ -105,6 +107,18 @@
       "main": "electron/main.cjs",
       "dependencies": {},
       "devDependencies": {}
+    },
+    "mac": {
+      "category": "public.app-category.healthcare-fitness",
+      "target": [
+        "dmg"
+      ],
+      "icon": "build/icon.icns",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.inherit.plist",
+      "notarize": true
     },
     "win": {
       "icon": "build/icon.ico",
